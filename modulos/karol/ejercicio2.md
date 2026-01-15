@@ -1,162 +1,241 @@
-# Ejercicio 2 – Sistema de Validación y Decisión de Solicitudes
+# Ejercicio 2 - Sistema de Validación y Decisión de Solicitudes
 
-## 1. Descripción general
+## 1. Datos de entrada
 
-Este ejercicio implementa un sistema que procesa solicitudes registradas por terminal, validando la integridad de los datos, ejecutando un proceso asincrónico simulado y determinando un resultado final según reglas de negocio previamente definidas.
+El sistema recibe un objeto solicitud, el cual contiene la información necesaria para evaluar y decidir el resultado de una operación.
 
-El diseño está orientado a la modularidad, el control de errores y el uso de programación asincrónica con `async/await`.
+Cada solicitud incluye los siguientes campos:
 
----
+id (number) → Identificador numérico de la solicitud
+tipo (string) → Tipo de operación solicitada
+valor (number) → Valor asociado a la operación
+estado (boolean) → Estado actual de la solicitud
+prioridad (number entero entre 1 y 5)
 
-## 2. Objetivo del sistema
+--
 
-Garantizar que cada solicitud:
+## 2. Procesos principales
 
-* Sea validada correctamente antes de ser procesada.
-* Pase por un proceso externo simulado.
-* Obtenga un resultado coherente (APROBADA, RECHAZADA o INVÁLIDA).
-* Notifique el resultado del procesamiento.
+Validación de datos básicos
 
----
+Se verifica que los datos principales de la solicitud cumplan las reglas mínimas:
 
-## 3. Estructura de la solicitud
+El id debe ser un número válido.
+El tipo debe ser un texto no vacío.
+El valor debe ser un número válido.
+El estado debe ser de tipo booleano.
+La prioridad debe estar entre 1 y 5.
 
-La solicitud debe cumplir con la siguiente estructura:
+Si alguna validación falla, se lanza un Error con un mensaje claro y controlado.
 
-```js
-{
-  id: Number,
-  tipo: String,
-  valor: Number,
-  estado: Boolean,
-  prioridad: Number // rango de 1 a 5
-}
-```
+--
 
----
+## 3. Proceso asincrónico (Promesa)
 
-## 4. Funciones del sistema
+Se utiliza una función que retorna una Promesa para simular un proceso externo.
+El proceso se ejecuta de forma asincrónica con un retardo de 800 ms.
+Simula validaciones o procesos que podrían ocurrir en un sistema real.
+La promesa se resuelve con un mensaje de confirmación.
 
-### 4.1 `validarSolicitud(solicitud)`
+--
 
-**Tipo:** Función de validación
+## 4. Decisión del resultado (Función pura)
 
-**Descripción:**
-Verifica que los datos básicos de la solicitud sean válidos antes de continuar con el procesamiento.
+Se evalúa la solicitud aplicando reglas de negocio:
 
-**Validaciones realizadas:**
+Si el valor es menor o igual a cero, la solicitud es INVÁLIDA.
+Si el estado es false y la prioridad es menor a 3, la solicitud es RECHAZADA.
+En cualquier otro caso, la solicitud es APROBADA.
 
-* `id` debe ser numérico.
-* `tipo` debe ser texto no vacío.
-* `valor` debe ser numérico.
-* `estado` debe ser booleano.
-* `prioridad` debe estar entre 1 y 5.
+Esta función no modifica el objeto original.
+Retorna únicamente el resultado de la evaluación.
 
-**Salida:**
+--
 
-* Retorna `true` si la validación es exitosa.
-* Lanza un error si alguna validación falla.
+## 5. Notificación mediante callback
 
----
+Se utiliza una función callback para simular el envío de notificaciones.
+Genera un mensaje indicando que se ha notificado el resultado.
+El callback se ejecuta después de determinar el resultado final.
 
-### 4.2 `decidirResultado(solicitud)`
+--
 
-**Tipo:** Función pura
+## 6. Flujo principal con async/await
 
-**Descripción:**
-Determina el resultado de la solicitud sin modificar el objeto recibido.
+La función principal coordina todo el proceso:
 
-**Reglas de decisión:**
+Valida los datos de entrada.
+Ejecuta el proceso asincrónico.
+Determina el resultado mediante la función pura.
+Notifica el resultado usando el callback.
+Maneja cualquier error de forma controlada.
 
-* Si `valor <= 0` → `INVÁLIDA`
-* Si `estado` es `false` y `prioridad < 3` → `RECHAZADA`
-* En cualquier otro caso → `APROBADA`
+--
 
----
+## 7. Manejo de errores
 
-### 4.3 `notificarResultado(resultado)`
+Todo el flujo está protegido con un bloque try/catch.
+Cualquier error es capturado y devuelto de forma controlada.
+El sistema nunca se detiene por errores inesperados.
+Los mensajes de error son claros y orientados al usuario.
 
-**Tipo:** Callback
+--
 
-**Descripción:**
-Simula el envío de una notificación posterior al procesamiento de la solicitud.
+## 8. Datos de salida
 
-**Salida:**
+El sistema retorna un objeto de resultado con la información del procesamiento:
 
-* Retorna un mensaje de notificación en texto.
+id → ID de la solicitud procesada
+resultado → "APROBADA", "RECHAZADA", "INVÁLIDA" o "ERROR"
+notificacion → Mensaje de notificación generado
+mensaje → Detalle del error (solo en caso de ERROR)
 
----
+Ejemplos de salida:
 
-### 4.4 `procesoAsincronico()`
+Solicitud aprobada correctamente.
+Solicitud rechazada por estado inactivo y baja prioridad.
+Solicitud inválida por valor no permitido.
+Error controlado por datos mal tipados.
 
-**Tipo:** Promesa
+--
 
-**Descripción:**
-Simula un proceso externo asincrónico con un retardo de 800 ms.
+## 9. Casos de prueba
 
-**Salida:**
+### Caso 1: Solicitud aprobada - todos los criterios cumplidos
 
-* Resuelve la promesa con un mensaje de confirmación.
+Datos de entrada:
+id: 1
+tipo: "Permiso especial"
+valor: 100
+estado: true
+prioridad: 4
 
----
+Resultado esperado:
+id: 1
+resultado: "APROBADA"
+notificacion: "Notificación enviada: APROBADA"
 
-### 4.5 `procesarSolicitudEj2(solicitud)`
+--
 
-**Tipo:** Función principal (`async/await`)
+### Caso 2: Solicitud rechazada - estado false y prioridad baja
 
-**Descripción:**
-Controla el flujo completo del sistema:
+Datos de entrada:
+id: 2
+tipo: "Solicitud de acceso"
+valor: 50
+estado: false
+prioridad: 2
 
-1. Valida los datos.
-2. Ejecuta el proceso asincrónico.
-3. Determina el resultado.
-4. Notifica el resultado.
-5. Maneja errores controlados.
+Resultado esperado:
+id: 2
+resultado: "RECHAZADA"
+notificacion: "Notificación enviada: RECHAZADA"
 
-**Exportación:**
+--
 
-```js
-export async function procesarSolicitudEj2(solicitud)
-```
+### Caso 3: Solicitud inválida - valor cero
 
-**Salida exitosa:**
+Datos de entrada:
+id: 3
+tipo: "Operación financiera"
+valor: 0
+estado: true
+prioridad: 5
 
-```js
-{
-  id: Number,
-  resultado: String,
-  notificacion: String
-}
-```
+Resultado esperado:
+id: 3
+resultado: "INVÁLIDA"
+notificacion: "Notificación enviada: INVÁLIDA"
 
-**Salida con error:**
+--
 
-```js
-{
-  id: Number | null,
-  resultado: "ERROR",
-  mensaje: String
-}
-```
+### Caso 4: Solicitud inválida - valor negativo
 
----
+Datos de entrada:
+id: 4
+tipo: "Devolución"
+valor: -20
+estado: true
+prioridad: 3
 
-## 5. Manejo de errores
+Resultado esperado:
+id: 4
+resultado: "INVÁLIDA"
+notificacion: "Notificación enviada: INVÁLIDA"
 
-El sistema utiliza un bloque `try/catch` para capturar errores de validación y retornarlos de forma controlada, evitando fallos inesperados en la ejecución.
+--
 
----
+### Caso 5: Error - ID inválido
 
-## 6. Principios aplicados
+Datos de entrada:
+id: "ABC"
+tipo: "Solicitud"
+valor: 10
+estado: true
+prioridad: 3
 
-* Programación modular
-* Funciones puras
-* Encapsulación
-* Programación asincrónica
-* Manejo controlado de errores
+Resultado esperado:
+id: null
+resultado: "ERROR"
+mensaje: "ID inválido"
 
----
+--
 
-## 7. Conclusión
+### Caso 6: Error - Tipo vacío
 
-El Ejercicio 2 demuestra el uso correcto de validaciones, asincronía, callbacks y control de flujo en JavaScript, manteniendo una estructura clara, escalable y fácil de integrar con otros módulos del sistema.
+Datos de entrada:
+id: 6
+tipo: ""
+valor: 25
+estado: true
+prioridad: 4
+
+Resultado esperado:
+id: 6
+resultado: "ERROR"
+mensaje: "Tipo de operación inválido"
+
+--
+
+### Caso 7: Error - Estado no booleano
+
+Datos de entrada:
+id: 7
+tipo: "Consulta"
+valor: 75
+estado: "activo"
+prioridad: 2
+
+Resultado esperado:
+id: 7
+resultado: "ERROR"
+mensaje: "Estado inválido"
+
+--
+
+### Caso 8: Error - Prioridad fuera de rango
+
+Datos de entrada:
+id: 8
+tipo: "Trámite urgente"
+valor: 150
+estado: true
+prioridad: 10
+
+Resultado esperado:
+id: 8
+resultado: "ERROR"
+mensaje: "Prioridad fuera de rango"
+
+--
+
+## 10. Justificación técnica
+
+Uso de validaciones estrictas → garantiza integridad de datos.
+Uso de Promesas → manejo claro de procesos asincrónicos.
+Uso de async/await → código más legible y estructurado.
+Uso de función pura → decisión sin efectos secundarios.
+Uso de callback → simulación de notificaciones externas.
+Uso de try/catch → evita que el programa se bloquee.
+Separación de funciones → facilita mantenimiento y pruebas.
+Validaciones por tipo de dato → previene errores en tiempo de ejecución.

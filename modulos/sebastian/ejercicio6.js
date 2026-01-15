@@ -1,7 +1,4 @@
-// =======================================================
 // EJERCICIO 6 - SISTEMA DE GESTIÓN Y VALIDACIÓN DE SERVICIOS
-// Archivo: modulos/sebastian/ejercicio6.js
-// =======================================================
 
 /**
  * FUNCIÓN PRINCIPAL (ASYNC / AWAIT)

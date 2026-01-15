@@ -84,25 +84,141 @@ Error controlado por datos inválidos.
 
 --
 
-## 8. Pruebas realizadas
+## 8. Casos de prueba
 
-Caso válido:
-Todos los datos correctos → solicitud aprobada.
+### Caso 1: Solicitud aprobada - todos los criterios cumplidos
 
-ID inválido:
-Rechazado por validación básica.
+Datos de entrada:
+id: 1
+nombre: "Carlos Méndez"
+tipo: "Solicitud de beca"
+prioridad: 5
+estado: true
+requisitos: [true, true, true]
 
-Nombre vacío:
-Error controlado.
+Resultado esperado:
+id: 1
+estado: "APROBADA"
+mensaje: "Solicitud procesada correctamente"
 
-Estado no booleano:
-Rechazado en validación con callback.
+--
 
-Requisitos incompletos:
-Solicitud rechazada.
+### Caso 2: Solicitud rechazada - requisitos incompletos
 
-Prioridad menor a 3:
-Solicitud rechazada por regla de negocio.
+Datos de entrada:
+id: 2
+nombre: "Ana López"
+tipo: "Permiso especial"
+prioridad: 4
+estado: true
+requisitos: [true, false, true]
+
+Resultado esperado:
+id: 2
+estado: "RECHAZADA"
+motivo: "Requisitos incompletos"
+
+--
+
+### Caso 3: Solicitud rechazada - prioridad insuficiente
+
+Datos de entrada:
+id: 3
+nombre: "Luis García"
+tipo: "Consulta académica"
+prioridad: 2
+estado: true
+requisitos: [true, true, true, true]
+
+Resultado esperado:
+id: 3
+estado: "RECHAZADA"
+motivo: "Prioridad insuficiente"
+
+--
+
+### Caso 4: Error - ID inválido
+
+Datos de entrada:
+id: "ABC"
+nombre: "María Torres"
+tipo: "Trámite"
+prioridad: 4
+estado: true
+requisitos: [true, true]
+
+Resultado esperado:
+id: null
+estado: "ERROR"
+mensaje: "ID inválido"
+
+--
+
+### Caso 5: Error - Nombre vacío
+
+Datos de entrada:
+id: 5
+nombre: ""
+tipo: "Certificado"
+prioridad: 4
+estado: true
+requisitos: [true, true]
+
+Resultado esperado:
+id: 5
+estado: "ERROR"
+mensaje: "Nombre inválido"
+
+--
+
+### Caso 6: Error - Prioridad fuera de rango
+
+Datos de entrada:
+id: 6
+nombre: "Roberto Castro"
+tipo: "Inscripción"
+prioridad: 8
+estado: true
+requisitos: [true, true, true]
+
+Resultado esperado:
+id: 6
+estado: "ERROR"
+mensaje: "Prioridad fuera de rango (1 a 5)"
+
+--
+
+### Caso 7: Error - Estado no booleano (validación con callback)
+
+Datos de entrada:
+id: 7
+nombre: "Patricia Morales"
+tipo: "Trámite urgente"
+prioridad: 4
+estado: "activo"
+requisitos: [true, true]
+
+Resultado esperado:
+id: 7
+estado: "ERROR"
+mensaje: "El estado inicial debe ser booleano"
+
+--
+
+### Caso 8: Error - Requisitos no es arreglo (validación con promesa)
+
+Datos de entrada:
+id: 8
+nombre: "Carmen Vargas"
+tipo: "Permiso"
+prioridad: 3
+estado: true
+requisitos: "completos"
+
+Resultado esperado:
+id: 8
+estado: "ERROR"
+mensaje: "Los requisitos deben ser un arreglo"
 
 --
 

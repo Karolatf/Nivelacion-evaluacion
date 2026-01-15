@@ -1,7 +1,5 @@
-// =======================================================
+
 // EJERCICIO 5 - SISTEMA DE ANÁLISIS Y VALIDACIÓN POR LOTES
-// Archivo: modulos/sebastian/ejercicio5.js
-// =======================================================
 
 /**
  * Procesa un arreglo de operaciones de forma asincrónica
