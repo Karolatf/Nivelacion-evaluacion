@@ -1,132 +1,272 @@
-# Guía Técnica – Ejercicio 3
+# Ejercicio 3 - Sistema de Gestión y Validación de Solicitudes de Acceso
 
-## Sistema de Gestión y Validación de Solicitudes de Acceso
+## 1. Datos de entrada
 
----
+El sistema recibe un objeto solicitud, el cual contiene la información necesaria para evaluar y decidir si se otorga acceso a un sistema interno.
 
-## 1. Descripción general
+Cada solicitud incluye los siguientes campos:
 
-El Ejercicio 3 implementa un **sistema de validación y decisión de solicitudes de acceso** a un sistema interno.
-El proceso combina validaciones sincrónicas, validaciones mediante callback y validaciones asincrónicas usando promesas, simulando un entorno real de control de accesos.
+id (number) → Identificador numérico de la solicitud
+nombre (string) → Nombre del solicitante
+edad (number) → Edad del solicitante (debe ser mayor o igual a 18)
+rol (string) → Rol solicitado dentro del sistema
+permisos (array de string) → Lista de permisos solicitados
+estado (string) → Estado actual de la solicitud
+aceptaCondiciones (boolean) → Indica si aceptó las condiciones del sistema
 
----
+--
 
-## 2. Datos de entrada
+## 2. Procesos principales
 
-El sistema recibe un **objeto solicitud**, el cual contiene la siguiente información:
+Validación básica mediante callback
 
-* `id` (number) → Identificador único de la solicitud.
-* `nombre` (string) → Nombre del solicitante.
-* `edad` (number) → Edad del solicitante (debe ser mayor o igual a 18).
-* `rol` (string) → Rol solicitado (`admin` o `usuario`).
-* `permisos` (array de string) → Lista de permisos solicitados.
-* `estado` (string) → Estado actual de la solicitud.
-* `aceptaCondiciones` (boolean) → Indica si el solicitante aceptó las condiciones del sistema.
+Se verifica que los datos principales de la solicitud cumplan las reglas mínimas:
 
----
+La edad debe ser un número válido y mayor o igual a 18.
+El solicitante debe haber aceptado las condiciones del sistema.
+Los permisos deben ser un arreglo no vacío.
 
-## 3. Procesos principales
+El proceso se ejecuta de forma asincrónica usando callback.
+Si alguna validación falla, se retorna un error mediante el callback.
 
-### 3.1 Ingreso de datos
+--
 
-* Los datos son capturados desde el menú general.
-* La información se estructura en un objeto `solicitud`.
-* El objeto se envía a la función principal para su procesamiento.
+## 3. Validación de rol y permisos (Función pura)
 
----
+Se utiliza una función pura para validar coherencia lógica.
+Se verifica que el rol solicitado sea compatible con los permisos.
 
-### 3.2 Validación básica (Callback)
+Regla principal:
 
-* Se valida que:
+Un usuario con rol "usuario" no puede solicitar el permiso "eliminar".
 
-  * La edad sea numérica y mayor o igual a 18.
-  * El solicitante haya aceptado las condiciones.
-  * Existan permisos solicitados.
-* La validación se realiza mediante **callback**, retornando:
+Esta función no modifica el objeto recibido.
+Retorna true si la validación es correcta, false en caso contrario.
 
-  * `true` y un mensaje de éxito, o
-  * `false` y el motivo del rechazo.
+--
 
----
+## 4. Validación externa asincrónica (Promesa)
 
-### 3.3 Validación rol – permisos
+Se usa una función que retorna una Promesa.
+Simula una validación externa como verificación de antecedentes.
+El proceso tiene un retardo de 1000 ms.
+El resultado es aleatorio para simular aprobaciones y rechazos.
+Si la validación externa falla, la solicitud queda en estado "EN REVISIÓN".
 
-* Se valida la coherencia entre el rol y los permisos solicitados.
-* Regla principal:
+--
 
-  * Un usuario con rol `usuario` **no puede solicitar el permiso `eliminar`**.
-* Esta validación se implementa como **función pura**, sin efectos secundarios.
+## 5. Flujo principal con async/await
 
----
+La función principal coordina todo el proceso:
 
-### 3.4 Validación externa (Promesa / async-await)
+Ejecuta la validación básica con callback.
+Valida coherencia entre rol y permisos.
+Ejecuta la validación externa asincrónica.
+Determina el estado final de la solicitud.
+Maneja errores de forma controlada.
 
-* Se simula una validación externa (por ejemplo, antecedentes o seguridad).
-* Se introduce un retardo de **1000 ms**.
-* El resultado es aleatorio:
+--
 
-  * Aprobación → la solicitud continúa.
-  * Rechazo → la solicitud queda en estado de revisión.
+## 6. Análisis lógico de la solicitud
 
----
+Luego de las validaciones técnicas, se aplican reglas de negocio:
 
-### 3.5 Flujo principal (async / await)
+Si la validación básica falla, la solicitud es rechazada.
+Si el rol no es compatible con los permisos, la solicitud es rechazada.
+Si la validación externa falla, la solicitud queda en revisión.
+Si todas las condiciones se cumplen, la solicitud es aprobada.
 
-* Coordina todo el proceso:
+--
 
-  1. Recibe la solicitud.
-  2. Ejecuta la validación básica con callback.
-  3. Valida rol y permisos.
-  4. Ejecuta la validación externa asincrónica.
-  5. Determina el estado final de la solicitud.
+## 7. Manejo de errores
 
----
+Todo el flujo está protegido con un bloque try/catch.
+Cualquier error es capturado y devuelto de forma controlada.
+El sistema nunca se detiene por errores inesperados.
+Los mensajes de error son claros y específicos.
 
-## 4. Manejo de errores
+--
 
-* El sistema utiliza bloques `try/catch` para capturar errores inesperados.
-* Los errores se manejan de forma controlada y con mensajes claros.
-* Se diferencian tres estados finales:
+## 8. Datos de salida
 
-  * **RECHAZADA** → error en validaciones básicas o rol/permisos.
-  * **EN REVISIÓN** → falla en validación externa.
-  * **APROBADA** → todas las validaciones superadas.
+El sistema retorna un objeto de resultado con la información del procesamiento:
 
----
+id → ID de la solicitud procesada
+estado → "APROBADA", "RECHAZADA", "EN REVISIÓN" o "ERROR"
+mensaje → Detalle del resultado (solo en aprobación)
+motivo → Razón del rechazo o revisión
 
-## 5. Datos de salida
+Ejemplos de salida:
 
-El sistema genera mensajes en consola indicando:
+Solicitud aprobada - acceso concedido.
+Solicitud rechazada por edad inválida.
+Solicitud rechazada por no aceptar condiciones.
+Solicitud rechazada por rol incompatible con permisos.
+Solicitud en revisión por falla en validación externa.
+Error controlado por datos inválidos.
 
-* Solicitud aprobada.
-* Solicitud rechazada y motivo.
-* Solicitud en revisión por validación externa.
+--
 
-Además, el flujo retorna objetos estructurados al menú general cuando corresponde.
+## 9. Casos de prueba
 
----
+### Caso 1: Solicitud aprobada - todos los criterios válidos
 
-## 6. Pruebas realizadas
+Datos de entrada:
+id: 1
+nombre: "María González"
+edad: 25
+rol: "admin"
+permisos: ["leer", "escribir", "eliminar"]
+estado: "pendiente"
+aceptaCondiciones: true
 
-* Edad menor de 18 → solicitud rechazada.
-* Condiciones no aceptadas → solicitud rechazada.
-* Permisos vacíos → solicitud rechazada.
-* Usuario con permiso `eliminar` → solicitud rechazada.
-* Fallo en validación externa → solicitud en revisión.
-* Solicitud válida completa → acceso concedido.
+Resultado esperado:
+id: 1
+estado: "APROBADA"
+mensaje: "Acceso concedido"
 
----
+Nota: Este resultado depende de la validación externa aleatoria.
+Si falla, el estado será "EN REVISIÓN".
 
-## 7. Justificación técnica
+--
 
-* Uso de **callbacks** → simulación de validaciones heredadas.
-* Uso de **promesas y async/await** → manejo moderno de asincronía.
-* Separación en funciones pequeñas → mejora mantenimiento y pruebas.
-* Funciones puras → mayor claridad y confiabilidad lógica.
-* Flujo controlado con manejo de errores → el sistema nunca se bloquea.
+### Caso 2: Solicitud aprobada - usuario con permisos válidos
 
----
+Datos de entrada:
+id: 2
+nombre: "Diego Fernández"
+edad: 21
+rol: "usuario"
+permisos: ["leer", "escribir"]
+estado: "pendiente"
+aceptaCondiciones: true
 
-## 8. Conclusión
+Resultado esperado:
+id: 2
+estado: "APROBADA"
+mensaje: "Acceso concedido"
 
-El Ejercicio 3 representa un sistema robusto de validación de accesos, integrando distintos paradigmas de programación asincrónica en JavaScript y siguiendo buenas prácticas de diseño, claridad y control de errores.
+Nota: Este resultado depende de la validación externa aleatoria.
+Si falla, el estado será "EN REVISIÓN".
+
+--
+
+### Caso 3: Solicitud rechazada - rol incompatible con permisos
+
+Datos de entrada:
+id: 3
+nombre: "Laura Martínez"
+edad: 28
+rol: "usuario"
+permisos: ["leer", "eliminar"]
+estado: "pendiente"
+aceptaCondiciones: true
+
+Resultado esperado:
+id: 3
+estado: "RECHAZADA"
+motivo: "Rol no compatible con permisos"
+
+--
+
+### Caso 4: Error - edad menor de 18 (validación con callback)
+
+Datos de entrada:
+id: 4
+nombre: "Juan Pérez"
+edad: 16
+rol: "usuario"
+permisos: ["leer"]
+estado: "pendiente"
+aceptaCondiciones: true
+
+Resultado esperado:
+id: 4
+estado: "ERROR"
+mensaje: "Edad inválida o menor de edad"
+
+--
+
+### Caso 5: Error - no aceptó condiciones (validación con callback)
+
+Datos de entrada:
+id: 5
+nombre: "Ana Torres"
+edad: 30
+rol: "usuario"
+permisos: ["leer", "escribir"]
+estado: "pendiente"
+aceptaCondiciones: false
+
+Resultado esperado:
+id: 5
+estado: "ERROR"
+mensaje: "No aceptó las condiciones del sistema"
+
+--
+
+### Caso 6: Error - permisos vacíos (validación con callback)
+
+Datos de entrada:
+id: 6
+nombre: "Carlos Ruiz"
+edad: 22
+rol: "admin"
+permisos: []
+estado: "pendiente"
+aceptaCondiciones: true
+
+Resultado esperado:
+id: 6
+estado: "ERROR"
+mensaje: "No se solicitaron permisos"
+
+--
+
+### Caso 7: Error - edad no numérica
+
+Datos de entrada:
+id: 7
+nombre: "Pedro Sánchez"
+edad: "veinticinco"
+rol: "admin"
+permisos: ["leer", "escribir"]
+estado: "pendiente"
+aceptaCondiciones: true
+
+Resultado esperado:
+id: 7
+estado: "ERROR"
+mensaje: "Edad inválida o menor de edad"
+
+--
+
+### Caso 8: Error - permisos no es un arreglo
+
+Datos de entrada:
+id: 8
+nombre: "Sofía López"
+edad: 35
+rol: "usuario"
+permisos: "leer"
+estado: "pendiente"
+aceptaCondiciones: true
+
+Resultado esperado:
+id: 8
+estado: "ERROR"
+mensaje: "No se solicitaron permisos"
+
+--
+
+## 10. Justificación técnica
+
+Uso de callback → permite simular validaciones heredadas o externas.
+Uso de Promesas → manejo claro de procesos asincrónicos.
+Uso de async/await → código más legible y estructurado.
+Uso de función pura → validación sin efectos secundarios.
+Uso de try/catch → evita que el programa se bloquee.
+Separación de funciones → facilita mantenimiento y pruebas.
+Validaciones claras → garantizan la integridad de los datos.
+Proceso aleatorio → simula comportamiento real de validaciones externas.
+Manejo de múltiples estados → refleja escenarios reales de aprobación.

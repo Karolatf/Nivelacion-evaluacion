@@ -1,13 +1,9 @@
-// ==================================================
 // SISTEMA DE TRANSACCIONES Y CONTROL DE RIESGO
 // Este archivo contiene TODA la lógica del ejercicio
-// ==================================================
 
 
-// ==================================================
 // FUNCIÓN CALLBACK (NO SE EXPORTA)
 // Simula una validación estructural externa
-// ==================================================
 function validarEstructuraTransaccion(transaccion, callback) {
 
   // setTimeout simula un proceso asincrónico
@@ -60,10 +56,8 @@ function validarEstructuraTransaccion(transaccion, callback) {
 }
 
 
-// ==================================================
 // FUNCIÓN CON PROMESA (NO SE EXPORTA)
 // Valida lógicamente el monto de la transacción
-// ==================================================
 function validarMontoTransaccion(transaccion) {
 
   // Se retorna una promesa
@@ -89,19 +83,18 @@ function validarMontoTransaccion(transaccion) {
 }
 
 
-// ==================================================
 // FUNCIÓN PRINCIPAL ASYNC / AWAIT
 // ESTA FUNCIÓN SÍ SE EXPORTA
 // Es la única función visible para el menú general
-// ==================================================
 export async function procesarTransaccionesEj4(transacciones) {
 
   // Arreglo para almacenar transacciones válidas
   const validas = [];
 
-  // Arreglo para almacenar transacciones sospechosas
-  const sospechosas = [];
-
+  // Arreglo para almacenar transacciones sospechosas                 // ESTA FUNCION VA DE LA MANO DE VALIDACION CON PROMESAS
+                                                                      // YA QUE EL ARREGLO INICIA VACIO Y DENTRO DEL CICLO DE transaccionValida
+  const sospechosas = [];                                             // SE VA GUARDANDO CADA OBJETO COMPLETO. 
+                                                                      // ESTO YA QUE NECESITO RETORNAR LAS TRANSACCIONES COMPLETAS, NO SOLO CONTARLAS. 
   // Arreglo para almacenar transacciones inválidas
   const invalidas = [];
 
@@ -129,7 +122,7 @@ export async function procesarTransaccionesEj4(transacciones) {
 
       try {
 
-        // ================= VALIDACIÓN CON CALLBACK =================
+        // - VALIDACIÓN CON CALLBACK -
         // Se envuelve la función callback dentro de una promesa
         const estructuraValida = await new Promise((resolve, reject) => {
 
@@ -147,11 +140,11 @@ export async function procesarTransaccionesEj4(transacciones) {
           });
         });
 
-        // ================= VALIDACIÓN CON PROMESA =================
+        // --- VALIDACIÓN CON PROMESA ---
         // Se valida el monto usando promesas
-        const transaccionValida = await validarMontoTransaccion(estructuraValida);
+        const transaccionValida = await validarMontoTransaccion(estructuraValida);       // ESTA FUNCION VA DE LA MANO DE ASYNC / AWAIT
 
-        // ================= CLASIFICACIÓN LÓGICA =================
+        // -- CLASIFICACIÓN LÓGICA --
         // Se evalúa si la transacción está autorizada
         if (transaccionValida.autorizada === true) {
 
@@ -187,7 +180,7 @@ export async function procesarTransaccionesEj4(transacciones) {
       }
     }
 
-    // ================= RESULTADO FINAL =================
+    // -- RESULTADO FINAL --
     // Se retorna un objeto con todos los resultados
     return {
       totalProcesadas: copiaTransacciones.length,
@@ -209,3 +202,10 @@ export async function procesarTransaccionesEj4(transacciones) {
     };
   }
 }
+
+
+// Yo entiendo que se puede usar un contador simple con let validas = 0, 
+// pero en este ejercicio la guía pide que retorne la lista completa de transacciones válidas, 
+// no solo el número. Por eso uso un arreglo con const validas = [] y voy agregando cada transacción válida con .push().
+// Al final, si necesito el total, uso validas.length que me da la cantidad."
+
