@@ -1,4 +1,6 @@
-// BARRIL DE MÓDULOS
+// BARRIL DE MÓDULOS 
+// Este archivo actúa como un barril que centraliza las exportaciones de varios módulos
+// Asi se importan y exportan funciones desde diferentes archivos para facilitar su uso en otros archivos.
 
 // -------- KAROL --------
 import { procesarSolicitud } from "./karol/ejercicio1.js";

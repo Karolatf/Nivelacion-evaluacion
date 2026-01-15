@@ -130,11 +130,11 @@ Porque `validas.length` me da CUÁNTAS transacciones hay, pero NO me da la SUMA 
 ```javascript
 const validas = [];  // El arreglo no cambia, pero su contenido sí
 
-validas.push(item);  // ✅ Correcto - modifico el contenido
-validas = [];        // ❌ Error - no puedo reasignar
+validas.push(item);  // Correcto - modifico el contenido
+validas = [];        // Error - no puedo reasignar
 
 const PI = 3.14159;
-PI = 3.14;          // ❌ Error - no puedo cambiar el valor
+PI = 3.14;          // Error - no puedo cambiar el valor
 ```
 
 **Por qué es bueno:**
@@ -154,11 +154,11 @@ PI = 3.14;          // ❌ Error - no puedo cambiar el valor
 **Ejemplo:**
 ```javascript
 let contador = 0;
-contador++;         // ✅ Correcto - puedo cambiar el valor
-contador = 10;      // ✅ Correcto
+contador++;         // Correcto - puedo cambiar el valor
+contador = 10;      // Correcto
 
 let total = 0;
-total += 100;       // ✅ Correcto
+total += 100;       // Correcto
 ```
 
 --
@@ -310,7 +310,7 @@ try {
 
 **Sin try/catch:**
 ```javascript
-const resultado = dividir(10, 0);  // ❌ El programa se detiene aquí
+const resultado = dividir(10, 0);  // El programa se detiene aquí
 console.log("Esto nunca se ejecuta");
 ```
 
@@ -321,7 +321,7 @@ try {
 } catch (error) {
   console.log("Error:", error.message);
 }
-console.log("Esto SÍ se ejecuta");  // ✅ El programa continúa
+console.log("Esto SÍ se ejecuta");  // El programa continúa
 ```
 
 --
@@ -343,7 +343,7 @@ console.log("Esto SÍ se ejecuta");  // ✅ El programa continúa
 **Ejemplo SIN inmutabilidad (MAL):**
 ```javascript
 function procesarDatos(datos) {
-  datos.push("nuevo");  // ❌ Modifica el arreglo original
+  datos.push("nuevo");  // Modifica el arreglo original
   return datos;
 }
 
@@ -356,7 +356,7 @@ console.log(original);  // [1, 2, 3, "nuevo"] ← Se modificó!
 **Ejemplo CON inmutabilidad (BIEN):**
 ```javascript
 function procesarDatos(datos) {
-  const copia = [...datos];  // ✅ Crea una copia
+  const copia = [...datos];  // Crea una copia
   copia.push("nuevo");
   return copia;
 }
@@ -427,7 +427,7 @@ array.forEach(item => {
 
 **⚠️ NO funciona bien con await:**
 ```javascript
-// ❌ MAL - no espera correctamente
+// MAL - no espera correctamente
 array.forEach(async item => {
   await procesar(item);
 });
@@ -587,7 +587,7 @@ sumar(2, 3);  // Siempre retorna 5
 let total = 0;
 
 function sumar(valor) {
-  total += valor;  // ❌ Modifica una variable externa
+  total += valor;  // Modifica una variable externa
   return total;
 }
 ```

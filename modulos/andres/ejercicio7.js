@@ -50,14 +50,25 @@ function validarEstructuraTransaccion(transaccion, callback) {
 // FUNCIÓN CON PROMESA (NO SE EXPORTA)
 // Valida lógicamente el monto de la transacción
 function validarMontoTransaccion(transaccion) {
+
+  // Se retorna una promesa
   return new Promise((resolve, reject) => {
+
+    // setTimeout simula un proceso asincrónico
     setTimeout(() => {
-      // Verifica que el monto sea numérico y positivo
+
+      // Se verifica que el monto sea numérico y positivo
       if (isNaN(transaccion.monto) || transaccion.monto <= 0) {
+
+        // Si el monto no es válido se rechaza la promesa
         reject(new Error("El monto debe ser un número positivo"));
+
       } else {
+
+        // Si el monto es correcto se resuelve la promesa
         resolve(transaccion);
       }
+
     }, 300);
   });
 }
@@ -102,59 +113,80 @@ export async function procesarTransaccionesEj7(transacciones) {
       // Se obtiene la transacción actual
       const transaccion = copiaTransacciones[i];
 
-      try {
+    try {
 
-        // -- VALIDACIÓN CON CALLBACK --
+        // VALIDACIÓN CON CALLBACK
+        // Se envuelve la función callback dentro de una promesa
         const estructuraValida = await new Promise((resolve, reject) => {
+
+          // Se llama a la validación estructural
           validarEstructuraTransaccion(transaccion, (error, data) => {
-            if (error) reject(error);
-            else resolve(data);
+
+            // Si hay error se rechaza la promesa
+            if (error) {
+              reject(error);
+            } 
+            // Si no hay error se continúa
+            else {
+              resolve(data);
+            }
           });
         });
 
-        // -- VALIDACIÓN CON PROMESA --
+     // VALIDACIÓN CON PROMESA
+        // Se valida el monto usando promesas
         const transaccionValida = await validarMontoTransaccion(estructuraValida);
 
-        //  PROCESAMIENTO 
+        // PROCESAMIENTO
+        // Se extraen los datos necesarios de la transacción
         const { idUsuario, tipo, monto } = transaccionValida;
 
-        // Inicializa saldo si no existe
+        // Se inicializa el saldo del usuario si no existe
         saldos[idUsuario] = saldos[idUsuario] ?? 0;
 
-        // Suma o resta según el tipo de transacción
+        // Se suma o resta según el tipo de transacción
         saldos[idUsuario] += tipo === "ingreso" ? monto : -monto;
 
-        // Almacena la transacción válida
+        // Se almacena la transacción válida
         validas.push(transaccionValida);
 
-        // -- DETECCIÓN DE SALDO NEGATIVO --
+
+      // DETECCIÓN DE SALDO NEGATIVO
+        // Se verifica si el saldo del usuario es negativo
         if (saldos[idUsuario] < 0) {
           saldoNegativo[idUsuario] = true;
         }
 
-        // -- DETECCIÓN DE PATRÓN DE RIESGO --
-        // Inicializa contador de egresos consecutivos
+        // DETECCIÓN DE PATRÓN DE RIESGO
+        // Se inicializa el contador de egresos consecutivos
         contadorEgresos[idUsuario] = contadorEgresos[idUsuario] ?? 0;
 
+        // Se verifica el tipo de transacción
         if (tipo === "egreso") {
+
+          // Se incrementa el contador de egresos
           contadorEgresos[idUsuario] += 1;
+
+          // Se marca patrón de riesgo si hay 2 o más egresos consecutivos
           if (contadorEgresos[idUsuario] >= 2) {
-            // Marca patrón de riesgo si hay 2 o más egresos consecutivos
             patronesRiesgo[idUsuario] = true;
           }
+
         } else {
-          // Si es ingreso, reinicia contador
+
+          // Si es ingreso, se reinicia el contador
           contadorEgresos[idUsuario] = 0;
         }
 
       } catch (errorInterno) {
-        // Si falla la transacción, se agrega como inválida
+
+        // Si falla una transacción
+        // se almacena como inválida sin detener el sistema
         invalidas.push({
           transaccion: transaccion,
           motivo: errorInterno.message
         });
       }
-
     }
 
     // -- RESULTADO FINAL --

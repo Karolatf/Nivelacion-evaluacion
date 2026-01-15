@@ -1,11 +1,11 @@
-// =========================================
-// APLICACIÓN PRINCIPAL - app.js
-// =========================================
+// Archivo PRINCIPAL - app.js
 
 // ------- IMPORTACIONES -------
 import PromptSync from "prompt-sync";
-const prompt = PromptSync();
+const prompt = PromptSync();             //La importación de prompt-sync/libreria para entradas por consola
 
+
+// Importación desde el barril de módulos de las funciones necesarias
 import {
   procesarSolicitud,
   procesarSolicitudEj2,
@@ -18,12 +18,10 @@ import {
   procesarOrdenesEj9,
   procesarSolicitudesEj10,
   procesarSolicitudesEj11,
-  procesarSolicitudesEj12   // ← NUEVO
+  procesarSolicitudesEj12   
 } from "./modulos/barril.js";
 
-// =========================================
 // CONFIGURACIÓN DE MENÚS
-// =========================================
 const ejerciciosPorCarpeta = {
   karol: [1, 2, 3],
   sebastian: [4, 5, 6],
@@ -31,9 +29,7 @@ const ejerciciosPorCarpeta = {
   isabella: [10, 11, 12]
 };
 
-// =========================================
 // MAPEO DE FUNCIONES POR EJERCICIO
-// =========================================
 const funcionesEjercicio = {
   1: ejecutarEjercicio1,
   2: ejecutarEjercicio2,
@@ -50,9 +46,8 @@ const funcionesEjercicio = {
 };
 
 
-// =========================================
+
 // MENÚ GENERAL
-// =========================================
 async function menuGeneral() {
   let opcion;
   const carpetas = Object.keys(ejerciciosPorCarpeta);
@@ -77,9 +72,7 @@ async function menuGeneral() {
   } while (opcion !== carpetas.length + 1);
 }
 
-// =========================================
 // SUBMENÚ POR CARPETA
-// =========================================
 async function menuCarpeta(nombreCarpeta) {
   const ejercicios = ejerciciosPorCarpeta[nombreCarpeta];
   let opcion;
@@ -105,10 +98,8 @@ async function menuCarpeta(nombreCarpeta) {
   } while (opcion !== ejercicios.length + 1);
 }
 
-// =========================================
-// EJERCICIOS
-// =========================================
 
+// EJERCICIOS
 async function ejecutarEjercicio1() {
   let solicitudes = [];
   const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
@@ -409,8 +400,6 @@ async function ejecutarEjercicio12() {
   }
 }
 
-// =========================================
 // EJECUCIÓN
-// =========================================
 menuGeneral();
 
