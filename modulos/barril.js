@@ -1,8 +1,4 @@
-// ===============================
 // BARRIL DE MÓDULOS
-// Archivo: modulos/barril.js
-// ===============================
-
 
 // -------- KAROL --------
 import { procesarSolicitud } from "./karol/ejercicio1.js";
@@ -19,9 +15,12 @@ import { procesarTransaccionesEj7 } from "./andres/ejercicio7.js";
 import { procesarInventarioEj8 } from "./andres/ejercicio8.js";
 import { procesarOrdenesEj9 } from "./andres/ejercicio9.js";
 
-// ===============================
+// -------- ISABELLA --------
+import { procesarSolicitudesEj10 } from "./isabella/ejercicio10.js";
+import { procesarSolicitudesEj11 } from "./isabella/ejercicio11.js";
+import { procesarSolicitudesEj12 } from "./isabella/ejercicio12.js";
+
 // EXPORTACIONES
-// ===============================
 export {
   procesarSolicitud,
   procesarSolicitudEj2,
@@ -31,5 +30,8 @@ export {
   procesarSolicitudesServicio,
   procesarTransaccionesEj7,
   procesarInventarioEj8,
-  procesarOrdenesEj9
+  procesarOrdenesEj9,
+  procesarSolicitudesEj10,
+  procesarSolicitudesEj11,
+  procesarSolicitudesEj12
 };

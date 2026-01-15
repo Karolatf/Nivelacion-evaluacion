@@ -1,6 +1,4 @@
-// ==================================================
 // EJERCICIO 9 - PROCESAMIENTO DE ÓRDENES
-// ==================================================
 
 function validarClienteCallback(orden, callback) {
   setTimeout(() => {

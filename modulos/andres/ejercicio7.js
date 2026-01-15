@@ -1,13 +1,8 @@
-// ==================================================
 // EJERCICIO 7 - SISTEMA DE TRANSACCIONES Y CONTROL DE RIESGO
 // Versión completa con saldo negativo y patrón de riesgo
-// ==================================================
 
-
-// ==================================================
 // FUNCIÓN CALLBACK (NO SE EXPORTA)
 // Valida la estructura básica de cada transacción
-// ==================================================
 function validarEstructuraTransaccion(transaccion, callback) {
   setTimeout(() => {
     try {
@@ -52,10 +47,8 @@ function validarEstructuraTransaccion(transaccion, callback) {
 }
 
 
-// ==================================================
 // FUNCIÓN CON PROMESA (NO SE EXPORTA)
 // Valida lógicamente el monto de la transacción
-// ==================================================
 function validarMontoTransaccion(transaccion) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
@@ -70,11 +63,9 @@ function validarMontoTransaccion(transaccion) {
 }
 
 
-// ==================================================
 // FUNCIÓN PRINCIPAL ASYNC / AWAIT
 // ESTA FUNCIÓN SÍ SE EXPORTA
 // Procesa todas las transacciones y genera resultados
-// ==================================================
 export async function procesarTransaccionesEj7(transacciones) {
 
   // Arreglo para almacenar transacciones válidas
@@ -113,7 +104,7 @@ export async function procesarTransaccionesEj7(transacciones) {
 
       try {
 
-        // ================= VALIDACIÓN CON CALLBACK =================
+        // -- VALIDACIÓN CON CALLBACK --
         const estructuraValida = await new Promise((resolve, reject) => {
           validarEstructuraTransaccion(transaccion, (error, data) => {
             if (error) reject(error);
@@ -121,10 +112,10 @@ export async function procesarTransaccionesEj7(transacciones) {
           });
         });
 
-        // ================= VALIDACIÓN CON PROMESA =================
+        // -- VALIDACIÓN CON PROMESA --
         const transaccionValida = await validarMontoTransaccion(estructuraValida);
 
-        // ================= PROCESAMIENTO =================
+        //  PROCESAMIENTO 
         const { idUsuario, tipo, monto } = transaccionValida;
 
         // Inicializa saldo si no existe
@@ -136,12 +127,12 @@ export async function procesarTransaccionesEj7(transacciones) {
         // Almacena la transacción válida
         validas.push(transaccionValida);
 
-        // ================= DETECCIÓN DE SALDO NEGATIVO =================
+        // -- DETECCIÓN DE SALDO NEGATIVO --
         if (saldos[idUsuario] < 0) {
           saldoNegativo[idUsuario] = true;
         }
 
-        // ================= DETECCIÓN DE PATRÓN DE RIESGO =================
+        // -- DETECCIÓN DE PATRÓN DE RIESGO --
         // Inicializa contador de egresos consecutivos
         contadorEgresos[idUsuario] = contadorEgresos[idUsuario] ?? 0;
 
@@ -166,7 +157,7 @@ export async function procesarTransaccionesEj7(transacciones) {
 
     }
 
-    // ================= RESULTADO FINAL =================
+    // -- RESULTADO FINAL --
     // Retorna un objeto con todos los resultados
     return {
       totalProcesadas: copiaTransacciones.length, // Cantidad total de transacciones

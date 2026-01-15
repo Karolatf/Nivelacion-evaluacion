@@ -15,7 +15,10 @@ import {
   procesarSolicitudesServicio,
   procesarTransaccionesEj7,
   procesarInventarioEj8,
-  procesarOrdenesEj9
+  procesarOrdenesEj9,
+  procesarSolicitudesEj10,
+  procesarSolicitudesEj11,
+  procesarSolicitudesEj12   // ← NUEVO
 } from "./modulos/barril.js";
 
 // =========================================
@@ -24,7 +27,8 @@ import {
 const ejerciciosPorCarpeta = {
   karol: [1, 2, 3],
   sebastian: [4, 5, 6],
-  andres: [7, 8, 9]
+  andres: [7, 8, 9],
+  isabella: [10, 11, 12]
 };
 
 // =========================================
@@ -39,8 +43,12 @@ const funcionesEjercicio = {
   6: ejecutarEjercicio6,
   7: ejecutarEjercicio7,
   8: ejecutarEjercicio8,
-  9: ejecutarEjercicio9
+  9: ejecutarEjercicio9,
+  10: ejecutarEjercicio10,
+  11: ejecutarEjercicio11,
+  12: ejecutarEjercicio12  
 };
+
 
 // =========================================
 // MENÚ GENERAL
@@ -268,7 +276,141 @@ async function ejecutarEjercicio9() {
   }
 }
 
+async function ejecutarEjercicio10() {
+  const solicitudes = [];
+  const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar?: "));
+
+  for (let i = 0; i < cantidad; i++) {
+    console.log(`\n--- Solicitud ${i + 1} ---`);
+
+    solicitudes.push({
+      id: parseInt(prompt("ID: ")),
+      area: prompt("Área (infraestructura/desarrollo/administración): "),
+      nivelUrgencia: parseInt(prompt("Nivel de urgencia (1 a 5): ")),
+      descripcion: prompt("Descripción: "),
+      reportadoPorSistema: prompt("¿Reportado por sistema? (true/false): ") === "true",
+      intentosPrevios: parseInt(prompt("Intentos previos: "))
+    });
+  }
+
+  console.log("\n PROCESANDO SOLICITUDES...\n");
+
+  try {
+    const respuesta = await procesarSolicitudesEj10(solicitudes);
+
+    respuesta.resultados.forEach(s => {
+      console.log(`Solicitud ${s.id}`);
+      console.log(`Área: ${s.area}`);
+      console.log(`Urgencia: ${s.nivelUrgencia}`);
+      console.log(`Estado final: ${s.estado}`);
+      console.log("-----------------------------");
+    });
+
+    if (respuesta.errores.length > 0) {
+      console.log("\n ERRORES DETECTADOS\n");
+      respuesta.errores.forEach(e => {
+        console.log(`Solicitud ${e.id}: ${e.mensaje}`);
+      });
+    }
+
+  } catch (error) {
+    console.log("Error crítico del sistema:", error.message);
+  }
+}
+async function ejecutarEjercicio11() {
+  console.log("\n--- EJERCICIO 11 ---");
+
+  const registros = [];
+  const cantidad = parseInt(prompt("¿Cuántos registros desea ingresar? "));
+
+  for (let i = 0; i < cantidad; i++) {
+    console.log(`\nRegistro ${i + 1}`);
+
+    registros.push({
+      id: parseInt(prompt("ID: ")),
+      nombre: prompt("Nombre: "),
+      rol: prompt("Rol (admin/tecnico/usuario): "),
+      activo: prompt("Activo (true/false): ") === "true",
+      intentosPrevios: parseInt(prompt("Intentos previos: ")),
+      nivelAccesoSolicitado: parseInt(prompt("Nivel de acceso solicitado: "))
+    });
+  }
+
+  console.log("\nPROCESANDO SOLICITUDES...\n");
+
+  const resultado = await procesarSolicitudesEj11(registros);
+
+  if (resultado.resultados.length > 0) {
+    console.log("\nSOLICITUDES PROCESADAS\n");
+    resultado.resultados.forEach(r => {
+      console.log(`ID: ${r.id}`);
+      console.log(`Estado: ${r.estado}`);
+      console.log(`Motivo: ${r.motivo}`);
+      console.log("------------------");
+    });
+  }
+
+  if (resultado.errores.length > 0) {
+    console.log("\nERRORES DETECTADOS\n");
+    resultado.errores.forEach(e => {
+      console.log(`ID ${e.id}: ${e.mensaje}`);
+    });
+  }
+
+  console.log(`\n${resultado.estadoSistema}`);
+}
+
+async function ejecutarEjercicio12() {
+  console.log("\n--- EJERCICIO 12 ---");
+
+  const solicitudes = [];
+  const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
+
+  for (let i = 0; i < cantidad; i++) {
+    console.log(`\nSolicitud ${i + 1}`);
+
+    solicitudes.push({
+      id: parseInt(prompt("ID: ")),
+      usuario: prompt("Usuario: "),
+      tipo: prompt("Tipo (software/hardware): "),
+      prioridad: parseInt(prompt("Prioridad (1-5): ")),
+      descripcion: prompt("Descripción: "),
+      estado: "pendiente"
+    });
+  }
+
+  console.log("\nPROCESANDO SOLICITUDES...\n");
+
+  try {
+    const resultado = await procesarSolicitudesEj12(solicitudes);
+
+    if (resultado.resultados.length > 0) {
+      resultado.resultados.forEach(r => {
+        console.log(`✔ Solicitud ${r.id} procesada correctamente`);
+        console.log(`Usuario: ${r.usuario}`);
+        console.log(`Tipo: ${r.tipo}`);
+        console.log(`Clasificación: ${r.clasificacion}`);
+        console.log(`Estado final: ${r.estado}`);
+        console.log("-----------------------------");
+      });
+    }
+
+    if (resultado.errores.length > 0) {
+      console.log("\nERRORES DETECTADOS\n");
+      resultado.errores.forEach(e => {
+        console.log(`✖ Solicitud ${e.id}: ${e.mensaje}`);
+      });
+    }
+
+    console.log(`\n${resultado.estadoSistema}`);
+
+  } catch (error) {
+    console.log("Error crítico del sistema:", error.message);
+  }
+}
+
 // =========================================
 // EJECUCIÓN
 // =========================================
 menuGeneral();
+

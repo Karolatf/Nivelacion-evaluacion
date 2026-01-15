@@ -1,15 +1,9 @@
-// ==================================================
 // EJERCICIO 8: SISTEMA DE ANÁLISIS Y CONTROL DE INVENTARIO POR LOTES
-// Archivo: andres/ejercicio8.js
 // Contiene toda la lógica de procesamiento del inventario
-// ==================================================
 
-
-// ==================================================
 // FUNCIÓN CALLBACK (NO SE EXPORTA)
 // Simula la validación externa de un lote
 // Recibe un movimiento y un callback, valida lote y estado
-// ==================================================
 function validarLoteCallback(movimiento, callback) {
   setTimeout(() => {
     try {
@@ -34,10 +28,8 @@ function validarLoteCallback(movimiento, callback) {
 }
 
 
-// ==================================================
 // FUNCIÓN CON PROMESA (NO SE EXPORTA)
 // Valida que la cantidad sea un número mayor a cero
-// ==================================================
 function validarCantidadPromesa(movimiento) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
@@ -51,11 +43,9 @@ function validarCantidadPromesa(movimiento) {
 }
 
 
-// ==================================================
 // FUNCIÓN PRINCIPAL ASYNC / AWAIT
 // ESTA FUNCIÓN SÍ SE EXPORTA
 // Procesa todos los movimientos de inventario
-// ==================================================
 export async function procesarInventarioEj8(movimientos) {
   // Arreglo de movimientos válidos
   const validos = [];
@@ -80,7 +70,7 @@ export async function procesarInventarioEj8(movimientos) {
       const movimiento = copiaMovimientos[i];
 
       try {
-        // ================= VALIDACIÓN CON CALLBACK =================
+        // -- VALIDACIÓN CON CALLBACK --
         const movimientoCallback = await new Promise((resolve, reject) => {
           validarLoteCallback(movimiento, (error, data) => {
             if (error) reject(error);
@@ -88,10 +78,10 @@ export async function procesarInventarioEj8(movimientos) {
           });
         });
 
-        // ================= VALIDACIÓN CON PROMESA =================
+        // -- VALIDACIÓN CON PROMESA --
         const movimientoValido = await validarCantidadPromesa(movimientoCallback);
 
-        // ================= CLASIFICACIÓN LÓGICA =================
+        // - CLASIFICACIÓN LÓGICA -
         // Solo procesamos productos activos
         if (movimientoValido.activo) {
           validos.push(movimientoValido);
@@ -134,7 +124,7 @@ export async function procesarInventarioEj8(movimientos) {
       }
     }
 
-    // ================= DETECTAR INVENTARIO NEGATIVO =================
+    // -- DETECTAR INVENTARIO NEGATIVO 
     const inventarioNegativo = Object.entries(inventarioFinal)
       .filter(([id, info]) => info.cantidad < 0)
       .map(([id, info]) => ({ 
@@ -143,7 +133,7 @@ export async function procesarInventarioEj8(movimientos) {
         cantidad: info.cantidad 
       }));
 
-    // ================= RETORNAR RESULTADOS =================
+    // -- RETORNAR RESULTADOS --
     return {
       validos,
       rechazados,
