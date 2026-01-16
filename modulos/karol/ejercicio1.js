@@ -1,5 +1,5 @@
 // SISTEMA DE VALIDACIÓN Y PROCESAMIENTO DE SOLICITUDES
-// Este archivo contiene TODA la lógica del Ejercicio 1
+// Este archivo contiene TODA la lógica de procesamiento del Ejercicio 1  (valida y procesa los datos recibidos)
 
 // FUNCIÓN CALLBACK (NO SE EXPORTA)
 // Simula una validación externa usando callback

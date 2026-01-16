@@ -85,43 +85,90 @@ function procesoAsincronico() {
 
 // FUNCIÓN PRINCIPAL ASYNC / AWAIT
 // ESTA FUNCIÓN SÍ SE EXPORTA
-// Es la función que usa el menú y el barril
-export async function procesarSolicitudEj2(solicitud) {
+// Ahora recibe un ARRAY de solicitudes
+export async function procesarSolicitudEj2(solicitudes) {
 
-  try {
+  // Se crean contadores para el resumen final
+  let totalProcesadas = 0;
+  let aprobadas = 0;
+  let rechazadas = 0;
+  let invalidas = 0;
+  let errores = 0;
 
-    // VALIDACIÓN DE LOS DATOS
-    // Se validan los datos básicos de la solicitud
-    validarSolicitud(solicitud);
+  // Se crea un arreglo para guardar los resultados
+  const resultados = [];
 
-    // PROCESO ASINCRÓNICO
-    // Se espera la finalización del proceso externo
-    await procesoAsincronico();
+  // Se recorre el arreglo de solicitudes
+  for (let i = 0; i < solicitudes.length; i++) {
+    
+    // Se obtiene la solicitud actual
+    const solicitud = solicitudes[i];
 
-    // DECISIÓN FINAL
-    // Se decide el resultado de la solicitud
-    const resultado = decidirResultado(solicitud);
+    try {
 
-    // CALLBACK DE NOTIFICACIÓN
-    // Se ejecuta el callback con el resultado
-    const notificacion = notificarResultado(resultado);
+      // VALIDACIÓN DE LOS DATOS
+      // Se validan los datos básicos de la solicitud
+      validarSolicitud(solicitud);
 
-    // RESULTADO FINAL
-    // Se retorna un objeto con la información del proceso
-    return {
-      id: solicitud.id,
-      resultado,
-      notificacion
-    };
+      // PROCESO ASINCRÓNICO
+      // Se espera la finalización del proceso externo
+      await procesoAsincronico();
 
-  } catch (error) {
+      // DECISIÓN FINAL
+      // Se decide el resultado de la solicitud
+      const resultado = decidirResultado(solicitud);
 
-    // MANEJO DE ERRORES CONTROLADOS
-    // Se retorna un objeto de error controlado
-    return {
-      id: solicitud?.id ?? null,
-      resultado: "ERROR",
-      mensaje: error.message
-    };
+      // CALLBACK DE NOTIFICACIÓN
+      // Se ejecuta el callback con el resultado
+      const notificacion = notificarResultado(resultado);
+
+      // RESULTADO INDIVIDUAL
+      // Se agrega el resultado al arreglo
+      resultados.push({
+        id: solicitud.id,
+        resultado: resultado,
+        notificacion: notificacion
+      });
+
+      // Se incrementa el contador de procesadas
+      totalProcesadas = totalProcesadas + 1;
+
+      // Se incrementan contadores según el resultado
+      if (resultado === "APROBADA") {
+        aprobadas = aprobadas + 1;
+      }
+      if (resultado === "RECHAZADA") {
+        rechazadas = rechazadas + 1;
+      }
+      if (resultado === "INVÁLIDA") {
+        invalidas = invalidas + 1;
+      }
+
+    } catch (error) {
+
+      // MANEJO DE ERRORES CONTROLADOS
+      // Se agrega el error al arreglo de resultados
+      resultados.push({
+        id: solicitud?.id ?? null,
+        resultado: "ERROR",
+        mensaje: error.message
+      });
+
+      // Se incrementa el contador de errores
+      errores = errores + 1;
+    }
   }
+
+  // RESUMEN FINAL
+  // Se retorna un objeto con los resultados y el resumen
+  return {
+    resultados: resultados,
+    resumen: {
+      total: totalProcesadas,
+      aprobadas: aprobadas,
+      rechazadas: rechazadas,
+      invalidas: invalidas,
+      errores: errores
+    }
+  };
 }

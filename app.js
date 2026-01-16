@@ -1,4 +1,5 @@
 // Archivo PRINCIPAL - app.js
+// Donde se hace captura de datos (interfaz/menú)(captura los datos del usuario)
 
 // ------- IMPORTACIONES -------
 import PromptSync from "prompt-sync";
@@ -99,19 +100,50 @@ async function menuCarpeta(nombreCarpeta) {
 }
 
 
-// EJERCICIOS
+// EJERCICIOS                                                                                        //EJERCICIO 1
 async function ejecutarEjercicio1() {
   let solicitudes = [];
   const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
 
   for (let i = 0; i < cantidad; i++) {
+    
+    // Se capturan los datos basicos
+    const id = parseInt(prompt("ID: "));
+    const nombre = prompt("Nombre: ");
+    const tipo = prompt("Tipo: ");
+    const prioridad = parseInt(prompt("Prioridad (1-5): "));
+    
+    // Se captura el estado como texto
+    const estadoTexto = prompt("Estado (true/false): ");
+    
+    // Se convierte a booleano solo si es true o false
+    let estado;
+    if (estadoTexto === "true") {
+      estado = true;
+    } else if (estadoTexto === "false") {
+      estado = false;
+    } else {
+      estado = estadoTexto;
+    }
+    
+    // Se capturan los requisitos
+    const cantidadRequisitos = parseInt(prompt("Cuantos requisitos: "));
+    const requisitos = [];
+    
+    // Se recorre para pedir cada requisito
+    for (let j = 0; j < cantidadRequisitos; j++) {
+      const requisito = prompt("Requisito " + (j + 1) + " (true/false): ") === "true";
+      requisitos.push(requisito);
+    }
+    
+    // Se agrega la solicitud completa
     solicitudes.push({
-      id: parseInt(prompt("ID: ")),
-      nombre: prompt("Nombre: "),
-      tipo: prompt("Tipo: "),
-      prioridad: parseInt(prompt("Prioridad (1-5): ")),
-      estado: prompt("Estado (true/false): ") === "true",
-      requisitos: []
+      id: id,
+      nombre: nombre,
+      tipo: tipo,
+      prioridad: prioridad,
+      estado: estado,
+      requisitos: requisitos
     });
   }
 
@@ -120,30 +152,168 @@ async function ejecutarEjercicio1() {
   }
 }
 
-async function ejecutarEjercicio2() {
-  const operacion = {
-    id: parseInt(prompt("ID: ")),
-    tipo: prompt("Tipo: "),
-    monto: parseFloat(prompt("Monto: ")),
-    autorizada: prompt("Autorizada (true/false): ") === "true",
-    categoria: prompt("Categoría: ")
-  };
+async function ejecutarEjercicio2() {                                                   //EJERCICIO 2
+  const solicitudes = [];
+  const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
 
-  console.log(await procesarSolicitudEj2(operacion));
+  // Captura múltiples solicitudes
+  for (let i = 0; i < cantidad; i++) {
+    
+    // Se capturan los datos basicos
+    const id = parseInt(prompt("ID: "));
+    const tipo = prompt("Tipo: ");
+    const valor = parseFloat(prompt("Valor: "));
+    
+    // Se captura el estado como texto
+    const estadoTexto = prompt("Estado (true/false): ");
+    
+    // Se convierte a booleano solo si es true o false
+    let estado;
+    if (estadoTexto === "true") {
+      estado = true;
+    } else if (estadoTexto === "false") {
+      estado = false;
+    } else {
+      estado = estadoTexto;
+    }
+    
+    const prioridad = parseInt(prompt("Prioridad (1-5): "));
+    
+    // Se agrega la solicitud completa
+    solicitudes.push({
+      id: id,
+      tipo: tipo,
+      valor: valor,
+      estado: estado,
+      prioridad: prioridad
+    });
+  }
+
+  // Se envía el ARRAY completo a la función
+  const respuesta = await procesarSolicitudEj2(solicitudes);
+  
+  // Se muestran los resultados individuales
+  console.log("\n--- RESULTADOS ---\n");
+  respuesta.resultados.forEach(resultado => {
+    console.log(resultado);
+  });
+  
+  // Se muestra el resumen final (REQUERIDO POR LA GUÍA)
+  console.log("\n--- RESUMEN FINAL ---");
+  console.log("Total procesadas: " + respuesta.resumen.total);
+  console.log("Aprobadas: " + respuesta.resumen.aprobadas);
+  console.log("Rechazadas: " + respuesta.resumen.rechazadas);
+  console.log("Inválidas: " + respuesta.resumen.invalidas);
+  console.log("Errores: " + respuesta.resumen.errores);
+  console.log("");
 }
 
-async function ejecutarEjercicio3() {
-  const solicitud = {
-    id: parseInt(prompt("ID: ")),
-    nombre: prompt("Nombre: "),
-    edad: parseInt(prompt("Edad: ")),
-    rol: prompt("Rol: "),
-    permisos: prompt("Permisos (coma): ").split(","),
-    estado: prompt("Estado: "),
-    aceptaCondiciones: prompt("Acepta condiciones (true/false): ") === "true"
-  };
+async function ejecutarEjercicio3() {                                                     //EJERCICIO 3
+  
+  // Se crea un arreglo vacío para almacenar todas las solicitudes
+  const solicitudes = [];
+  
+  // Se pregunta cuántas solicitudes se van a ingresar
+  const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
 
-  console.log(await procesarSolicitudEj3(solicitud));
+  // Se usa un ciclo for para capturar múltiples solicitudes
+  // El ciclo se ejecuta tantas veces como solicitudes se pidieron
+  for (let i = 0; i < cantidad; i++) {
+    
+    // CAPTURA DE DATOS BÁSICOS
+    // Se captura el ID como número entero
+    const id = parseInt(prompt("ID: "));
+    
+    // Se captura el nombre como texto
+    const nombre = prompt("Nombre: ");
+    
+    // Se captura la edad y se convierte a número
+    // parseInt convierte el texto del prompt a número
+    const edad = parseInt(prompt("Edad: "));
+    
+    // Se captura el rol como texto
+    const rol = prompt("Rol: ");
+    
+    // CAPTURA Y PROCESAMIENTO DE PERMISOS
+    // Los permisos se ingresan como texto separado por comas
+    const permisosTexto = prompt("Permisos (separados por coma): ");
+    
+    // Se declara la variable permisos
+    let permisos;
+    
+    // Si el usuario no ingresó nada o solo espacios
+    if (permisosTexto.trim() === "") {
+      
+      // Se asigna un arreglo vacío
+      // Esto permitirá validar el caso de "permisos no solicitados"
+      permisos = [];
+      
+    } else {
+      
+      // Si hay contenido, se separa el texto por comas
+      // split(",") divide el texto en un arreglo
+      // map(p => p.trim()) elimina espacios de cada permiso
+      permisos = permisosTexto.split(",").map(p => p.trim());
+    }
+    
+    // Se captura el estado como texto
+    const estado = prompt("Estado: ");
+    
+    // CONVERSIÓN DE ACEPTACONDICIONES A BOOLEANO
+    // Se captura como texto primero
+    const aceptaTexto = prompt("Acepta condiciones (true/false): ");
+    
+    // Se declara la variable para el booleano
+    let aceptaCondiciones;
+    
+    // Se valida si el usuario escribió exactamente "true"
+    if (aceptaTexto === "true") {
+      
+      // Se asigna el booleano true
+      aceptaCondiciones = true;
+      
+    } else if (aceptaTexto === "false") {
+      
+      // Se asigna el booleano false
+      aceptaCondiciones = false;
+      
+    } else {
+      
+      // Si escribió otra cosa, se guarda tal cual
+      // Esto permite validar datos mal ingresados
+      aceptaCondiciones = aceptaTexto;
+    }
+    
+    // Se agrega el objeto solicitud completo al arreglo
+    // Cada propiedad corresponde a los datos capturados
+    solicitudes.push({
+      id: id,
+      nombre: nombre,
+      edad: edad,
+      rol: rol,
+      permisos: permisos,
+      estado: estado,
+      aceptaCondiciones: aceptaCondiciones
+    });
+  }
+
+  // Se envía el ARRAY completo de solicitudes a la función procesadora
+  // await espera a que termine todo el procesamiento asincrónico
+  const resultados = await procesarSolicitudEj3(solicitudes);
+  
+  // MOSTRAR RESULTADOS EN CONSOLA
+  console.log("\n--- RESULTADOS ---\n");
+  
+  // Se recorre el arreglo de resultados y se imprime cada uno
+  // forEach ejecuta una función por cada elemento del arreglo
+  resultados.forEach(resultado => {
+    
+    // Se imprime el objeto resultado completo
+    console.log(resultado);
+  });
+  
+  // Se imprime una línea en blanco al final
+  console.log("");
 }
 
 async function ejecutarEjercicio4() {

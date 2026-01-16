@@ -71,10 +71,10 @@ Maneja errores de forma controlada.
 
 Luego de las validaciones técnicas, se aplican reglas de negocio:
 
-Si la validación básica falla, la solicitud es rechazada.
-Si el rol no es compatible con los permisos, la solicitud es rechazada.
-Si la validación externa falla, la solicitud queda en revisión.
-Si todas las condiciones se cumplen, la solicitud es aprobada.
+Si la validación básica falla, la solicitud es rechazada con ERROR.
+Si el rol no es compatible con los permisos, la solicitud es RECHAZADA.
+Si la validación externa falla, la solicitud queda en EN REVISIÓN.
+Si todas las condiciones se cumplen, la solicitud es APROBADA.
 
 --
 
@@ -241,21 +241,25 @@ mensaje: "Edad inválida o menor de edad"
 
 --
 
-### Caso 8: Error - permisos no es un arreglo
+### Caso 8: Solicitud en revisión - falla validación externa
 
 Datos de entrada:
 id: 8
-nombre: "Sofía López"
-edad: 35
-rol: "usuario"
-permisos: "leer"
+nombre: "Roberto Silva"
+edad: 26
+rol: "admin"
+permisos: ["leer", "escribir"]
 estado: "pendiente"
 aceptaCondiciones: true
 
 Resultado esperado:
 id: 8
-estado: "ERROR"
-mensaje: "No se solicitaron permisos"
+estado: "EN REVISIÓN"
+motivo: "Error en validación externa"
+
+Nota: Este caso depende del resultado aleatorio de la validación externa.
+Ejecutar varias veces hasta que la validación externa falle (30% probabilidad).
+Si la validación externa tiene éxito, el estado será "APROBADA".
 
 --
 

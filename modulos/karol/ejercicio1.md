@@ -205,20 +205,20 @@ mensaje: "El estado inicial debe ser booleano"
 
 --
 
-### Caso 8: Error - Requisitos no es arreglo (validación con promesa)
+### Caso 8: Error - Tipo de solicitud inválido
 
 Datos de entrada:
 id: 8
 nombre: "Carmen Vargas"
-tipo: "Permiso"
+tipo: ""
 prioridad: 3
 estado: true
-requisitos: "completos"
+requisitos: [true, true]
 
 Resultado esperado:
 id: 8
 estado: "ERROR"
-mensaje: "Los requisitos deben ser un arreglo"
+mensaje: "Tipo de solicitud inválido"
 
 --
 
