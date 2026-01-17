@@ -7,15 +7,15 @@ El sistema recibe un arreglo de objetos, donde cada objeto representa una operac
 Cada operación incluye los siguientes campos:
 
 id (string o number) → Identificador único de la operación
-activo (boolean) → Indica si la operación está habilitada
 valores (array de numbers) → Arreglo de valores numéricos
 tipo (string) → Tipo de operación ("suma", "promedio" o "multiplicacion")
+activo (boolean) → Indica si la operación está habilitada
 
 --
 
 ## 2. Procesos principales
 
-Validación de datos
+Validación de datos con callback
 
 Se verifica que los datos de cada operación cumplan las reglas mínimas:
 
@@ -25,7 +25,8 @@ Los valores deben ser un arreglo no vacío.
 Cada valor debe ser de tipo numérico.
 El tipo de operación debe ser reconocido.
 
-Si alguna validación falla, se genera un error controlado.
+El proceso se ejecuta de forma asincrónica usando callback.
+Si alguna validación falla, se genera un error controlado mediante callback.
 
 --
 
@@ -67,7 +68,8 @@ La función principal coordina todo el proceso:
 
 Recorre el arreglo usando un ciclo for.
 Clona cada operación para garantizar inmutabilidad.
-Procesa cada operación de forma asincrónica.
+Valida cada operación con callback.
+Procesa cada operación de forma asincrónica con promesa.
 Almacena los resultados en un arreglo de reporte.
 Maneja errores de forma controlada sin detener el flujo.
 
@@ -104,140 +106,97 @@ motivo → Mensaje con la razón del rechazo
 ### Caso 1: Operación válida - suma
 
 Datos de entrada:
-{
-  id: 1,
-  activo: true,
-  valores: [10, 20, 30],
-  tipo: "suma"
-}
+id: 1
+valores: [10, 20, 30]
+tipo: "suma"
+activo: true
 
 Resultado esperado:
 id: 1
 estado: "APROBADA"
-motivo: "Operación válida. Resultado: 60"
+motivo: "Operacion valida. Resultado: 60"
 
 --
 
 ### Caso 2: Operación válida - promedio
 
 Datos de entrada:
-{
-  id: 2,
-  activo: true,
-  valores: [15, 25, 35],
-  tipo: "promedio"
-}
+id: 2
+valores: [15, 25, 35]
+tipo: "promedio"
+activo: true
 
 Resultado esperado:
 id: 2
 estado: "APROBADA"
-motivo: "Operación válida. Resultado: 25"
+motivo: "Operacion valida. Resultado: 25"
 
 --
 
 ### Caso 3: Operación válida - multiplicación
 
 Datos de entrada:
-{
-  id: 3,
-  activo: true,
-  valores: [2, 3, 4],
-  tipo: "multiplicacion"
-}
+id: 3
+valores: [2, 3, 4]
+tipo: "multiplicacion"
+activo: true
 
 Resultado esperado:
 id: 3
 estado: "APROBADA"
-motivo: "Operación válida. Resultado: 24"
+motivo: "Operacion valida. Resultado: 24"
 
 --
 
 ### Caso 4: Operación rechazada - resultado cero
 
 Datos de entrada:
-{
-  id: 4,
-  activo: true,
-  valores: [0, 5, 10],
-  tipo: "multiplicacion"
-}
+id: 4
+valores: [0, 5, 10]
+tipo: "multiplicacion"
+activo: true
 
 Resultado esperado:
 id: 4
 estado: "RECHAZADA"
-motivo: "Resultado inválido: debe ser mayor a cero"
+motivo: "Resultado invalido: debe ser mayor a cero"
 
 --
 
-### Caso 5: Error - operación sin identificador
+### Caso 5: Error - operación desactivada
 
 Datos de entrada:
-{
-  activo: true,
-  valores: [5, 10, 15],
-  tipo: "suma"
-}
+id: 5
+valores: [8, 12, 16]
+tipo: "suma"
+activo: false
 
 Resultado esperado:
-id: "SIN ID"
+id: 5
 estado: "RECHAZADA"
-motivo: "La operación no tiene identificador"
+motivo: "La operacion esta desactivada"
 
 --
 
-### Caso 6: Error - operación desactivada
+### Caso 6: Error - arreglo de valores vacío
 
 Datos de entrada:
-{
-  id: 6,
-  activo: false,
-  valores: [8, 12, 16],
-  tipo: "suma"
-}
+id: 6
+valores: [dejar vacío o presionar enter]
+tipo: "promedio"
+activo: true
 
 Resultado esperado:
 id: 6
 estado: "RECHAZADA"
-motivo: "La operación está desactivada"
+motivo: "El arreglo de valores es invalido o esta vacio"
 
 --
 
-### Caso 7: Error - arreglo de valores vacío
-
-Datos de entrada:
-{
-  id: 7,
-  activo: true,
-  valores: [],
-  tipo: "promedio"
-}
-
-Resultado esperado:
-id: 7
-estado: "RECHAZADA"
-motivo: "El arreglo de valores es inválido o está vacío"
-
---
-
-### Caso 8: Error - valores no numéricos
-
-Datos de entrada:
-{
-  id: 8,
-  activo: true,
-  valores: [10, "veinte", 30],
-  tipo: "suma"
-}
-
-Resultado esperado:
-id: 8
-estado: "RECHAZADA"
-motivo: "Existen valores no numéricos en la operación"
-
---
 
 ## 10. Justificación técnica
 
+Uso de callback → validación inicial de datos con callback.
 Uso de Promesas → procesamiento asincrónico con tiempo variable.
 Uso de async/await → coordinación del flujo completo.
 Uso de try/catch → manejo de errores sin bloquear el sistema.

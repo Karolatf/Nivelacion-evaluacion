@@ -1,83 +1,132 @@
-// EJERCICIO 5 - SISTEMA DE ANÁLISIS Y VALIDACIÓN POR LOTES
-// Este archivo contiene TODA la lógica del ejercicio
+// SISTEMA DE ANALISIS Y VALIDACION POR LOTES
+// Este archivo contiene la logica completa del Ejercicio 5 
 
 
-// FUNCIÓN PRINCIPAL ASYNC / AWAIT
-// ESTA FUNCIÓN SÍ SE EXPORTA
-// Es la única función visible para el menú general
-export async function procesarTransaccionesEj5(operaciones) {
+// FUNCION DE VALIDACION CON CALLBACK (NO SE EXPORTA)
+// Valida los datos basicos de la operacion
+function validarDatosCallback(operacion, callback) {
 
-  // Arreglo donde se almacenan los resultados finales
-  const reporte = [];
-
-  // Se recorre el arreglo usando un ciclo for clásico
-  for (let i = 0; i < operaciones.length; i++) {
+  // setTimeout simula un proceso asincronico
+  setTimeout(() => {
 
     try {
 
-      // Se clona la operación para garantizar inmutabilidad
-      const operacionCopia = { ...operaciones[i] };
+      // Se valida que la operacion tenga identificador
+      if (operacion.id === undefined || operacion.id === null) {
+        throw new Error("La operacion no tiene identificador");
+      }
 
-      // Procesamiento asincrónico
-      // Se valida y procesa la operación
-      const resultado = await validarOperacionAsync(operacionCopia);
+      // Se valida que la operacion este activa
+      if (operacion.activo !== true) {
+        throw new Error("La operacion esta desactivada");
+      }
 
-      // Se almacena el resultado
-      reporte.push(resultado);
+      // Se valida que los valores sean un arreglo no vacio
+      if (!Array.isArray(operacion.valores) || operacion.valores.length === 0) {
+        throw new Error("El arreglo de valores es invalido o esta vacio");
+      }
+
+      // Se recorre el arreglo de valores
+      for (let i = 0; i < operacion.valores.length; i++) {
+        const valor = operacion.valores[i];
+
+        // Se valida que cada valor sea numerico
+        if (typeof valor !== "number") {
+          throw new Error("Existen valores no numericos en la operacion");
+        }
+      }
+
+      // Se define un arreglo con los tipos de operacion validos
+      const tiposValidos = ["suma", "promedio", "multiplicacion"];
+
+      // Se valida que el tipo de operacion sea uno de los permitidos
+      if (!tiposValidos.includes(operacion.tipo)) {
+        throw new Error("Tipo de operacion no reconocido");
+      }
+
+      // Si todas las validaciones son correctas, se retorna sin error
+      callback(null, operacion);
 
     } catch (error) {
 
-      // Manejo de error sin detener el flujo
-      // Si una operación falla, se registra pero el sistema continúa
-      reporte.push({
-        id: operaciones[i]?.id ?? "SIN ID",
-        estado: "RECHAZADA",
-        motivo: error.message
-      });
+      // Si ocurre cualquier error, se retorna por callback
+      callback(error, null);
     }
-  }
 
-  // Se retorna el arreglo completo con todos los resultados
-  return reporte;
+  }, 200);
 }
 
 
-// FUNCIÓN CON PROMESA (NO SE EXPORTA)
-// Valida y procesa una operación simulando tiempo variable
-function validarOperacionAsync(operacion) {
+// FUNCION DE CALCULO (FUNCION PURA)
+// Realiza el calculo matematico segun el tipo de operacion
+// No modifica el objeto recibido
+function calcularOperacion(operacion) {
+
+  // Variable para almacenar el resultado
+  let resultado = 0;
+
+  // Si es suma, se suman todos los valores
+  if (operacion.tipo === "suma") {
+    for (let i = 0; i < operacion.valores.length; i++) {
+      resultado = resultado + operacion.valores[i];
+    }
+  }
+
+  // Si es promedio, se calcula la media aritmetica
+  if (operacion.tipo === "promedio") {
+    let suma = 0;
+    for (let i = 0; i < operacion.valores.length; i++) {
+      suma = suma + operacion.valores[i];
+    }
+    resultado = suma / operacion.valores.length;
+  }
+
+  // Si es multiplicacion, se multiplican todos los valores
+  if (operacion.tipo === "multiplicacion") {
+    resultado = 1;
+    for (let i = 0; i < operacion.valores.length; i++) {
+      resultado = resultado * operacion.valores[i];
+    }
+  }
+
+  // Se retorna el resultado del calculo
+  return resultado;
+}
+
+
+// PROMESA ASINCRONICA (NO SE EXPORTA)
+// Procesa la operacion validada y retorna el resultado
+function procesarOperacionAsync(operacion) {
 
   // Se retorna una promesa
   return new Promise((resolve) => {
 
-    // Se calcula un tiempo de procesamiento variable (entre 500ms y 2500ms)
+    // Se calcula un tiempo de procesamiento variable entre 500ms y 2500ms
     const tiempo = Math.floor(Math.random() * 2000) + 500;
 
-    // setTimeout simula un proceso asincrónico
+    // setTimeout simula un proceso asincronico
     setTimeout(() => {
 
       try {
 
-        // Se validan los datos de la operación
-        validarDatos(operacion);
-
-        // Se calcula el resultado de la operación
+        // Se calcula el resultado de la operacion
         const resultado = calcularOperacion(operacion);
 
         // Se valida que el resultado sea mayor a cero
         if (resultado <= 0) {
-          throw new Error("Resultado inválido: debe ser mayor a cero");
+          throw new Error("Resultado invalido: debe ser mayor a cero");
         }
 
-        // Si todo es correcto, se resuelve la promesa con operación aprobada
+        // Si todo es correcto, se resuelve la promesa con operacion aprobada
         resolve({
           id: operacion.id,
           estado: "APROBADA",
-          motivo: `Operación válida. Resultado: ${resultado}`
+          motivo: "Operacion valida. Resultado: " + resultado
         });
 
       } catch (error) {
 
-        // Si ocurre un error, se resuelve la promesa con operación rechazada
+        // Si ocurre un error, se resuelve la promesa con operacion rechazada
         resolve({
           id: operacion.id,
           estado: "RECHAZADA",
@@ -90,77 +139,74 @@ function validarOperacionAsync(operacion) {
 }
 
 
-// FUNCIÓN DE VALIDACIÓN (NO SE EXPORTA)
-// Valida coherencia y tipos de datos de la operación
-function validarDatos(operacion) {
+// FUNCION PRINCIPAL ASYNC / AWAIT
+// ESTA FUNCION SI SE EXPORTA
+// Es la unica funcion visible para el menu general
+export async function procesarTransaccionesEj5(operaciones) {
 
-  // Se valida que la operación tenga identificador
-  if (operacion.id === undefined) {
-    throw new Error("La operación no tiene identificador");
-  }
+  // Arreglo donde se almacenan los resultados finales
+  const reporte = [];
 
-  // Se valida que la operación esté activa
-  if (operacion.activo !== true) {
-    throw new Error("La operación está desactivada");
-  }
+  try {
 
-  // Se valida que los valores sean un arreglo no vacío
-  if (!Array.isArray(operacion.valores) || operacion.valores.length === 0) {
-    throw new Error("El arreglo de valores es inválido o está vacío");
-  }
-
-  // Se recorre el arreglo de valores
-  for (let valor of operacion.valores) {
-
-    // Se valida que cada valor sea numérico
-    if (typeof valor !== "number") {
-      throw new Error("Existen valores no numéricos en la operación");
+    // Se valida que la entrada sea un arreglo
+    if (!Array.isArray(operaciones)) {
+      throw new Error("Las operaciones deben ser un arreglo");
     }
-  }
 
-  // Se define un arreglo con los tipos de operación válidos
-  const tiposValidos = ["suma", "promedio", "multiplicacion"];
+    // Se recorre el arreglo usando un ciclo for clasico
+    for (let i = 0; i < operaciones.length; i++) {
 
-  // Se valida que el tipo de operación sea uno de los permitidos
-  if (!tiposValidos.includes(operacion.tipo)) {
-    throw new Error("Tipo de operación no reconocido");
-  }
-}
+      try {
 
+        // Se clona la operacion para garantizar inmutabilidad
+        const operacionCopia = { ...operaciones[i] };
 
-// FUNCIÓN DE CÁLCULO (NO SE EXPORTA)
-// Realiza el cálculo matemático según el tipo de operación
-function calcularOperacion(operacion) {
+        // VALIDACION CON CALLBACK
+        // Se envuelve la funcion callback dentro de una promesa
+        const operacionValidada = await new Promise((resolve, reject) => {
 
-  // Variable para almacenar el resultado
-  let resultado = 0;
+          // Se llama a la validacion con callback
+          validarDatosCallback(operacionCopia, (error, data) => {
 
-  // Cálculo según el tipo de operación
+            // Si hay error se rechaza la promesa
+            if (error) {
+              reject(error);
+            } else {
+              // Si no hay error se continua
+              resolve(data);
+            }
+          });
+        });
 
-  // Si es suma, se suman todos los valores
-  if (operacion.tipo === "suma") {
-    for (let valor of operacion.valores) {
-      resultado += valor;
+        // PROCESAMIENTO CON PROMESA
+        // Se procesa la operacion validada
+        const resultado = await procesarOperacionAsync(operacionValidada);
+
+        // Se almacena el resultado
+        reporte.push(resultado);
+
+      } catch (error) {
+
+        // Si falla una operacion, se registra pero el sistema continua
+        reporte.push({
+          id: operaciones[i]?.id ?? "SIN ID",
+          estado: "RECHAZADA",
+          motivo: error.message
+        });
+      }
     }
-  }
 
-  // Si es promedio, se calcula la media aritmética
-  if (operacion.tipo === "promedio") {
-    let suma = 0;
-    for (let valor of operacion.valores) {
-      suma += valor;
-    }
-    resultado = suma / operacion.valores.length;
-  }
+    // Se retorna el arreglo completo con todos los resultados
+    return reporte;
 
-  // Si es multiplicación, se multiplican todos los valores
-  if (operacion.tipo === "multiplicacion") {
-    resultado = 1;
-    for (let valor of operacion.valores) {
-      resultado *= valor;
-    }
-  }
+  } catch (errorGeneral) {
 
-  // Se retorna el resultado del cálculo
-  return resultado;
+    // Si ocurre un error critico, se retorna error controlado
+    return [{
+      id: "SISTEMA",
+      estado: "ERROR",
+      motivo: errorGeneral.message
+    }];
+  }
 }

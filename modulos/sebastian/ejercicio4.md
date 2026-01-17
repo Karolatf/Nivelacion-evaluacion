@@ -110,14 +110,12 @@ En caso de error crítico, retorna un objeto con estado ERROR y mensaje.
 ### Caso 1: Transacción válida tipo ingreso
 
 Datos de entrada:
-{
-  id: 1,
-  usuario: "Carlos Mendez",
-  monto: 1500,
-  tipo: "ingreso",
-  autorizada: true,
-  fecha: "2025-01-14"
-}
+id: 1
+usuario: "Carlos Mendez"
+monto: 1500
+tipo: "ingreso"
+autorizada: true
+fecha: "2025-01-14"
 
 Resultado esperado:
 Clasificada como válida
@@ -129,14 +127,12 @@ Balance final incrementado
 ### Caso 2: Transacción válida tipo egreso
 
 Datos de entrada:
-{
-  id: 2,
-  usuario: "Ana Lopez",
-  monto: 800,
-  tipo: "egreso",
-  autorizada: true,
-  fecha: "2025-01-14"
-}
+id: 2
+usuario: "Ana Lopez"
+monto: 800
+tipo: "egreso"
+autorizada: true
+fecha: "2025-01-14"
 
 Resultado esperado:
 Clasificada como válida
@@ -148,14 +144,12 @@ Balance final incrementado
 ### Caso 3: Transacción sospechosa - no autorizada
 
 Datos de entrada:
-{
-  id: 3,
-  usuario: "Luis Garcia",
-  monto: 2000,
-  tipo: "ingreso",
-  autorizada: false,
-  fecha: "2025-01-14"
-}
+id: 3
+usuario: "Luis Garcia"
+monto: 2000
+tipo: "ingreso"
+autorizada: false
+fecha: "2025-01-14"
 
 Resultado esperado:
 Clasificada como sospechosa
@@ -164,17 +158,15 @@ Incluida en arreglo de sospechosas
 
 --
 
-### Caso 4: Error - ID inválido (string)
+### Caso 4: Error - ID inválido (número negativo)
 
 Datos de entrada:
-{
-  id: "ABC",
-  usuario: "Maria Torres",
-  monto: 500,
-  tipo: "ingreso",
-  autorizada: true,
-  fecha: "2025-01-14"
-}
+id: -5
+usuario: "Pedro Ruiz"
+monto: 300
+tipo: "egreso"
+autorizada: true
+fecha: "2025-01-14"
 
 Resultado esperado:
 Clasificada como inválida
@@ -183,36 +175,15 @@ No procesada en los cálculos
 
 --
 
-### Caso 5: Error - ID inválido (número negativo)
+### Caso 5: Error - Usuario vacío
 
 Datos de entrada:
-{
-  id: -5,
-  usuario: "Pedro Ruiz",
-  monto: 300,
-  tipo: "egreso",
-  autorizada: true,
-  fecha: "2025-01-14"
-}
-
-Resultado esperado:
-Clasificada como inválida
-Motivo: "ID inválido"
-No procesada en los cálculos
-
---
-
-### Caso 6: Error - Usuario vacío (validación con callback)
-
-Datos de entrada:
-{
-  id: 6,
-  usuario: "",
-  monto: 1000,
-  tipo: "ingreso",
-  autorizada: true,
-  fecha: "2025-01-14"
-}
+id: 5
+usuario: ""
+monto: 1000
+tipo: "ingreso"
+autorizada: true
+fecha: "2025-01-14"
 
 Resultado esperado:
 Clasificada como inválida
@@ -221,17 +192,15 @@ No procesada en los cálculos
 
 --
 
-### Caso 7: Error - Tipo de transacción inválido
+### Caso 6: Error - Tipo de transacción inválido
 
 Datos de entrada:
-{
-  id: 7,
-  usuario: "Sandra Diaz",
-  monto: 450,
-  tipo: "transferencia",
-  autorizada: true,
-  fecha: "2025-01-14"
-}
+id: 6
+usuario: "Sandra Diaz"
+monto: 450
+tipo: "transferencia"
+autorizada: true
+fecha: "2025-01-14"
 
 Resultado esperado:
 Clasificada como inválida
@@ -240,21 +209,36 @@ No procesada en los cálculos
 
 --
 
-### Caso 8: Error - Estado de autorización no booleano
+### Caso 7: Error - Estado de autorización no booleano
 
 Datos de entrada:
-{
-  id: 8,
-  usuario: "Roberto Castro",
-  monto: 600,
-  tipo: "egreso",
-  autorizada: "si",
-  fecha: "2025-01-14"
-}
+id: 7
+usuario: "Roberto Castro"
+monto: 600
+tipo: "egreso"
+autorizada: "si"
+fecha: "2025-01-14"
 
 Resultado esperado:
 Clasificada como inválida
 Motivo: "Estado de autorización inválido"
+No procesada en los cálculos
+
+--
+
+### Caso 8: Error - ID cero
+
+Datos de entrada:
+id: 0
+usuario: "Maria Torres"
+monto: 500
+tipo: "ingreso"
+autorizada: true
+fecha: "2025-01-14"
+
+Resultado esperado:
+Clasificada como inválida
+Motivo: "ID inválido"
 No procesada en los cálculos
 
 --
