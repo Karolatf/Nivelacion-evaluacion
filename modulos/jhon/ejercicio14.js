@@ -1,122 +1,182 @@
-// EJERCICIO 14 - Sistema de Análisis y Validación de Transacciones Bancarias
-// Este módulo se encarga de cargar, validar, clasificar y analizar transacciones bancarias
-// utilizando programación asincrónica, callbacks y manejo controlado de errores.
+// SISTEMA DE ANALISIS Y VALIDACION DE TRANSACCIONES BANCARIAS
+// Este archivo contiene la logica completa del Ejercicio 14 (ejercicio 2 de Jhon)
 
 
-// -------------------------------
-// Simulación de carga asincrónica
-// -------------------------------
-const cargarTransacciones = (transacciones) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (!Array.isArray(transacciones)) {
-        reject(new Error("Los datos de entrada deben ser un arreglo de transacciones"));
-      } else {
-        resolve([...transacciones]); // se devuelve copia (inmutabilidad)
-      }
-    }, 500);
-  });
-};
+// FUNCION DE VALIDACION (NO SE EXPORTA)
+// Valida los datos basicos de la transaccion
+// Si falla lanza un Error
+function validarTransaccion(transaccion) {
 
-
-// -------------------------------
-// Validación con callback
-// -------------------------------
-const validarAutorizacion = (transaccion, callback) => {
-  if (transaccion.autorizado !== true) {
-    callback("Transacción no autorizada");
-  } else {
-    callback(null);
-  }
-};
-
-
-// -------------------------------
-// Validación principal
-// -------------------------------
-const validarTransaccion = (transaccion, callback) => {
+  // Se valida que el ID sea un numero
   if (typeof transaccion.id !== "number") {
-    return "ID inválido";
+    throw new Error("ID invalido");
   }
 
+  // Se valida que el cliente sea un string no vacio
   if (typeof transaccion.cliente !== "string" || transaccion.cliente.trim() === "") {
-    return "Cliente inválido";
+    throw new Error("Cliente invalido");
   }
 
-  if (!["deposito", "retiro", "transferencia"].includes(transaccion.tipo)) {
-    return "Tipo de transacción inválido";
+  // Se valida que el tipo sea deposito, retiro o transferencia
+  const tiposPermitidos = ["deposito", "retiro", "transferencia"];
+  if (typeof transaccion.tipo !== "string" || !tiposPermitidos.includes(transaccion.tipo)) {
+    throw new Error("Tipo de transaccion invalido");
   }
 
+  // Se valida que el monto sea un numero mayor a cero
   if (typeof transaccion.monto !== "number" || transaccion.monto <= 0) {
-    return "Monto inválido";
+    throw new Error("Monto invalido debe ser mayor a cero");
   }
 
-  let errorAutorizacion = null;
-  validarAutorizacion(transaccion, (error) => {
-    if (error) errorAutorizacion = error;
+  // Se valida que autorizado sea booleano
+  if (typeof transaccion.autorizado !== "boolean") {
+    throw new Error("Campo autorizado invalido");
+  }
+
+  // Se valida que la transaccion este autorizada
+  if (transaccion.autorizado !== true) {
+    throw new Error("Transaccion no autorizada");
+  }
+
+  // Si todas las validaciones son correctas, retorna true
+  return true;
+}
+
+
+// FUNCION CALLBACK (NO SE EXPORTA)
+// Simula procesamiento con callback
+function procesarConCallback(transaccion, callback) {
+
+  // setTimeout simula un proceso asincronico
+  setTimeout(() => {
+
+    // Se retorna el resultado mediante callback
+    callback("Transaccion " + transaccion.id + " cargada con CALLBACK");
+
+  }, 400);
+}
+
+
+// PROMESA ASINCRONICA (NO SE EXPORTA)
+// Simula carga de datos con promesa
+function cargarConPromesa(transacciones) {
+
+  // Se retorna una promesa
+  return new Promise((resolve, reject) => {
+
+    // setTimeout simula un proceso asincronico
+    setTimeout(() => {
+
+      // Se valida que sea un arreglo
+      if (!Array.isArray(transacciones)) {
+        reject(new Error("Los datos deben ser un arreglo"));
+      }
+
+      // Se resuelve la promesa con copia inmutable
+      resolve([...transacciones]);
+
+    }, 600);
   });
-
-  if (errorAutorizacion) {
-    return errorAutorizacion;
-  }
-
-  return null;
-};
+}
 
 
-// -------------------------------
-// Proceso principal
-// -------------------------------
-export const procesarTransaccionesEj14 = async (transacciones) => {
+// FUNCION PRINCIPAL ASYNC / AWAIT
+// ESTA FUNCION SI SE EXPORTA
+// Es la unica funcion visible para el menu general
+export async function procesarTransaccionesEj14(transacciones) {
+
+  // Arreglos para almacenar resultados
+  const transaccionesValidas = [];
+  const transaccionesRechazadas = [];
+
+  // Contadores para resumen final
+  let totalProcesadas = 0;
+  let validas = 0;
+  let rechazadas = 0;
+  let totalDepositos = 0;
+  let totalRetiros = 0;
+
   try {
-    const datos = await cargarTransacciones(transacciones);
 
-    let totalDepositos = 0;
-    let totalRetiros = 0;
-    let validas = 0;
-    let rechazadas = 0;
+    // CARGA ASINCRONICA CON PROMESA
+    // Se simula la carga de datos desde una fuente externa
+    const datosRecibidos = await cargarConPromesa(transacciones);
 
-    const motivosRechazo = [];
+    // Se obtiene el total de transacciones
+    totalProcesadas = datosRecibidos.length;
 
-    for (let i = 0; i < datos.length; i++) {
-      const transaccion = datos[i];
-      const error = validarTransaccion(transaccion);
+    // VALIDACION Y CLASIFICACION DE TRANSACCIONES
+    // Se recorre el arreglo usando un ciclo for clasico
+    for (let i = 0; i < datosRecibidos.length; i++) {
 
-      if (error) {
-        rechazadas++;
-        motivosRechazo.push({
-          id: transaccion.id ?? null,
-          motivo: error
+      // Se obtiene la transaccion actual
+      const transaccion = datosRecibidos[i];
+
+      try {
+
+        // Se valida la transaccion
+        validarTransaccion(transaccion);
+
+        // PROCESO CON CALLBACK
+        // Se envuelve el callback en una promesa
+        await new Promise((resolve) => {
+          procesarConCallback(transaccion, resolve);
         });
-        continue;
-      }
 
-      validas++;
+        // PROCESO ADICIONAL CON ASYNC / AWAIT
+        // Se simula validacion extra
+        await new Promise((resolve) => setTimeout(resolve, 300));
 
-      if (transaccion.tipo === "deposito") {
-        totalDepositos += transaccion.monto;
-      }
+        // Si es valida se agrega al arreglo de validas
+        // Se usa spread operator para garantizar inmutabilidad
+        transaccionesValidas.push({ ...transaccion });
 
-      if (transaccion.tipo === "retiro") {
-        totalRetiros += transaccion.monto;
+        // Se incrementa el contador de validas
+        validas = validas + 1;
+
+        // Se calculan los totales por tipo
+        if (transaccion.tipo === "deposito") {
+          totalDepositos = totalDepositos + transaccion.monto;
+        }
+
+        if (transaccion.tipo === "retiro") {
+          totalRetiros = totalRetiros + transaccion.monto;
+        }
+
+      } catch (errorValidacion) {
+
+        // Si falla la validacion se agrega al arreglo de rechazadas
+        transaccionesRechazadas.push({
+          id: transaccion.id ?? null,
+          motivo: errorValidacion.message
+        });
+
+        // Se incrementa el contador de rechazadas
+        rechazadas = rechazadas + 1;
       }
     }
 
-    // Resultado final
+    // Se retorna un objeto con todos los resultados
     return {
-      estado: "ANÁLISIS COMPLETADO",
-      totalProcesadas: datos.length,
-      transaccionesValidas: validas,
-      transaccionesRechazadas: rechazadas,
-      totalDepositos,
-      totalRetiros,
-      motivosRechazo
+      totalProcesadas: totalProcesadas,
+      validas: validas,
+      rechazadas: rechazadas,
+      totalDepositos: totalDepositos,
+      totalRetiros: totalRetiros,
+      errores: transaccionesRechazadas
     };
 
-  } catch (error) {
+  } catch (errorGeneral) {
+
+    // Si ocurre un error critico, se retorna error controlado
     return {
-      estado: "ERROR",
-      mensaje: error.message
+      totalProcesadas: 0,
+      validas: 0,
+      rechazadas: 0,
+      totalDepositos: 0,
+      totalRetiros: 0,
+      errores: [],
+      error: errorGeneral.message
     };
   }
-};
+}
