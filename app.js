@@ -331,56 +331,289 @@ async function ejecutarEjercicio3() {                                           
   console.log("");
 }
 
-async function ejecutarEjercicio4() {
+async function ejecutarEjercicio4() {                                                    //EJERCICIO 4
+  
+  // Se crea el arreglo para guardar transacciones
   const transacciones = [];
+  
+  // Se pregunta cuantas transacciones va a ingresar
   const cantidad = parseInt(prompt("¿Cuántas transacciones? "));
 
+  // Se recorre para capturar cada transaccion
   for (let i = 0; i < cantidad; i++) {
+    
+    // Se captura el ID como texto
+    const idTexto = prompt("ID: ");
+    
+    // Se declara la variable id
+    let id;
+    
+    // Valida si esta vacio o no es numero
+    if (idTexto === "" || isNaN(idTexto)) {
+      id = idTexto;
+    } else {
+      id = parseInt(idTexto);
+    }
+    
+    // Se capturan los demas campos
+    const usuario = prompt("Usuario: ");
+    const monto = parseFloat(prompt("Monto: "));
+    const tipo = prompt("Tipo: ");
+    
+    // Se captura autorizada como texto
+    const autorizadaTexto = prompt("Autorizada (true/false): ");
+    
+    // Se convierte a booleano
+    let autorizada;
+    if (autorizadaTexto === "true") {
+      autorizada = true;
+    } else if (autorizadaTexto === "false") {
+      autorizada = false;
+    } else {
+      autorizada = autorizadaTexto;
+    }
+    
+    const fecha = prompt("Fecha: ");
+    
+    // Se agrega al arreglo
     transacciones.push({
-      id: parseInt(prompt("ID: ")),
-      usuario: prompt("Usuario: "),
-      monto: parseFloat(prompt("Monto: ")),
-      tipo: prompt("Tipo: "),
-      autorizada: prompt("Autorizada (true/false): ") === "true",
-      fecha: prompt("Fecha: ")
+      id: id,
+      usuario: usuario,
+      monto: monto,
+      tipo: tipo,
+      autorizada: autorizada,
+      fecha: fecha
     });
   }
 
-  console.log(await procesarTransaccionesEj4(transacciones));
+  // Se procesa el arreglo completo
+  const resultado = await procesarTransaccionesEj4(transacciones);
+
+  console.log("\n");
+  console.log("RESULTADOS DEL PROCESAMIENTO");
+  console.log("\n");
+
+  // Se muestran las transacciones validas
+  console.log("TRANSACCIONES VALIDAS");
+  console.log("\n");
+  
+  if (resultado.validas && resultado.validas.length > 0) {
+    
+    // Se recorre cada transaccion valida
+    for (let i = 0; i < resultado.validas.length; i++) {
+      const t = resultado.validas[i];
+      console.log("ID: " + t.id + " | Usuario: " + t.usuario + " | Monto: $" + t.monto + " | Tipo: " + t.tipo);
+    }
+    
+  } else {
+    console.log("No hay transacciones validas");
+  }
+  
+  console.log("\n");
+
+  // Se muestran las transacciones sospechosas
+  console.log("TRANSACCIONES SOSPECHOSAS");
+  console.log("\n");
+  
+  if (resultado.sospechosas && resultado.sospechosas.length > 0) {
+    
+    // Se recorre cada transaccion sospechosa
+    for (let i = 0; i < resultado.sospechosas.length; i++) {
+      const t = resultado.sospechosas[i];
+      console.log("ID: " + t.id + " | Usuario: " + t.usuario + " | Monto: $" + t.monto + " | Tipo: " + t.tipo);
+    }
+    
+  } else {
+    console.log("No hay transacciones sospechosas");
+  }
+  
+  console.log("\n");
+
+  // Se muestran las transacciones invalidas
+  console.log("TRANSACCIONES INVALIDAS");
+  console.log("\n");
+  
+  if (resultado.invalidas && resultado.invalidas.length > 0) {
+    
+    // Se recorre cada transaccion invalida
+    for (let i = 0; i < resultado.invalidas.length; i++) {
+      const item = resultado.invalidas[i];
+      
+      // Se obtiene el id de la transaccion
+      let idInvalido;
+      if (item.transaccion && item.transaccion.id) {
+        idInvalido = item.transaccion.id;
+      } else {
+        idInvalido = "N/A";
+      }
+      
+      console.log("ID: " + idInvalido + " | Motivo: " + item.motivo);
+    }
+    
+  } else {
+    console.log("No hay transacciones invalidas");
+  }
+  
+  console.log("\n");
+
+  // Se muestra el resumen financiero
+  console.log("RESUMEN FINANCIERO");
+  console.log("\n");
+  console.log("Total procesadas:  " + resultado.totalProcesadas);
+  console.log("Total de ingresos: $" + resultado.totalIngresos);
+  console.log("Total de egresos:  $" + resultado.totalEgresos);
+  console.log("Balance final:     $" + resultado.balanceFinal);
+  console.log("\n");
 }
 
-async function ejecutarEjercicio5() {
+async function ejecutarEjercicio5() {                                                   //EJERCICIO 5
+  
+  // Se crea el arreglo vacio para guardar operaciones
   const operaciones = [];
+  
+  // Se pregunta cuantas operaciones va a ingresar
   const cantidad = parseInt(prompt("¿Cuántas operaciones? "));
 
+  // Se recorre para capturar cada operacion
   for (let i = 0; i < cantidad; i++) {
+    
+    // Se captura el ID
+    const id = prompt("ID: ");
+    
+    // Se capturan los valores separados por coma
+    const valoresTexto = prompt("Valores (separados por coma): ");
+    
+    // Se procesan los valores
+    let valores;
+    
+    // Si esta vacio, se asigna array vacio
+    if (valoresTexto.trim() === "") {
+      valores = [];
+    } else {
+      // Se separa por comas y se convierte a numeros
+      valores = valoresTexto.split(",").map(v => parseFloat(v.trim()));
+    }
+    
+    // Se captura el tipo de operacion
+    const tipo = prompt("Tipo: ");
+    
+    // Se captura activo como texto
+    const activoTexto = prompt("Activo (true/false): ");
+    
+    // Se convierte a booleano
+    let activo;
+    if (activoTexto === "true") {
+      activo = true;
+    } else if (activoTexto === "false") {
+      activo = false;
+    } else {
+      activo = activoTexto;
+    }
+    
+    // Se agrega al arreglo
     operaciones.push({
-      id: prompt("ID: "),
-      valores: prompt("Valores (coma): ").split(",").map(Number),
-      tipo: prompt("Tipo: "),
-      activo: prompt("Activo (true/false): ") === "true"
+      id: id,
+      valores: valores,
+      tipo: tipo,
+      activo: activo
     });
   }
 
-  (await procesarTransaccionesEj5(operaciones)).forEach(r => console.log(r));
+  // Se procesa el arreglo completo
+  const resultados = await procesarTransaccionesEj5(operaciones);
+
+  console.log("\n");
+  console.log("RESULTADOS DEL PROCESAMIENTO");
+  console.log("\n");
+
+  // Se muestran los resultados
+  if (resultados && resultados.length > 0) {
+    
+    // Se recorre cada resultado
+    for (let i = 0; i < resultados.length; i++) {
+      const r = resultados[i];
+      console.log("ID: " + r.id + " | Estado: " + r.estado + " | Motivo: " + r.motivo);
+    }
+    
+  } else {
+    console.log("No hay resultados");
+  }
+  
+  console.log("\n");
 }
 
-async function ejecutarEjercicio6() {
+async function ejecutarEjercicio6() {                                                    //EJERCICIO 6
+  
+  // Se crea el arreglo para guardar solicitudes
   const solicitudes = [];
+  
+  // Se pregunta cuantas solicitudes va a ingresar
   const cantidad = parseInt(prompt("¿Cuántas solicitudes? "));
 
+  // Se recorre para capturar cada solicitud
   for (let i = 0; i < cantidad; i++) {
+    
+    // Se capturan los datos basicos
+    const id = parseInt(prompt("ID: "));
+    const cliente = prompt("Cliente: ");
+    const tipoServicio = prompt("Tipo de servicio: ");
+    const prioridad = parseInt(prompt("Prioridad (1-5): "));
+    
+    // Se captura activo como texto
+    const activoTexto = prompt("Activa (true/false): ");
+    
+    // Se convierte a booleano
+    let activo;
+    if (activoTexto === "true") {
+      activo = true;
+    } else if (activoTexto === "false") {
+      activo = false;
+    } else {
+      activo = activoTexto;
+    }
+    
+    const fechaSolicitud = prompt("Fecha: ");
+    
+    // Se agrega al arreglo
     solicitudes.push({
-      id: parseInt(prompt("ID: ")),
-      cliente: prompt("Cliente: "),
-      tipoServicio: prompt("Tipo de servicio: "),
-      prioridad: parseInt(prompt("Prioridad (1-5): ")),
-      activo: prompt("Activa (true/false): ") === "true",
-      fechaSolicitud: prompt("Fecha: ")
+      id: id,
+      cliente: cliente,
+      tipoServicio: tipoServicio,
+      prioridad: prioridad,
+      activo: activo,
+      fechaSolicitud: fechaSolicitud
     });
   }
 
-  console.log(await procesarSolicitudesServicio(solicitudes));
+  // Se procesa el arreglo completo
+  const resultado = await procesarSolicitudesServicio(solicitudes);
+
+  console.log("\n");
+  console.log("RESULTADOS DEL PROCESAMIENTO");
+  console.log("\n");
+
+  // Se muestra el detalle de cada solicitud
+  if (resultado.detalle && resultado.detalle.length > 0) {
+    
+    // Se recorre cada resultado
+    for (let i = 0; i < resultado.detalle.length; i++) {
+      const r = resultado.detalle[i];
+      console.log("ID: " + r.id + " | Estado: " + r.estado + " | Motivo: " + r.motivo);
+    }
+    
+  } else {
+    console.log("No hay resultados");
+  }
+  
+  console.log("\n");
+
+  // Se muestra el resumen final
+  console.log("RESUMEN FINAL");
+  console.log("\n");
+  console.log("Total procesadas: " + resultado.totalProcesadas);
+  console.log("Total aprobadas:  " + resultado.totalAprobadas);
+  console.log("Total rechazadas: " + resultado.totalRechazadas);
+  console.log("\n");
 }
 
 async function ejecutarEjercicio7() {

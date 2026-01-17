@@ -107,14 +107,12 @@ motivo → Mensaje descriptivo del resultado
 ### Caso 1: Solicitud aprobada - prioridad alta
 
 Datos de entrada:
-{
-  id: 1,
-  cliente: "Maria Gonzalez",
-  tipoServicio: "Mantenimiento",
-  prioridad: 5,
-  activo: true,
-  fechaSolicitud: "2025-01-14"
-}
+id: 1
+cliente: "Maria Gonzalez"
+tipoServicio: "Mantenimiento"
+prioridad: 5
+activo: true
+fechaSolicitud: "2025-01-14"
 
 Resultado esperado:
 id: 1
@@ -126,14 +124,12 @@ motivo: "Solicitud validada y aceptada correctamente"
 ### Caso 2: Solicitud aprobada - prioridad límite
 
 Datos de entrada:
-{
-  id: 2,
-  cliente: "Carlos Mendez",
-  tipoServicio: "Instalación",
-  prioridad: 3,
-  activo: true,
-  fechaSolicitud: "2025-01-14"
-}
+id: 2
+cliente: "Carlos Mendez"
+tipoServicio: "Instalacion"
+prioridad: 3
+activo: true
+fechaSolicitud: "2025-01-14"
 
 Resultado esperado:
 id: 2
@@ -145,14 +141,12 @@ motivo: "Solicitud validada y aceptada correctamente"
 ### Caso 3: Solicitud rechazada - prioridad insuficiente
 
 Datos de entrada:
-{
-  id: 3,
-  cliente: "Ana Lopez",
-  tipoServicio: "Consulta",
-  prioridad: 2,
-  activo: true,
-  fechaSolicitud: "2025-01-14"
-}
+id: 3
+cliente: "Ana Lopez"
+tipoServicio: "Consulta"
+prioridad: 2
+activo: true
+fechaSolicitud: "2025-01-14"
 
 Resultado esperado:
 id: 3
@@ -161,98 +155,71 @@ motivo: "Prioridad insuficiente para el servicio"
 
 --
 
-### Caso 4: Error - ID inválido (validación con callback)
+### Caso 4: Error - Cliente vacío
 
 Datos de entrada:
-{
-  id: "ABC",
-  cliente: "Luis Garcia",
-  tipoServicio: "Reparación",
-  prioridad: 4,
-  activo: true,
-  fechaSolicitud: "2025-01-14"
-}
+id: 4
+cliente: [presionar enter sin escribir]
+tipoServicio: "Soporte"
+prioridad: 4
+activo: true
+fechaSolicitud: "2025-01-14"
 
 Resultado esperado:
-id: null
+id: 4
 estado: "RECHAZADA"
-motivo: "ID inválido"
+motivo: "Nombre de cliente invalido"
 
 --
 
-### Caso 5: Error - Cliente vacío (validación con callback)
+### Caso 5: Error - Prioridad fuera de rango
 
 Datos de entrada:
-{
-  id: 5,
-  cliente: "",
-  tipoServicio: "Soporte",
-  prioridad: 4,
-  activo: true,
-  fechaSolicitud: "2025-01-14"
-}
+id: 5
+cliente: "Pedro Ruiz"
+tipoServicio: "Revision"
+prioridad: 8
+activo: true
+fechaSolicitud: "2025-01-14"
 
 Resultado esperado:
 id: 5
-estado: "RECHAZADA"
-motivo: "Nombre de cliente inválido"
-
---
-
-### Caso 6: Error - Prioridad fuera de rango
-
-Datos de entrada:
-{
-  id: 6,
-  cliente: "Pedro Ruiz",
-  tipoServicio: "Revisión",
-  prioridad: 8,
-  activo: true,
-  fechaSolicitud: "2025-01-14"
-}
-
-Resultado esperado:
-id: 6
 estado: "RECHAZADA"
 motivo: "Prioridad fuera de rango (1 a 5)"
 
 --
 
-### Caso 7: Error - Solicitud desactivada (validación con callback)
+### Caso 6: Error - Solicitud desactivada
 
 Datos de entrada:
-{
-  id: 7,
-  cliente: "Sandra Diaz",
-  tipoServicio: "Actualización",
-  prioridad: 4,
-  activo: false,
-  fechaSolicitud: "2025-01-14"
-}
+id: 6
+cliente: "Sandra Diaz"
+tipoServicio: "Actualizacion"
+prioridad: 4
+activo: false
+fechaSolicitud: "2025-01-14"
+
+Resultado esperado:
+id: 6
+estado: "RECHAZADA"
+motivo: "La solicitud esta desactivada"
+
+--
+
+### Caso 7: Error - Prioridad cero
+
+Datos de entrada:
+id: 7
+cliente: "Roberto Castro"
+tipoServicio: "Instalacion"
+prioridad: 0
+activo: true
+fechaSolicitud: "2025-01-14"
 
 Resultado esperado:
 id: 7
 estado: "RECHAZADA"
-motivo: "La solicitud está desactivada"
-
---
-
-### Caso 8: Error - Tipo de servicio inválido
-
-Datos de entrada:
-{
-  id: 8,
-  cliente: "Roberto Castro",
-  tipoServicio: 123,
-  prioridad: 3,
-  activo: true,
-  fechaSolicitud: "2025-01-14"
-}
-
-Resultado esperado:
-id: 8
-estado: "RECHAZADA"
-motivo: "Tipo de servicio inválido"
+motivo: "Prioridad fuera de rango (1 a 5)"
 
 --
 
