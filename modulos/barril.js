@@ -34,8 +34,15 @@ import { procesarSolicitudesEj18 } from "./manuel/ejercicio18.js";
 
 // -------- PAULO --------
 import { procesarSolicitudesEj19 } from "./paulo/ejercicio19.js";
+import { procesarSolicitudesEj20 } from "./paulo/ejercicio20.js";
+import { procesarSolicitudesEj21 } from "./paulo/ejercicio21.js";
 
-// EXPORTACIONES
+// -------- WILMER --------
+import { procesarSolicitudesEj22 } from "./wilmer/ejercicio22.js";
+import { procesarSolicitudesEj23 } from "./wilmer/ejercicio23.js";
+import { procesarSolicitudesEj24 } from "./wilmer/ejercicio24.js";
+
+// -------- EXPORTACIONES --------
 export {
   procesarSolicitud,
   procesarSolicitudEj2,
@@ -55,5 +62,10 @@ export {
   procesarSolicitudesEj16,
   procesarTransaccionesEj17,
   procesarSolicitudesEj18,
-  procesarSolicitudesEj19
+  procesarSolicitudesEj19,
+  procesarSolicitudesEj20,
+  procesarSolicitudesEj21,
+  procesarSolicitudesEj22,
+  procesarSolicitudesEj23,
+  procesarSolicitudesEj24
 };

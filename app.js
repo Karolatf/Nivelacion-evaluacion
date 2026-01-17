@@ -26,7 +26,13 @@ import {
   procesarSolicitudesEj16,
   procesarTransaccionesEj17,
   procesarSolicitudesEj18,
-  procesarSolicitudesEj19
+  procesarSolicitudesEj19,
+  procesarSolicitudesEj20,
+  procesarSolicitudesEj21,
+  procesarSolicitudesEj22,
+  procesarSolicitudesEj23,
+  procesarSolicitudesEj24
+     
 } from "./modulos/barril.js";
 
 // CONFIGURACIÓN DE MENÚS
@@ -37,7 +43,8 @@ const ejerciciosPorCarpeta = {
   isabella: [10, 11, 12],
   jhon: [13, 14, 15],
   manuel: [16, 17, 18], 
-  paulo: [19, 20, 21]    
+  paulo: [19, 20, 21],
+  wilmer: [22, 23, 24]    
 };
 
 // MAPEO DE FUNCIONES POR EJERCICIO
@@ -60,8 +67,14 @@ const funcionesEjercicio = {
   16: ejecutarEjercicio16,
   17: ejecutarEjercicio17,
   18: ejecutarEjercicio18,
-  19: procesarSolicitudesEj19
+  19: ejecutarEjercicio19,
+  20: ejecutarEjercicio20,
+  21: ejecutarEjercicio21,
+  22: ejecutarEjercicio22,
+  23: ejecutarEjercicio23,
+  24: ejecutarEjercicio24     
 };
+
 
 // MENÚ GENERAL
 async function menuGeneral() {
@@ -1170,6 +1183,239 @@ async function ejecutarEjercicio19() {
   }
 }
 
+async function ejecutarEjercicio20() {
+  console.log("\n--- EJERCICIO 20 ---");
+  console.log("Sistema de gestión inmutable de solicitudes\n");
+
+  // Arreglo para almacenar las solicitudes ingresadas
+  const solicitudes = [];
+
+  // Se pregunta cuántas solicitudes se desean ingresar
+  const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
+
+  // Ciclo para capturar cada solicitud
+  for (let i = 0; i < cantidad; i++) {
+    console.log(`\nSolicitud ${i + 1}`);
+
+    solicitudes.push({
+      id: parseInt(prompt("ID: ")),
+      usuario: prompt("Usuario: "),
+      tipo: prompt("Tipo (hardware/software/red): "),
+      prioridad: parseInt(prompt("Prioridad (1-5): ")),
+      estado: "pendiente"
+    });
+  }
+
+  console.log("\nPROCESANDO SOLICITUDES...\n");
+
+  try {
+    // Se envía el arreglo completo al módulo
+    const resultado = await procesarSolicitudesEj20(solicitudes);
+
+    // Mostrar arreglo original (sin modificaciones)
+    console.log("--- SOLICITUDES ORIGINALES ---");
+    console.log(resultado.originales);
+
+    // Mostrar solicitudes procesadas
+    console.log("\n--- SOLICITUDES PROCESADAS ---");
+    resultado.procesadas.forEach(s => {
+      console.log(`Solicitud ${s.id}`);
+      console.log(`Usuario: ${s.usuario}`);
+      console.log(`Tipo: ${s.tipo}`);
+      console.log(`Clasificación: ${s.clasificacion}`);
+      console.log(`Estado final: ${s.estado}`);
+      console.log("-----------------------------");
+    });
+
+    // Mostrar solicitudes rechazadas
+    if (resultado.rechazadas.length > 0) {
+      console.log("\n--- SOLICITUDES RECHAZADAS ---");
+      resultado.rechazadas.forEach(r => {
+        console.log(`ID ${r.id}: ${r.motivo}`);
+      });
+    }
+
+    console.log("\n✔ Ejercicio 20 ejecutado correctamente");
+
+  } catch (error) {
+    console.log("Error crítico controlado:", error.message);
+  }
+}
+
+async function ejecutarEjercicio21() {
+  console.log("\n--- EJERCICIO 21 ---");
+  console.log("Sistema de Gestión de Solicitudes de Soporte Técnico\n");
+
+  // Arreglo para almacenar las solicitudes
+  const solicitudes = [];
+
+  // Cantidad de solicitudes a ingresar
+  const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
+
+  // Captura de datos por consola
+  for (let i = 0; i < cantidad; i++) {
+    console.log(`\nSolicitud ${i + 1}`);
+
+    solicitudes.push({
+      id: parseInt(prompt("ID: ")),
+      usuario: prompt("Usuario: "),
+      tipo: prompt("Tipo (hardware/software/red): "),
+      prioridad: parseInt(prompt("Prioridad (1-5): ")),
+      estado: "pendiente"
+    });
+  }
+
+  console.log("\nINICIANDO PROCESAMIENTO...\n");
+
+  try {
+    // Envío del arreglo completo al módulo
+    const resultado = await procesarSolicitudesEj21(solicitudes);
+
+    // Mostrar arreglo original sin modificaciones
+    console.log("--- SOLICITUDES ORIGINALES ---");
+    console.log(resultado.originales);
+
+    // Mostrar solicitudes procesadas correctamente
+    if (resultado.procesadas.length > 0) {
+      console.log("\n--- SOLICITUDES PROCESADAS ---");
+      resultado.procesadas.forEach(s => {
+        console.log(`Solicitud ${s.id}`);
+        console.log(`Usuario: ${s.usuario}`);
+        console.log(`Tipo: ${s.tipo}`);
+        console.log(`Clasificación: ${s.clasificacion}`);
+        console.log(`Estado final: ${s.estado}`);
+        console.log("-----------------------------");
+      });
+    }
+
+    // Mostrar solicitudes rechazadas con motivo
+    if (resultado.rechazadas.length > 0) {
+      console.log("\n--- SOLICITUDES RECHAZADAS ---");
+      resultado.rechazadas.forEach(r => {
+        console.log(`ID ${r.id}: ${r.motivo}`);
+      });
+    }
+
+    // Confirmación del proceso asíncrono
+    console.log("\n Proceso asíncrono completado correctamente");
+    console.log(" Ejercicio 21 ejecutado sin bloquear el sistema");
+
+  } catch (error) {
+    console.log("Error crítico controlado:", error.message);
+  }
+}
+
+async function ejecutarEjercicio22() {
+  console.log("\n--- EJERCICIO 22 ---");
+  console.log("Sistema de validación básica de solicitudes\n");
+
+  const solicitudes = [];
+  const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
+
+  for (let i = 0; i < cantidad; i++) {
+    console.log(`\nSolicitud ${i + 1}`);
+
+    solicitudes.push({
+      id: parseInt(prompt("ID: ")),
+      tipo: prompt("Tipo de operación: "),
+      valor: parseFloat(prompt("Valor asociado: ")),
+      estado: prompt("Estado (true/false): "),
+      prioridad: parseInt(prompt("Prioridad (1-5): "))
+    });
+  }
+
+  try {
+    const resultado = await procesarSolicitudesEj22(solicitudes);
+
+    console.log("\n--- RESULTADOS ---");
+    resultado.detalle.forEach(r => {
+      console.log(`ID ${r.id} → Estado: ${r.estado} | Motivo: ${r.motivo}`);
+    });
+
+    console.log("\n--- RESUMEN FINAL ---");
+    console.log(resultado.resumen);
+
+  } catch (error) {
+    console.log("Error controlado:", error.message);
+  }
+}
+
+async function ejecutarEjercicio23() {
+  console.log("\n--- EJERCICIO 23 ---");
+  console.log("Sistema de Procesos y Validación de Operaciones\n");
+
+  const solicitudes = [];
+  const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
+
+  for (let i = 0; i < cantidad; i++) {
+    console.log(`\nSolicitud ${i + 1}`);
+
+    solicitudes.push({
+      id: parseInt(prompt("ID: ")),
+      tipoOperacion: prompt("Tipo de operación: "),
+      valor: parseFloat(prompt("Valor: ")),
+      estado: prompt("Estado (true/false): "),
+      prioridad: parseInt(prompt("Prioridad (1-5): "))
+    });
+  }
+
+  try {
+    const resultado = await procesarSolicitudesEj23(solicitudes);
+
+    console.log("\n--- RESULTADOS INDIVIDUALES ---");
+    resultado.resultados.forEach(r => {
+      console.log(`ID ${r.id} → ${r.resultado} | ${r.motivo}`);
+    });
+
+    console.log("\n--- RESUMEN FINAL ---");
+    console.log(resultado.resumen);
+
+  } catch (error) {
+    console.log("Error capturado correctamente:", error.message);
+  }
+}
+
+async function ejecutarEjercicio24() {
+  console.log("\n--- EJERCICIO 24 ---");
+  console.log("Sistema de Gestión y Validación de Solicitudes de Acceso\n");
+
+  const solicitudes = [];
+  const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
+
+  for (let i = 0; i < cantidad; i++) {
+    console.log(`\nSolicitud ${i + 1}`);
+
+    const permisosTexto = prompt("Permisos (separados por coma): ");
+    const permisos = permisosTexto.trim() === ""
+      ? []
+      : permisosTexto.split(",").map(p => p.trim());
+
+    solicitudes.push({
+      id: parseInt(prompt("ID solicitud: ")),
+      nombre: prompt("Nombre del solicitante: "),
+      edad: parseInt(prompt("Edad: ")),
+      rol: prompt("Rol solicitado: "),
+      permisos: permisos,
+      estado: "pendiente",
+      aceptaCondiciones: prompt("Acepta condiciones (true/false): ") === "true"
+    });
+  }
+
+  try {
+    const resultado = await procesarSolicitudesEj24(solicitudes);
+
+    console.log("\n--- RESULTADOS ---");
+    resultado.resultados.forEach(r => {
+      console.log(`ID ${r.id}`);
+      console.log(`Estado final: ${r.estado}`);
+      console.log(`Motivo: ${r.motivo}`);
+      console.log("-----------------------------");
+    });
+
+  } catch (error) {
+    console.log("Error controlado:", error.message);
+  }
+}
 // EJECUCIÓN
 menuGeneral();
 

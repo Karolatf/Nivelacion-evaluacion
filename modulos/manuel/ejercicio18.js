@@ -1,62 +1,86 @@
-async function ejecutarEjercicio18() {
-  console.log("\n--- EJERCICIO 18 ---");
+// SISTEMA DE GESTIÓN Y VALIDACIÓN DE SOLICITUDES DE SOPORTE
+// Archivo: ejercicio18.js
 
-  const solicitudes = [];
-  const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
+// -------- FUNCIÓN CALLBACK INTERNA --------
+// Valida el estado activo de la solicitud de forma asincrónica
+function validarActivo(activo, callback) {
+  setTimeout(() => {
+    if (typeof activo !== "boolean") {
+      callback(new Error("El campo 'activo' debe ser booleano"), null);
+    } else if (!activo) {
+      callback(new Error("La solicitud está inactiva"), null);
+    } else {
+      callback(null, true);
+    }
+  }, 300);
+}
 
-  for (let i = 0; i < cantidad; i++) {
-    console.log(`\nSolicitud ${i + 1}`);
+// -------- FUNCIÓN PROMESA INTERNA --------
+// Valida que el nivel de urgencia esté dentro del rango permitido
+function validarNivel(nivel) {
+  return new Promise((resolve, reject) => {
+    if (typeof nivel !== "number" || !Number.isInteger(nivel)) {
+      reject(new Error("El nivel debe ser un número entero"));
+    } else if (nivel < 1 || nivel > 5) {
+      reject(new Error("Nivel fuera de rango (1-5)"));
+    } else {
+      resolve(true);
+    }
+  });
+}
 
-    solicitudes.push({
-      id: parseInt(prompt("ID: ")),
-      usuario: prompt("Usuario: "),
-      tipo: prompt("Tipo (hardware/software/red): "),
-      nivel: parseInt(prompt("Nivel de urgencia (1-5): ")),
-      activo: prompt("Activo (true/false): ") === "true"
-    });
-  }
-
-  console.log("\nANALIZANDO SOLICITUDES...\n");
-
+// -------- FUNCIÓN PRINCIPAL ASYNC / AWAIT --------
+// Se exporta para ser usada por app.js o barril.js
+// En ejercicio18.js
+export async function procesarSolicitudesEj18(solicitud) {  
   try {
-    const resultado = await procesarSolicitudesEj18(solicitudes);
-
-    console.log("\n--- RESUMEN GENERAL ---");
-    console.log(`Total recibidas: ${resultado.total}`);
-    console.log(`Solicitudes válidas: ${resultado.validas}`);
-    console.log(`Solicitudes rechazadas: ${resultado.invalidas}`);
-
-    if (resultado.rechazadas.length > 0) {
-      console.log("\n--- SOLICITUDES RECHAZADAS ---");
-      resultado.rechazadas.forEach(s => {
-        console.log(`ID ${s.id}: ${s.motivo}`);
-      });
+    // VALIDACIÓN DE DATOS BÁSICOS
+    if (typeof solicitud.id !== "number" || isNaN(solicitud.id)) {
+      throw new Error("ID inválido");
     }
 
-    if (resultado.prioridadAlta.length > 0) {
-      console.log("\n--- PRIORIDAD ALTA ---");
-      resultado.prioridadAlta.forEach(s => {
-        console.log(`Solicitud ${s.id} | Usuario: ${s.usuario} | Nivel: ${s.nivel}`);
-      });
+    if (typeof solicitud.usuario !== "string" || solicitud.usuario.trim() === "") {
+      throw new Error("Usuario inválido");
     }
 
-    if (resultado.prioridadMedia.length > 0) {
-      console.log("\n--- PRIORIDAD MEDIA ---");
-      resultado.prioridadMedia.forEach(s => {
-        console.log(`Solicitud ${s.id} | Usuario: ${s.usuario} | Nivel: ${s.nivel}`);
-      });
+    if (
+      typeof solicitud.tipo !== "string" ||
+      !["hardware", "software", "red"].includes(solicitud.tipo.toLowerCase())
+    ) {
+      throw new Error("Tipo de solicitud inválido (hardware/software/red)");
     }
 
-    if (resultado.prioridadBaja.length > 0) {
-      console.log("\n--- PRIORIDAD BAJA ---");
-      resultado.prioridadBaja.forEach(s => {
-        console.log(`Solicitud ${s.id} | Usuario: ${s.usuario} | Nivel: ${s.nivel}`);
+    // VALIDACIÓN ASINCRÓNICA CON CALLBACK
+    await new Promise((resolve, reject) => {
+      validarActivo(solicitud.activo, (error) => {
+        if (error) reject(error);
+        else resolve();
       });
-    }
+    });
 
-    console.log("\n✔ Proceso finalizado sin bloqueos");
+    // VALIDACIÓN DE NIVEL CON PROMESA
+    await validarNivel(solicitud.nivel);
+
+    // CLASIFICACIÓN POR PRIORIDAD
+    let prioridad;
+    if (solicitud.nivel >= 4) prioridad = "ALTA";
+    else if (solicitud.nivel >= 2) prioridad = "MEDIA";
+    else prioridad = "BAJA";
+
+    // RESULTADO FINAL
+    return {
+      id: solicitud.id,
+      estado: "VÁLIDA",
+      prioridad: prioridad,
+      mensaje: "Solicitud procesada correctamente"
+    };
 
   } catch (error) {
-    console.log("Error crítico controlado:", error.message);
+    // RETORNA OBJETO CONTROLADO EN CASO DE ERROR
+    return {
+      id: solicitud?.id ?? null,
+      estado: "INVALIDA",
+      motivo: error.message
+    };
   }
 }
