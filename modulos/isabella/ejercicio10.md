@@ -58,7 +58,7 @@ Retorna únicamente el estado determinado.
 
 ## 5. Procesamiento de solicitudes
 
-Se recorre el arreglo usando un ciclo for...of.
+Se recorre el arreglo usando un ciclo for.
 Cada solicitud se procesa de forma independiente.
 Las solicitudes válidas se agregan al arreglo de resultados.
 Las solicitudes con errores se agregan al arreglo de errores.
@@ -108,14 +108,12 @@ errores → Arreglo de solicitudes con error con:
 ### Caso 1: Solicitud atendida - urgencia alta y reportada por sistema
 
 Datos de entrada:
-{
-  id: 1,
-  area: "infraestructura",
-  nivelUrgencia: 5,
-  descripcion: "Servidor caído",
-  reportadoPorSistema: true,
-  intentosPrevios: 0
-}
+id: 1
+area: "infraestructura"
+nivelUrgencia: 5
+descripcion: "Servidor caido"
+reportadoPorSistema: true
+intentosPrevios: 0
 
 Resultado esperado:
 estado: "ATENDIDA"
@@ -126,14 +124,12 @@ Solicitud procesada correctamente
 ### Caso 2: Solicitud en espera - urgencia media
 
 Datos de entrada:
-{
-  id: 2,
-  area: "desarrollo",
-  nivelUrgencia: 3,
-  descripcion: "Error en compilación",
-  reportadoPorSistema: false,
-  intentosPrevios: 1
-}
+id: 2
+area: "desarrollo"
+nivelUrgencia: 3
+descripcion: "Error en compilacion"
+reportadoPorSistema: false
+intentosPrevios: 1
 
 Resultado esperado:
 estado: "EN ESPERA"
@@ -141,17 +137,15 @@ Solicitud procesada correctamente
 
 --
 
-### Caso 3: Solicitud rechazada - múltiples intentos previos
+### Caso 3: Solicitud rechazada - multiples intentos previos
 
 Datos de entrada:
-{
-  id: 3,
-  area: "administración",
-  nivelUrgencia: 2,
-  descripcion: "Problema de acceso",
-  reportadoPorSistema: false,
-  intentosPrevios: 3
-}
+id: 3
+area: "administracion"
+nivelUrgencia: 2
+descripcion: "Problema de acceso"
+reportadoPorSistema: false
+intentosPrevios: 3
 
 Resultado esperado:
 estado: "RECHAZADA"
@@ -162,14 +156,12 @@ Solicitud procesada correctamente
 ### Caso 4: Solicitud en espera - urgencia alta sin reporte de sistema
 
 Datos de entrada:
-{
-  id: 4,
-  area: "infraestructura",
-  nivelUrgencia: 4,
-  descripcion: "Red lenta",
-  reportadoPorSistema: false,
-  intentosPrevios: 0
-}
+id: 4
+area: "infraestructura"
+nivelUrgencia: 4
+descripcion: "Red lenta"
+reportadoPorSistema: false
+intentosPrevios: 0
 
 Resultado esperado:
 estado: "EN ESPERA"
@@ -177,91 +169,66 @@ Solicitud procesada correctamente
 
 --
 
-### Caso 5: Error - ID inválido (validación con callback)
+### Caso 5: Error - Area vacia
 
 Datos de entrada:
-{
-  id: "ABC",
-  area: "desarrollo",
-  nivelUrgencia: 3,
-  descripcion: "Bug en aplicación",
-  reportadoPorSistema: true,
-  intentosPrevios: 0
-}
+id: 5
+area: [presionar enter sin escribir]
+nivelUrgencia: 4
+descripcion: "Error critico"
+reportadoPorSistema: true
+intentosPrevios: 0
 
 Resultado esperado:
-id: "SIN ID"
-mensaje: "Datos básicos inválidos"
+id: 5
+mensaje: "Datos basicos invalidos"
 Solicitud no procesada
 
 --
 
-### Caso 6: Error - Área vacía (validación con callback)
+### Caso 6: Error - Nivel de urgencia fuera de rango
 
 Datos de entrada:
-{
-  id: 6,
-  area: "",
-  nivelUrgencia: 4,
-  descripcion: "Error crítico",
-  reportadoPorSistema: true,
-  intentosPrevios: 0
-}
+id: 6
+area: "infraestructura"
+nivelUrgencia: 8
+descripcion: "Servidor sin respuesta"
+reportadoPorSistema: true
+intentosPrevios: 0
 
 Resultado esperado:
 id: 6
-mensaje: "Datos básicos inválidos"
-Solicitud no procesada
-
---
-
-### Caso 7: Error - Nivel de urgencia fuera de rango (validación con promesa)
-
-Datos de entrada:
-{
-  id: 7,
-  area: "infraestructura",
-  nivelUrgencia: 8,
-  descripcion: "Servidor sin respuesta",
-  reportadoPorSistema: true,
-  intentosPrevios: 0
-}
-
-Resultado esperado:
-id: 7
 mensaje: "Nivel de urgencia fuera de rango (1 a 5)"
 Solicitud no procesada
 
 --
 
-### Caso 8: Error - Intentos previos negativos (validación con callback)
+### Caso 7: Error - Intentos previos negativos
 
 Datos de entrada:
-{
-  id: 8,
-  area: "desarrollo",
-  nivelUrgencia: 2,
-  descripcion: "Error de sintaxis",
-  reportadoPorSistema: false,
-  intentosPrevios: -1
-}
+id: 7
+area: "desarrollo"
+nivelUrgencia: 2
+descripcion: "Error de sintaxis"
+reportadoPorSistema: false
+intentosPrevios: -1
 
 Resultado esperado:
-id: 8
-mensaje: "Datos básicos inválidos"
+id: 7
+mensaje: "Datos basicos invalidos"
 Solicitud no procesada
 
 --
 
 ## 10. Justificación técnica
 
-Uso de callback → validación básica externa simulada.
-Uso de Promesas → validación de urgencia asincrónica.
-Uso de async/await → coordinación del flujo completo.
+Uso de callback → validacion basica externa simulada.
+Uso de Promesas → validacion de urgencia asincronica.
+Uso de async/await → coordinacion del flujo completo.
 Uso de try/catch → manejo de errores sin bloquear el sistema.
-Uso de ciclo for...of → procesamiento secuencial de solicitudes.
-Uso de spread operator → garantía de inmutabilidad.
-Función pura para decisión → resultado predecible sin efectos secundarios.
-Operadores lógicos compuestos → evaluación de múltiples condiciones.
+Uso de ciclo for → procesamiento secuencial de solicitudes.
+Uso de spread operator → garantia de inmutabilidad.
+Funcion pura para decision → resultado predecible sin efectos secundarios.
+Operadores logicos compuestos → evaluacion de multiples condiciones.
 Operador nullish coalescing (??) → manejo seguro de valores indefinidos.
-Separación de responsabilidades → funciones con propósitos específicos.
+Separacion de responsabilidades → funciones con propositos especificos.

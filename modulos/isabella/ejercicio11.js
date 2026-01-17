@@ -1,90 +1,90 @@
-// EJERCICIO 11 - SISTEMA DE CONTROL DE ACCESOS
-// Este archivo contiene TODA la lógica del ejercicio
+// SISTEMA DE VALIDACION Y PROCESAMIENTO DE SOLICITUDES DE ACCESO
+// Este archivo contiene la logica completa del Ejercicio 11 (ejercicio 2 de Isabella)
 
 
-// FUNCIÓN CALLBACK (NO SE EXPORTA)
-// Valida los datos básicos del registro
+// FUNCION CALLBACK (NO SE EXPORTA)
+// Valida los datos basicos del registro
 function validarRegistroCallback(registro, callback) {
 
-  // setTimeout simula un proceso asincrónico
+  // setTimeout simula un proceso asincronico
   setTimeout(() => {
 
-    // Se valida que el ID sea un número positivo
-    if (typeof registro.id !== "number" || registro.id <= 0) {
-      callback(new Error("Datos básicos inválidos"), null);
+    // Se valida que el ID sea un numero positivo
+    if (typeof registro.id !== "number" || isNaN(registro.id) || registro.id <= 0) {
+      callback(new Error("Datos basicos invalidos"), null);
       return;
     }
 
-    // Se valida que el nombre sea un string no vacío
+    // Se valida que el nombre sea un string no vacio
     if (typeof registro.nombre !== "string" || registro.nombre.trim() === "") {
-      callback(new Error("Datos básicos inválidos"), null);
+      callback(new Error("Datos basicos invalidos"), null);
       return;
     }
 
     // Se valida que el rol sea un string
     if (typeof registro.rol !== "string") {
-      callback(new Error("Datos básicos inválidos"), null);
+      callback(new Error("Datos basicos invalidos"), null);
       return;
     }
 
     // Se valida que activo sea booleano
     if (typeof registro.activo !== "boolean") {
-      callback(new Error("Datos básicos inválidos"), null);
+      callback(new Error("Datos basicos invalidos"), null);
       return;
     }
 
-    // Se valida que intentosPrevios sea un número mayor o igual a 0
+    // Se valida que intentosPrevios sea un numero mayor o igual a 0
     if (typeof registro.intentosPrevios !== "number" || registro.intentosPrevios < 0) {
-      callback(new Error("Datos básicos inválidos"), null);
+      callback(new Error("Datos basicos invalidos"), null);
       return;
     }
 
-    // Se valida que nivelAccesoSolicitado sea numérico
+    // Se valida que nivelAccesoSolicitado sea numerico
     if (typeof registro.nivelAccesoSolicitado !== "number") {
-      callback(new Error("Datos básicos inválidos"), null);
+      callback(new Error("Datos basicos invalidos"), null);
       return;
     }
 
-    // Si todas las validaciones son correctas
-    // se retorna el registro sin modificar
+    // Si todas las validaciones son correctas, se retorna el registro
     callback(null, registro);
 
-  }, 300); // Retardo artificial para simular asincronía
+  }, 300);
 }
 
 
-// FUNCIÓN CON PROMESA (NO SE EXPORTA)
-// Valida que el nivel de acceso esté en rango
+// PROMESA ASINCRONICA (NO SE EXPORTA)
+// Valida que el nivel de acceso este en rango
 function validarNivelAccesoPromesa(registro) {
 
   // Se retorna una promesa
   return new Promise((resolve, reject) => {
 
-    // Se valida que el nivel de acceso esté entre 1 y 5
+    // Se valida que el nivel de acceso este entre 1 y 5
     if (registro.nivelAccesoSolicitado < 1 || registro.nivelAccesoSolicitado > 5) {
 
-      // Si está fuera de rango, se rechaza la promesa
+      // Si esta fuera de rango, se rechaza la promesa
       reject(new Error("Nivel de acceso fuera de rango (1 a 5)"));
 
     } else {
 
-      // Si está en rango, se resuelve la promesa
+      // Si esta en rango, se resuelve la promesa
       resolve(registro);
     }
   });
 }
 
 
-// FUNCIÓN DE DECISIÓN (NO SE EXPORTA)
-// Determina el estado final del registro según reglas de negocio
+// FUNCION DE DECISION (FUNCION PURA)
+// Determina el estado final del registro segun reglas de negocio
+// No modifica el objeto recibido
 function determinarEstado(registro) {
 
-  // Se deniega si el usuario está inactivo
+  // Se deniega si el usuario esta inactivo
   if (!registro.activo) {
     return { estado: "DENEGADO", motivo: "Usuario inactivo" };
   }
 
-  // Se bloquea si hay 3 o más intentos previos fallidos
+  // Se bloquea si hay 3 o mas intentos previos fallidos
   if (registro.intentosPrevios >= 3) {
     return { estado: "BLOQUEADO", motivo: "Demasiados intentos fallidos" };
   }
@@ -94,14 +94,14 @@ function determinarEstado(registro) {
     return { estado: "APROBADO", motivo: "Acceso administrativo concedido" };
   }
 
-  // Se aprueba si es técnico y solicita nivel 3 o más
+  // Se aprueba si es tecnico y solicita nivel 3 o mas
   if (registro.rol === "tecnico" && registro.nivelAccesoSolicitado >= 3) {
-    return { estado: "APROBADO", motivo: "Acceso técnico concedido" };
+    return { estado: "APROBADO", motivo: "Acceso tecnico concedido" };
   }
 
   // Se aprueba si es usuario y solicita nivel 1 o 2
   if (registro.rol === "usuario" && registro.nivelAccesoSolicitado <= 2) {
-    return { estado: "APROBADO", motivo: "Acceso básico concedido" };
+    return { estado: "APROBADO", motivo: "Acceso basico concedido" };
   }
 
   // En cualquier otro caso, se deniega
@@ -109,9 +109,9 @@ function determinarEstado(registro) {
 }
 
 
-// FUNCIÓN PRINCIPAL ASYNC / AWAIT
-// ESTA FUNCIÓN SÍ SE EXPORTA
-// Es la única función visible para el menú general
+// FUNCION PRINCIPAL ASYNC / AWAIT
+// ESTA FUNCION SI SE EXPORTA
+// Es la unica funcion visible para el menu general
 export async function procesarSolicitudesEj11(registros) {
 
   // Arreglo para almacenar registros procesados correctamente
@@ -120,59 +120,97 @@ export async function procesarSolicitudesEj11(registros) {
   // Arreglo para almacenar registros con errores
   const errores = [];
 
-  // Se recorre el arreglo usando un ciclo for...of
-  for (const registro of registros) {
+  // Contadores para resumen final
+  let totalAprobadas = 0;
+  let totalRechazadas = 0;
+  let totalBloqueadas = 0;
 
-    try {
+  try {
 
-      // VALIDACIÓN CON CALLBACK
-      // Se envuelve la función callback dentro de una promesa
-      const validado = await new Promise((resolve, reject) => {
-
-        // Se llama a la validación básica
-        validarRegistroCallback(registro, (error, data) => {
-
-          // Si hay error se rechaza la promesa, si no se resuelve
-          error ? reject(error) : resolve(data);
-        });
-      });
-
-      // VALIDACIÓN CON PROMESA
-      // Se valida el nivel de acceso usando promesas
-      const accesoValido = await validarNivelAccesoPromesa(validado);
-
-      // Se determina el estado final del registro
-      const decision = determinarEstado(accesoValido);
-
-      // Se crea un nuevo objeto con el estado y motivo determinados
-      // Se garantiza inmutabilidad usando spread operator
-      resultados.push({
-        ...accesoValido,
-        estado: decision.estado,
-        motivo: decision.motivo
-      });
-
-    } catch (error) {
-
-      // Si falla un registro
-      // se almacena el error sin detener el sistema
-      errores.push({
-        id: registro.id ?? "SIN ID",
-        mensaje: error.message
-      });
+    // Se valida que la entrada sea un arreglo
+    if (!Array.isArray(registros)) {
+      throw new Error("Los registros deben ser un arreglo");
     }
+
+    // Se recorre el arreglo usando un ciclo for clasico
+    for (let i = 0; i < registros.length; i++) {
+
+      // Se obtiene el registro actual
+      const registro = registros[i];
+
+      try {
+
+        // VALIDACION CON CALLBACK
+        // Se envuelve la funcion callback dentro de una promesa
+        const validado = await new Promise((resolve, reject) => {
+
+          // Se llama a la validacion basica
+          validarRegistroCallback(registro, (error, data) => {
+
+            // Si hay error se rechaza la promesa
+            if (error) {
+              reject(error);
+            } else {
+              // Si no hay error se resuelve
+              resolve(data);
+            }
+          });
+        });
+
+        // VALIDACION CON PROMESA
+        // Se valida el nivel de acceso usando promesas
+        const accesoValido = await validarNivelAccesoPromesa(validado);
+
+        // Se determina el estado final del registro
+        const decision = determinarEstado(accesoValido);
+
+        // Se crea un nuevo objeto con el estado y motivo determinados
+        // Se garantiza inmutabilidad usando spread operator
+        const resultado = {
+          ...accesoValido,
+          estado: decision.estado,
+          motivo: decision.motivo
+        };
+
+        // Se agrega al arreglo de resultados
+        resultados.push(resultado);
+
+        // Se incrementa el contador correspondiente
+        if (decision.estado === "APROBADO") {
+          totalAprobadas = totalAprobadas + 1;
+        } else if (decision.estado === "DENEGADO") {
+          totalRechazadas = totalRechazadas + 1;
+        } else if (decision.estado === "BLOQUEADO") {
+          totalBloqueadas = totalBloqueadas + 1;
+        }
+
+      } catch (errorInterno) {
+
+        // Si falla un registro, se almacena el error
+        errores.push({
+          id: registro.id ?? "SIN ID",
+          mensaje: errorInterno.message
+        });
+      }
+    }
+
+    // Se retorna un objeto con todos los resultados y el resumen
+    return {
+      resultados: resultados,
+      errores: errores,
+      totalProcesadas: registros.length,
+      totalAprobadas: totalAprobadas,
+      totalRechazadas: totalRechazadas,
+      totalBloqueadas: totalBloqueadas,
+      totalErrores: errores.length
+    };
+
+  } catch (errorGeneral) {
+
+    // Si ocurre un error critico, se retorna error controlado
+    return {
+      estado: "ERROR",
+      mensaje: errorGeneral.message
+    };
   }
-
-  // Se determina el estado general del sistema
-  const estadoSistema = errores.length === 0
-    ? "Sistema procesado correctamente"
-    : "Sistema procesado con errores";
-
-  // RESULTADO FINAL
-  // Se retorna un objeto con todos los resultados
-  return {
-    resultados: resultados,
-    errores: errores,
-    estadoSistema: estadoSistema
-  };
 }

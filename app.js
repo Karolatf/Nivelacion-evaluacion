@@ -883,137 +883,246 @@ async function ejecutarEjercicio9() {                                           
   console.log("\n");
 }
 
-async function ejecutarEjercicio10() {
+async function ejecutarEjercicio10() {                                                          //EJERCICIO 10
+  
+  // Se crea el arreglo para guardar solicitudes
   const solicitudes = [];
-  const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar?: "));
+  
+  // Se pregunta cuantas solicitudes va a ingresar
+  const cantidad = parseInt(prompt("¿Cuántas solicitudes? "));
 
+  // Se recorre para capturar cada solicitud
   for (let i = 0; i < cantidad; i++) {
-    console.log(`\n--- Solicitud ${i + 1} ---`);
-
-    solicitudes.push({
-      id: parseInt(prompt("ID: ")),
-      area: prompt("Área (infraestructura/desarrollo/administración): "),
-      nivelUrgencia: parseInt(prompt("Nivel de urgencia (1 a 5): ")),
-      descripcion: prompt("Descripción: "),
-      reportadoPorSistema: prompt("¿Reportado por sistema? (true/false): ") === "true",
-      intentosPrevios: parseInt(prompt("Intentos previos: "))
-    });
-  }
-
-  console.log("\n PROCESANDO SOLICITUDES...\n");
-
-  try {
-    const respuesta = await procesarSolicitudesEj10(solicitudes);
-
-    respuesta.resultados.forEach(s => {
-      console.log(`Solicitud ${s.id}`);
-      console.log(`Área: ${s.area}`);
-      console.log(`Urgencia: ${s.nivelUrgencia}`);
-      console.log(`Estado final: ${s.estado}`);
-      console.log("-----------------------------");
-    });
-
-    if (respuesta.errores.length > 0) {
-      console.log("\n ERRORES DETECTADOS\n");
-      respuesta.errores.forEach(e => {
-        console.log(`Solicitud ${e.id}: ${e.mensaje}`);
-      });
+    
+    // Se capturan los datos basicos
+    const id = parseInt(prompt("ID: "));
+    const area = prompt("Área (infraestructura/desarrollo/administración): ");
+    const nivelUrgencia = parseInt(prompt("Nivel de urgencia (1-5): "));
+    const descripcion = prompt("Descripción: ");
+    
+    // Se captura reportadoPorSistema como texto
+    const reportadoTexto = prompt("Reportado por sistema (true/false): ");
+    
+    // Se convierte a booleano
+    let reportadoPorSistema;
+    if (reportadoTexto === "true") {
+      reportadoPorSistema = true;
+    } else if (reportadoTexto === "false") {
+      reportadoPorSistema = false;
+    } else {
+      reportadoPorSistema = reportadoTexto;
     }
-
-  } catch (error) {
-    console.log("Error crítico del sistema:", error.message);
-  }
-}
-async function ejecutarEjercicio11() {
-  console.log("\n--- EJERCICIO 11 ---");
-
-  const registros = [];
-  const cantidad = parseInt(prompt("¿Cuántos registros desea ingresar? "));
-
-  for (let i = 0; i < cantidad; i++) {
-    console.log(`\nRegistro ${i + 1}`);
-
-    registros.push({
-      id: parseInt(prompt("ID: ")),
-      nombre: prompt("Nombre: "),
-      rol: prompt("Rol (admin/tecnico/usuario): "),
-      activo: prompt("Activo (true/false): ") === "true",
-      intentosPrevios: parseInt(prompt("Intentos previos: ")),
-      nivelAccesoSolicitado: parseInt(prompt("Nivel de acceso solicitado: "))
+    
+    const intentosPrevios = parseInt(prompt("Intentos previos: "));
+    
+    // Se agrega al arreglo
+    solicitudes.push({
+      id: id,
+      area: area,
+      nivelUrgencia: nivelUrgencia,
+      descripcion: descripcion,
+      reportadoPorSistema: reportadoPorSistema,
+      intentosPrevios: intentosPrevios
     });
   }
 
-  console.log("\nPROCESANDO SOLICITUDES...\n");
+  // Se procesa el arreglo completo
+  const resultado = await procesarSolicitudesEj10(solicitudes);
 
+  console.log("\n");
+  console.log("RESULTADOS DEL PROCESAMIENTO");
+  console.log("\n");
+
+  // Se muestran las solicitudes procesadas
+  if (resultado.resultados && resultado.resultados.length > 0) {
+    console.log("SOLICITUDES PROCESADAS");
+    console.log("\n");
+    
+    // Se recorre cada solicitud procesada
+    for (let i = 0; i < resultado.resultados.length; i++) {
+      const sol = resultado.resultados[i];
+      console.log("Solicitud " + sol.id + ": " + sol.estado);
+    }
+    console.log("\n");
+  }
+
+  // Se muestran los errores
+  if (resultado.errores && resultado.errores.length > 0) {
+    console.log("SOLICITUDES CON ERRORES");
+    console.log("\n");
+    
+    // Se recorre cada error
+    for (let i = 0; i < resultado.errores.length; i++) {
+      const error = resultado.errores[i];
+      console.log("Error en solicitud " + error.id);
+      console.log("  Mensaje: " + error.mensaje);
+      console.log("");
+    }
+  }
+
+  console.log("\n");
+}
+
+async function ejecutarEjercicio11() {                                                            //EJERCICIO 11
+  
+  // Se crea el arreglo para guardar registros
+  const registros = [];
+  
+  // Se pregunta cuantos registros va a ingresar
+  const cantidad = parseInt(prompt("¿Cuántos registros? "));
+
+  // Se recorre para capturar cada registro
+  for (let i = 0; i < cantidad; i++) {
+    
+    // Se capturan los datos basicos
+    const id = parseInt(prompt("ID: "));
+    const nombre = prompt("Nombre: ");
+    const rol = prompt("Rol (admin/tecnico/usuario): ");
+    const nivelAccesoSolicitado = parseInt(prompt("Nivel de acceso solicitado (1-5): "));
+    
+    // Se captura activo como texto
+    const activoTexto = prompt("Activo (true/false): ");
+    
+    // Se convierte a booleano
+    let activo;
+    if (activoTexto === "true") {
+      activo = true;
+    } else if (activoTexto === "false") {
+      activo = false;
+    } else {
+      activo = activoTexto;
+    }
+    
+    const intentosPrevios = parseInt(prompt("Intentos previos: "));
+    
+    // Se agrega al arreglo
+    registros.push({
+      id: id,
+      nombre: nombre,
+      rol: rol,
+      nivelAccesoSolicitado: nivelAccesoSolicitado,
+      activo: activo,
+      intentosPrevios: intentosPrevios
+    });
+  }
+
+  // Se procesa el arreglo completo
   const resultado = await procesarSolicitudesEj11(registros);
 
-  if (resultado.resultados.length > 0) {
-    console.log("\nSOLICITUDES PROCESADAS\n");
-    resultado.resultados.forEach(r => {
-      console.log(`ID: ${r.id}`);
-      console.log(`Estado: ${r.estado}`);
-      console.log(`Motivo: ${r.motivo}`);
-      console.log("------------------");
-    });
+  console.log("\n");
+  console.log("RESULTADOS DEL PROCESAMIENTO");
+  console.log("\n");
+
+  // Se muestran las solicitudes procesadas
+  if (resultado.resultados && resultado.resultados.length > 0) {
+    console.log("SOLICITUDES PROCESADAS");
+    console.log("\n");
+    
+    // Se recorre cada solicitud procesada
+    for (let i = 0; i < resultado.resultados.length; i++) {
+      const reg = resultado.resultados[i];
+      console.log("Registro " + reg.id + ": " + reg.estado);
+      console.log("  Motivo: " + reg.motivo);
+      console.log("");
+    }
   }
 
-  if (resultado.errores.length > 0) {
-    console.log("\nERRORES DETECTADOS\n");
-    resultado.errores.forEach(e => {
-      console.log(`ID ${e.id}: ${e.mensaje}`);
-    });
+  // Se muestran los errores
+  if (resultado.errores && resultado.errores.length > 0) {
+    console.log("SOLICITUDES CON ERRORES");
+    console.log("\n");
+    
+    // Se recorre cada error
+    for (let i = 0; i < resultado.errores.length; i++) {
+      const error = resultado.errores[i];
+      console.log("Error en registro " + error.id);
+      console.log("  Mensaje: " + error.mensaje);
+      console.log("");
+    }
   }
 
-  console.log(`\n${resultado.estadoSistema}`);
+  // Se muestra resumen final
+  console.log("RESUMEN FINAL");
+  console.log("\n");
+  console.log("Total procesadas: " + resultado.totalProcesadas);
+  console.log("Total aprobadas:  " + resultado.totalAprobadas);
+  console.log("Total rechazadas: " + resultado.totalRechazadas);
+  console.log("Total bloqueadas: " + resultado.totalBloqueadas);
+  console.log("Total con error:  " + resultado.totalErrores);
+  console.log("\n");
 }
 
-async function ejecutarEjercicio12() {
-  console.log("\n--- EJERCICIO 12 ---");
-
+async function ejecutarEjercicio12() {                                                            //EJERCICIO 12
+  
+  // Se crea el arreglo para guardar solicitudes
   const solicitudes = [];
-  const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
+  
+  // Se pregunta cuantas solicitudes va a ingresar
+  const cantidad = parseInt(prompt("¿Cuántas solicitudes? "));
 
+  // Se recorre para capturar cada solicitud
   for (let i = 0; i < cantidad; i++) {
-    console.log(`\nSolicitud ${i + 1}`);
-
+    
+    // Se capturan los datos basicos
+    const id = parseInt(prompt("ID: "));
+    const usuario = prompt("Usuario: ");
+    const tipo = prompt("Tipo (software/hardware): ");
+    const prioridad = parseInt(prompt("Prioridad (1-5): "));
+    const descripcion = prompt("Descripción: ");
+    const estado = prompt("Estado: ");
+    
+    // Se agrega al arreglo
     solicitudes.push({
-      id: parseInt(prompt("ID: ")),
-      usuario: prompt("Usuario: "),
-      tipo: prompt("Tipo (software/hardware): "),
-      prioridad: parseInt(prompt("Prioridad (1-5): ")),
-      descripcion: prompt("Descripción: "),
-      estado: "pendiente"
+      id: id,
+      usuario: usuario,
+      tipo: tipo,
+      prioridad: prioridad,
+      descripcion: descripcion,
+      estado: estado
     });
   }
 
-  console.log("\nPROCESANDO SOLICITUDES...\n");
+  // Se procesa el arreglo completo
+  const resultado = await procesarSolicitudesEj12(solicitudes);
 
-  try {
-    const resultado = await procesarSolicitudesEj12(solicitudes);
+  console.log("\n");
+  console.log("RESULTADOS DEL PROCESAMIENTO");
+  console.log("\n");
 
-    if (resultado.resultados.length > 0) {
-      resultado.resultados.forEach(r => {
-        console.log(`✔ Solicitud ${r.id} procesada correctamente`);
-        console.log(`Usuario: ${r.usuario}`);
-        console.log(`Tipo: ${r.tipo}`);
-        console.log(`Clasificación: ${r.clasificacion}`);
-        console.log(`Estado final: ${r.estado}`);
-        console.log("-----------------------------");
-      });
+  // Se muestran las solicitudes procesadas
+  if (resultado.resultados && resultado.resultados.length > 0) {
+    console.log("SOLICITUDES PROCESADAS");
+    console.log("\n");
+    
+    // Se recorre cada solicitud procesada
+    for (let i = 0; i < resultado.resultados.length; i++) {
+      const sol = resultado.resultados[i];
+      console.log("Solicitud " + sol.id + " procesada correctamente");
+      console.log("  Usuario: " + sol.usuario);
+      console.log("  Tipo: " + sol.tipo);
+      console.log("  Clasificacion: " + sol.clasificacion);
+      console.log("  Estado final: " + sol.estado);
+      console.log("");
     }
-
-    if (resultado.errores.length > 0) {
-      console.log("\nERRORES DETECTADOS\n");
-      resultado.errores.forEach(e => {
-        console.log(`✖ Solicitud ${e.id}: ${e.mensaje}`);
-      });
-    }
-
-    console.log(`\n${resultado.estadoSistema}`);
-
-  } catch (error) {
-    console.log("Error crítico del sistema:", error.message);
   }
+
+  // Se muestran los errores
+  if (resultado.errores && resultado.errores.length > 0) {
+    console.log("ERRORES DETECTADOS");
+    console.log("\n");
+    
+    // Se recorre cada error
+    for (let i = 0; i < resultado.errores.length; i++) {
+      const error = resultado.errores[i];
+      console.log("Solicitud " + error.id + ": " + error.mensaje);
+      console.log("");
+    }
+  }
+
+  // Se muestra estado final del sistema
+  console.log("ESTADO FINAL");
+  console.log(resultado.estadoSistema);
+  console.log("\n");
 }
 
 async function ejecutarEjercicio13() {
