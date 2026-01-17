@@ -1390,150 +1390,280 @@ async function ejecutarEjercicio15() {                                          
   console.log("\n");
 }
 
-async function ejecutarEjercicio16() {
-  console.log("\n--- EJERCICIO 16 ---");
-
+async function ejecutarEjercicio16() {                                                            //EJERCICIO 16
+  
+  // Se crea el arreglo para guardar solicitudes
   const solicitudes = [];
-  const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
+  
+  // Se pregunta cuantas solicitudes va a ingresar
+  const cantidad = parseInt(prompt("¿Cuántas solicitudes? "));
 
+  // Se recorre para capturar cada solicitud
   for (let i = 0; i < cantidad; i++) {
-    console.log(`\nSolicitud ${i + 1}`);
-
+    
+    // Se capturan los datos basicos
+    const id = parseInt(prompt("ID: "));
+    const usuario = prompt("Usuario: ");
+    const tipo = prompt("Tipo (hardware/software/red): ");
+    const prioridad = parseInt(prompt("Prioridad (1-5): "));
+    const descripcion = prompt("Descripción (mínimo 10 caracteres): ");
+    
+    // Se captura activo como texto
+    const activoTexto = prompt("Activo (true/false): ");
+    
+    // Se convierte a booleano
+    let activo;
+    if (activoTexto === "true") {
+      activo = true;
+    } else if (activoTexto === "false") {
+      activo = false;
+    } else {
+      activo = activoTexto;
+    }
+    
+    // Se agrega al arreglo
     solicitudes.push({
-      id: parseInt(prompt("ID: ")),
-      usuario: prompt("Usuario: "),
-      tipo: prompt("Tipo (hardware/software/red): "),
-      prioridad: parseInt(prompt("Prioridad (1-5): ")),
-      descripcion: prompt("Descripción (mínimo 10 caracteres): "),
-      activo: prompt("Activo (true/false): ") === "true"
+      id: id,
+      usuario: usuario,
+      tipo: tipo,
+      prioridad: prioridad,
+      descripcion: descripcion,
+      activo: activo
     });
   }
 
-  console.log("\nPROCESANDO SOLICITUDES...\n");
+  // Se procesa el arreglo completo
+  const resultado = await procesarSolicitudesEj16(solicitudes);
 
-  try {
-    const resultado = await procesarSolicitudesEj16(solicitudes);
+  console.log("\n");
+  console.log("RESULTADOS DEL PROCESAMIENTO");
+  console.log("\n");
 
-    console.log("\n--- RESUMEN GENERAL ---");
-    console.log(`Total recibidas: ${resultado.total}`);
-    console.log(`Solicitudes válidas: ${resultado.validas}`);
-    console.log(`Solicitudes inválidas: ${resultado.invalidas}`);
+  // Se muestra el resumen general
+  console.log("RESUMEN");
+  console.log("\n");
+  console.log("Total recibidas: " + resultado.resumen.totalRecibidas);
+  console.log("Validas: " + resultado.resumen.validas);
+  console.log("Invalidas: " + resultado.resumen.invalidas);
+  console.log("\n");
 
-    if (resultado.invalidasDetalle.length > 0) {
-      console.log("\n--- SOLICITUDES INVÁLIDAS ---");
-      resultado.invalidasDetalle.forEach(s => {
-        console.log(`ID ${s.id}: ${s.motivo}`);
-      });
+  // Se muestran las solicitudes invalidas
+  if (resultado.solicitudesInvalidas && resultado.solicitudesInvalidas.length > 0) {
+    console.log("SOLICITUDES INVALIDAS");
+    console.log("\n");
+    
+    // Se recorre cada solicitud invalida
+    for (let i = 0; i < resultado.solicitudesInvalidas.length; i++) {
+      const sol = resultado.solicitudesInvalidas[i];
+      console.log("ID " + sol.id + ": " + sol.error);
+      console.log("");
     }
-
-    if (resultado.procesadas.length > 0) {
-      console.log("\n--- SOLICITUDES PROCESADAS ---");
-      resultado.procesadas.forEach(s => {
-        console.log(`Solicitud ${s.id}`);
-        console.log(`Tipo: ${s.tipo}`);
-        console.log(`Prioridad: ${s.prioridad}`);
-        console.log(`Clasificación: ${s.clasificacion}`);
-        console.log(`Estado final: ${s.estado}`);
-        console.log("-----------------------------");
-      });
-    }
-
-    console.log("\n✔ Ejercicio 16 ejecutado correctamente");
-
-  } catch (error) {
-    console.log("Error crítico controlado:", error.message);
   }
-}
-async function ejecutarEjercicio17() {
-  console.log("\n--- EJERCICIO 17 ---");
 
+  // Se muestran las solicitudes procesadas
+  if (resultado.solicitudesProcesadas && resultado.solicitudesProcesadas.length > 0) {
+    console.log("SOLICITUDES PROCESADAS");
+    console.log("\n");
+    
+    // Se recorre cada solicitud procesada
+    for (let i = 0; i < resultado.solicitudesProcesadas.length; i++) {
+      const sol = resultado.solicitudesProcesadas[i];
+      console.log("Solicitud " + sol.id);
+      console.log("  Tipo: " + sol.tipo);
+      console.log("  Prioridad: " + sol.prioridad);
+      console.log("  Clasificacion: " + sol.clasificacion);
+      console.log("  Estado: " + sol.estadoFinal);
+      console.log("");
+    }
+  }
+
+  console.log("\n");
+}
+
+async function ejecutarEjercicio17() {                                                            //EJERCICIO 17
+  
+  // Se crea el arreglo para guardar transacciones
   const transacciones = [];
-  const cantidad = parseInt(prompt("¿Cuántas transacciones desea ingresar? "));
+  
+  // Se pregunta cuantas transacciones va a ingresar
+  const cantidad = parseInt(prompt("¿Cuántas transacciones? "));
 
+  // Se recorre para capturar cada transaccion
   for (let i = 0; i < cantidad; i++) {
-    console.log(`\nTransacción ${i + 1}`);
-
+    
+    // Se captura el ID como texto
+    const idTexto = prompt("ID: ");
+    
+    // Se declara la variable id
+    let id;
+    
+    // Valida si esta vacio o no es numero
+    if (idTexto === "" || isNaN(idTexto)) {
+      id = idTexto;
+    } else {
+      id = parseFloat(idTexto);
+    }
+    
+    // Se capturan los demas campos
+    const cliente = prompt("Cliente: ");
+    const tipo = prompt("Tipo (deposito/retiro/transferencia): ");
+    const monto = parseFloat(prompt("Monto: "));
+    
+    // Se captura autorizado como texto
+    const autorizadoTexto = prompt("Autorizado (true/false): ");
+    
+    // Se convierte a booleano
+    let autorizado;
+    if (autorizadoTexto === "true") {
+      autorizado = true;
+    } else if (autorizadoTexto === "false") {
+      autorizado = false;
+    } else {
+      autorizado = autorizadoTexto;
+    }
+    
+    // Se agrega al arreglo
     transacciones.push({
-      id: parseInt(prompt("ID: ")),
-      cliente: prompt("Cliente: "),
-      tipo: prompt("Tipo (deposito/retiro/transferencia): "),
-      monto: parseFloat(prompt("Monto: ")),
-      autorizado: prompt("Autorizado (true/false): ") === "true"
+      id: id,
+      cliente: cliente,
+      tipo: tipo,
+      monto: monto,
+      autorizado: autorizado
     });
   }
 
-  console.log("\nCARGANDO Y ANALIZANDO TRANSACCIONES...\n");
+  // Se procesa el arreglo completo
+  const resultado = await procesarTransaccionesEj17(transacciones);
 
-  try {
-    const resultado = await procesarTransaccionesEj17(transacciones);
+  console.log("\n");
+  console.log("RESULTADOS DEL PROCESAMIENTO");
+  console.log("\n");
 
-    console.log("\n--- RESUMEN FINAL ---");
-    console.log(`Transacciones procesadas: ${resultado.totalProcesadas}`);
-    console.log(`Transacciones válidas: ${resultado.validas}`);
-    console.log(`Transacciones rechazadas: ${resultado.rechazadas}`);
-    console.log(`Total depósitos: $${resultado.totalDepositos}`);
-    console.log(`Total retiros: $${resultado.totalRetiros}`);
+  // Se muestra el resumen
+  console.log("RESUMEN");
+  console.log("\n");
+  console.log("Transacciones procesadas: " + resultado.totalProcesadas);
+  console.log("Transacciones validas: " + resultado.validas);
+  console.log("Transacciones rechazadas: " + resultado.rechazadas);
+  console.log("Total depositos: $" + resultado.totalDepositos);
+  console.log("Total retiros: $" + resultado.totalRetiros);
+  console.log("\n");
 
-    if (resultado.errores.length > 0) {
-      console.log("\n--- TRANSACCIONES RECHAZADAS ---");
-      resultado.errores.forEach(e => {
-        console.log(`ID ${e.id}: ${e.motivo}`);
-      });
+  // Se muestran las transacciones rechazadas
+  if (resultado.errores && resultado.errores.length > 0) {
+    console.log("TRANSACCIONES RECHAZADAS");
+    console.log("\n");
+    
+    // Se recorre cada transaccion rechazada
+    for (let i = 0; i < resultado.errores.length; i++) {
+      const error = resultado.errores[i];
+      console.log("ID " + error.id + ": " + error.motivo);
+      console.log("");
     }
-
-    console.log("\n✔ Ejercicio 17 ejecutado correctamente");
-
-  } catch (error) {
-    console.log("Error crítico controlado:", error.message);
   }
+
+  console.log("\n");
 }
 
-async function ejecutarEjercicio18() {
-  console.log("\n--- EJERCICIO 18 ---");
-
+async function ejecutarEjercicio18() {                                                            //EJERCICIO 18
+  
+  // Se crea el arreglo para guardar solicitudes
   const solicitudes = [];
-  const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
+  
+  // Se pregunta cuantas solicitudes va a ingresar
+  const cantidad = parseInt(prompt("¿Cuántas solicitudes? "));
 
+  // Se recorre para capturar cada solicitud
   for (let i = 0; i < cantidad; i++) {
-    console.log(`\nSolicitud ${i + 1}`);
-
+    
+    // Se captura el ID como texto
+    const idTexto = prompt("ID: ");
+    
+    // Se declara la variable id
+    let id;
+    
+    // Valida si esta vacio o no es numero
+    if (idTexto === "" || isNaN(idTexto)) {
+      id = idTexto;
+    } else {
+      id = parseFloat(idTexto);
+    }
+    
+    // Se capturan los demas campos
+    const usuario = prompt("Usuario: ");
+    const tipo = prompt("Tipo (hardware/software/red): ");
+    const nivel = parseInt(prompt("Nivel de urgencia (1-5): "));
+    
+    // Se captura activo como texto
+    const activoTexto = prompt("Activo (true/false): ");
+    
+    // Se convierte a booleano
+    let activo;
+    if (activoTexto === "true") {
+      activo = true;
+    } else if (activoTexto === "false") {
+      activo = false;
+    } else {
+      activo = activoTexto;
+    }
+    
+    // Se agrega al arreglo
     solicitudes.push({
-      id: parseInt(prompt("ID: ")),
-      usuario: prompt("Usuario: "),
-      tipo: prompt("Tipo (hardware/software/red): "),
-      nivel: parseInt(prompt("Nivel de urgencia (1-5): ")),
-      activo: prompt("Activo (true/false): ") === "true"
+      id: id,
+      usuario: usuario,
+      tipo: tipo,
+      nivel: nivel,
+      activo: activo
     });
   }
 
-  console.log("\nPROCESANDO SOLICITUDES...\n");
+  // Se procesa el arreglo completo
+  const resultado = await procesarSolicitudesEj18(solicitudes);
 
-  try {
-    const resultado = await procesarSolicitudesEj18(solicitudes);
+  console.log("\n");
+  console.log("RESULTADOS DEL PROCESAMIENTO");
+  console.log("\n");
 
-    if (resultado.validas.length > 0) {
-      console.log("\n--- SOLICITUDES VÁLIDAS ---");
-      resultado.validas.forEach(s => {
-        console.log(`Solicitud ${s.id}`);
-        console.log(`Usuario: ${s.usuario}`);
-        console.log(`Tipo: ${s.tipo}`);
-        console.log(`Prioridad: ${s.prioridad}`);
-        console.log("-----------------------------");
-      });
+  // Se muestra el resumen general
+  console.log("RESUMEN");
+  console.log("\n");
+  console.log("Total recibidas: " + resultado.resumen.totalRecibidas);
+  console.log("Validas: " + resultado.resumen.validas);
+  console.log("Invalidas: " + resultado.resumen.invalidas);
+  console.log("\n");
+
+  // Se muestran las solicitudes invalidas
+  if (resultado.solicitudesInvalidas && resultado.solicitudesInvalidas.length > 0) {
+    console.log("SOLICITUDES INVALIDAS");
+    console.log("\n");
+    
+    // Se recorre cada solicitud invalida
+    for (let i = 0; i < resultado.solicitudesInvalidas.length; i++) {
+      const sol = resultado.solicitudesInvalidas[i];
+      console.log("ID " + sol.id + ": " + sol.motivo);
+      console.log("");
     }
-
-    if (resultado.invalidas.length > 0) {
-      console.log("\n--- SOLICITUDES RECHAZADAS ---");
-      resultado.invalidas.forEach(s => {
-        console.log(`ID ${s.id}: ${s.motivo}`);
-      });
-    }
-
-    console.log("\n✔ Ejercicio 18 ejecutado correctamente");
-
-  } catch (error) {
-    console.log("Error crítico controlado:", error.message);
   }
+
+  // Se muestran las solicitudes procesadas
+  if (resultado.solicitudesValidas && resultado.solicitudesValidas.length > 0) {
+    console.log("SOLICITUDES PROCESADAS");
+    console.log("\n");
+    
+    // Se recorre cada solicitud procesada
+    for (let i = 0; i < resultado.solicitudesValidas.length; i++) {
+      const sol = resultado.solicitudesValidas[i];
+      console.log("Solicitud " + sol.id);
+      console.log("  Usuario: " + sol.usuario);
+      console.log("  Tipo: " + sol.tipo);
+      console.log("  Nivel: " + sol.nivel);
+      console.log("  Prioridad: " + sol.prioridad);
+      console.log("  Estado: " + sol.estadoFinal);
+      console.log("");
+    }
+  }
+
+  console.log("\n");
 }
 
 async function ejecutarEjercicio19() {
