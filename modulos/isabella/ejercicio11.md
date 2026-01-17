@@ -136,7 +136,7 @@ motivo: "Acceso administrativo concedido"
 Datos de entrada:
 {
   id: 2,
-  nombre: "Ana Lopez",
+  nombre: "Felipe Lopez",
   rol: "tecnico",
   nivelAccesoSolicitado: 3,
   activo: true,

@@ -1,156 +1,235 @@
-// EJERCICIO 15 - SISTEMA DE GESTIÓN Y VALIDACIÓN DE SOLICITUDES DE SOPORTE
-// Este módulo analiza, valida, clasifica y procesa solicitudes de soporte técnico
-// usando validaciones estrictas, asincronía y manejo controlado de errores.
+// SISTEMA DE GESTION Y VALIDACION DE SOLICITUDES DE SOPORTE TECNICO
+// Este archivo contiene la logica completa del Ejercicio 15 (ejercicio 3 de Jhon)
 
 
-// ---------------- VALIDACIÓN DE UNA SOLICITUD ----------------
-// Función pura: no muta la solicitud original
+// FUNCION DE VALIDACION (NO SE EXPORTA)
+// Valida los datos basicos de la solicitud
+// Si falla lanza un Error
 function validarSolicitud(solicitud) {
 
-  // Desestructuración para facilitar validaciones
-  const { id, usuario, tipo, nivel, activo } = solicitud;
-
-  // Validación de ID
-  if (typeof id !== "number" || id <= 0) {
-    return { valida: false, motivo: "ID inválido" };
+  // Se valida que el ID sea un numero entero positivo
+  if (typeof solicitud.id !== "number" || !Number.isInteger(solicitud.id) || solicitud.id <= 0) {
+    throw new Error("ID invalido");
   }
 
-  // Validación de usuario
-  if (typeof usuario !== "string" || usuario.trim() === "") {
-    return { valida: false, motivo: "Usuario inválido" };
+  // Se valida que el usuario sea un string no vacio
+  if (typeof solicitud.usuario !== "string" || solicitud.usuario.trim() === "") {
+    throw new Error("Usuario invalido");
   }
 
-  // Validación del tipo
+  // Se valida que el tipo sea hardware, software o red
   const tiposPermitidos = ["hardware", "software", "red"];
-  if (!tiposPermitidos.includes(tipo)) {
-    return { valida: false, motivo: "Tipo de problema inválido" };
+  if (typeof solicitud.tipo !== "string" || !tiposPermitidos.includes(solicitud.tipo)) {
+    throw new Error("Tipo de problema invalido");
   }
 
-  // Validación del nivel
-  if (typeof nivel !== "number" || nivel < 1 || nivel > 5) {
-    return { valida: false, motivo: "Nivel de urgencia fuera de rango" };
+  // Se valida que el nivel sea un numero entero entre 1 y 5
+  if (typeof solicitud.nivel !== "number" || !Number.isInteger(solicitud.nivel) || solicitud.nivel < 1 || solicitud.nivel > 5) {
+    throw new Error("Nivel de urgencia fuera de rango");
   }
 
-  // Validación de estado activo
-  if (typeof activo !== "boolean" || activo === false) {
-    return { valida: false, motivo: "Solicitud inactiva" };
+  // Se valida que activo sea booleano
+  if (typeof solicitud.activo !== "boolean") {
+    throw new Error("Campo activo invalido");
   }
 
-  // Si pasa todas las validaciones
-  return { valida: true };
+  // Se valida que la solicitud este activa
+  if (solicitud.activo !== true) {
+    throw new Error("Solicitud inactiva");
+  }
+
+  // Si todas las validaciones son correctas, retorna true
+  return true;
 }
 
 
-// ---------------- CLASIFICACIÓN DE PRIORIDAD ----------------
+// FUNCION DE CLASIFICACION (FUNCION PURA)
+// Determina la clasificacion de prioridad
+// No modifica el objeto recibido
 function clasificarPrioridad(nivel) {
 
-  if (nivel >= 4) return "ALTA";
-  if (nivel >= 2) return "MEDIA";
+  // Se clasifica en alta prioridad si es 4 o 5
+  if (nivel >= 4) {
+    return "ALTA";
+  }
+
+  // Se clasifica en prioridad media si es 2 o 3
+  if (nivel >= 2) {
+    return "MEDIA";
+  }
+
+  // Se clasifica en baja prioridad si es 1
   return "BAJA";
 }
 
 
-// ---------------- PROCESO ASINCRÓNICO CON CALLBACK ----------------
+// FUNCION CALLBACK (NO SE EXPORTA)
+// Simula procesamiento con callback
 function procesarConCallback(solicitud, callback) {
+
+  // setTimeout simula un proceso asincronico
   setTimeout(() => {
-    callback(null, `Solicitud ${solicitud.id} procesada por CALLBACK`);
+
+    // Se retorna el resultado mediante callback
+    callback("Solicitud " + solicitud.id + " enviada con CALLBACK");
+
   }, 500);
 }
 
 
-// ---------------- PROCESO ASINCRÓNICO CON PROMESA ----------------
+// PROMESA ASINCRONICA (NO SE EXPORTA)
+// Simula procesamiento con promesa
 function procesarConPromesa(solicitud) {
+
+  // Se retorna una promesa
   return new Promise((resolve) => {
+
+    // setTimeout simula un proceso asincronico
     setTimeout(() => {
-      resolve(`Solicitud ${solicitud.id} procesada con PROMESA`);
+
+      // Se resuelve la promesa con el resultado
+      resolve("Solicitud " + solicitud.id + " enviada con PROMESA");
+
     }, 700);
   });
 }
 
 
-// ---------------- PROCESO ASINCRÓNICO CON ASYNC/AWAIT ----------------
-async function procesarConAsyncAwait(solicitud) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(`Solicitud ${solicitud.id} procesada con ASYNC/AWAIT`);
-    }, 900);
-  });
-}
-
-
-// ---------------- FUNCIÓN PRINCIPAL ----------------
+// FUNCION PRINCIPAL ASYNC / AWAIT
+// ESTA FUNCION SI SE EXPORTA
+// Es la unica funcion visible para el menu general
 export async function procesarSolicitudesEj15(solicitudes) {
 
-  // Garantía de inmutabilidad
-  const solicitudesOriginales = [...solicitudes];
-
+  // Arreglos para almacenar resultados
   const solicitudesValidas = [];
   const solicitudesInvalidas = [];
-  const procesadas = [];
+  const resultados = [];
+
+  // Contadores para resumen final
+  let total = 0;
+  let validas = 0;
+  let invalidas = 0;
 
   try {
 
-    // Validación y separación
-    for (const solicitud of solicitudesOriginales) {
-
-      const resultado = validarSolicitud(solicitud);
-
-      if (!resultado.valida) {
-        solicitudesInvalidas.push({
-          id: solicitud.id,
-          motivo: resultado.motivo
-        });
-        continue;
-      }
-
-      // Clasificación
-      solicitudesValidas.push({
-        ...solicitud,
-        prioridad: clasificarPrioridad(solicitud.nivel)
-      });
+    // Se valida que la entrada sea un arreglo
+    if (!Array.isArray(solicitudes)) {
+      throw new Error("La entrada debe ser un arreglo de solicitudes");
     }
 
-    // Procesamiento asincrónico
+    // Se obtiene el total de solicitudes
+    total = solicitudes.length;
+
+    // VALIDACION DE SOLICITUDES
+    // Se recorre el arreglo usando un ciclo for clasico
+    for (let i = 0; i < solicitudes.length; i++) {
+
+      // Se obtiene la solicitud actual
+      const solicitud = solicitudes[i];
+
+      try {
+
+        // Se valida la solicitud
+        validarSolicitud(solicitud);
+
+        // Se usa destructuring para extraer campos relevantes
+        const { id, usuario, tipo, nivel, activo } = solicitud;
+
+        // Si es valida se agrega al arreglo de validas
+        // Se usa spread operator para garantizar inmutabilidad
+        solicitudesValidas.push({ id, usuario, tipo, nivel, activo });
+
+        // Se incrementa el contador de validas
+        validas = validas + 1;
+
+      } catch (errorValidacion) {
+
+        // Si falla la validacion se agrega al arreglo de invalidas
+        solicitudesInvalidas.push({
+          id: solicitud.id ?? null,
+          error: errorValidacion.message
+        });
+
+        // Se incrementa el contador de invalidas
+        invalidas = invalidas + 1;
+      }
+    }
+
+    // PROCESAMIENTO ASINCRONO DE SOLICITUDES VALIDAS
+    // Se recorre el arreglo de solicitudes validas
     for (let i = 0; i < solicitudesValidas.length; i++) {
 
-      const solicitud = solicitudesValidas[i];
+      // Se obtiene la solicitud actual usando destructuring
+      const { id, usuario, tipo, nivel } = solicitudesValidas[i];
 
-      // Alternancia de métodos asincrónicos
-      if (i % 3 === 0) {
-        await new Promise((resolve, reject) => {
-          procesarConCallback(solicitud, (err, msg) => {
-            if (err) reject(err);
-            procesadas.push(msg);
-            resolve();
-          });
+      try {
+
+        // Se clasifica la prioridad
+        const clasificacion = clasificarPrioridad(nivel);
+
+        // PROCESO CON CALLBACK
+        // Se envuelve el callback en una promesa
+        const resultadoCallback = await new Promise((resolve) => {
+          procesarConCallback({ id }, resolve);
         });
 
-      } else if (i % 3 === 1) {
-        const msg = await procesarConPromesa(solicitud);
-        procesadas.push(msg);
+        // PROCESO CON PROMESA
+        const resultadoPromesa = await procesarConPromesa({ id });
 
-      } else {
-        const msg = await procesarConAsyncAwait(solicitud);
-        procesadas.push(msg);
+        // PROCESO CON ASYNC / AWAIT
+        // Se simula un proceso adicional
+        await new Promise((resolve) => setTimeout(resolve, 400));
+
+        // Se crea el resultado final de la solicitud
+        // Se garantiza inmutabilidad
+        resultados.push({
+          id,
+          usuario,
+          tipo,
+          nivel,
+          clasificacion,
+          estadoFinal: "PROCESADA",
+          detalles: [
+            resultadoCallback,
+            resultadoPromesa,
+            "Solicitud procesada con ASYNC/AWAIT"
+          ]
+        });
+
+      } catch (errorProcesamiento) {
+
+        // Si falla el procesamiento se agrega como error
+        resultados.push({
+          id: solicitudesValidas[i].id,
+          estadoFinal: "ERROR",
+          mensaje: errorProcesamiento.message
+        });
       }
     }
 
-    // Resultado final estructurado
+    // Se retorna un objeto con todos los resultados
     return {
-      estadoSistema: "Proceso finalizado correctamente",
-      solicitudesValidas,
-      solicitudesInvalidas,
-      procesadas
+      resumen: {
+        totalRecibidas: total,
+        validas: validas,
+        invalidas: invalidas
+      },
+      solicitudesInvalidas: solicitudesInvalidas,
+      solicitudesProcesadas: resultados
     };
 
-  } catch (error) {
+  } catch (errorGeneral) {
 
-    // Error controlado
+    // Si ocurre un error critico, se retorna error controlado
     return {
-      estadoSistema: "Error controlado en el sistema",
-      mensaje: error.message,
-      solicitudesValidas,
-      solicitudesInvalidas
+      resumen: {
+        totalRecibidas: 0,
+        validas: 0,
+        invalidas: 0
+      },
+      solicitudesInvalidas: [],
+      solicitudesProcesadas: [],
+      error: errorGeneral.message
     };
   }
 }

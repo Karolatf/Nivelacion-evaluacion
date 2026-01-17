@@ -79,7 +79,6 @@ Ejecuta validación básica con callback.
 Ejecuta validación de prioridad con promesa.
 Clasifica la prioridad.
 Atiende la solicitud de forma asincrónica.
-Registra mensajes en consola durante el proceso.
 Almacena resultados y errores.
 Genera resumen final del sistema.
 
@@ -92,7 +91,6 @@ Los errores individuales no detienen el procesamiento completo.
 Cada solicitud con error se almacena con su ID y mensaje.
 El sistema valida si el arreglo está vacío antes de procesar.
 Los mensajes de error son claros y específicos.
-Se registran logs en consola para seguimiento.
 
 --
 
@@ -117,8 +115,6 @@ estadoSistema → Mensaje final indicando:
   - "PROCESO COMPLETADO CON ERRORES" (con errores)
   - "PROCESO FINALIZADO CON ERRORES" (arreglo vacío o inválido)
 
-Además se muestran mensajes en consola durante el proceso.
-
 --
 
 ## 9. Casos de prueba
@@ -142,7 +138,6 @@ tipo: "software"
 prioridad: 5
 clasificacion: "Alta prioridad"
 estado: "atendida"
-Tiempo de atención: 500 ms
 
 --
 
@@ -165,7 +160,6 @@ tipo: "hardware"
 prioridad: 3
 clasificacion: "Prioridad media"
 estado: "atendida"
-Tiempo de atención: 800 ms
 
 --
 
@@ -188,7 +182,6 @@ tipo: "software"
 prioridad: 1
 clasificacion: "Baja prioridad"
 estado: "atendida"
-Tiempo de atención: 1200 ms
 
 --
 
@@ -206,7 +199,7 @@ Datos de entrada:
 
 Resultado esperado:
 id: 4
-mensaje: "Datos inválidos en la solicitud"
+mensaje: "Datos invalidos en la solicitud"
 Solicitud no procesada
 
 --
@@ -225,7 +218,7 @@ Datos de entrada:
 
 Resultado esperado:
 id: 5
-mensaje: "Datos inválidos en la solicitud"
+mensaje: "Datos invalidos en la solicitud"
 Solicitud no procesada
 
 --
@@ -263,7 +256,7 @@ Datos de entrada:
 
 Resultado esperado:
 id: 7
-mensaje: "Datos inválidos en la solicitud"
+mensaje: "Datos invalidos en la solicitud"
 Solicitud no procesada
 
 --
@@ -275,7 +268,7 @@ Datos de entrada:
 
 Resultado esperado:
 resultados: []
-errores: [{ mensaje: "El arreglo de solicitudes está vacío o es inválido" }]
+errores: mensaje: "Datos invalidos en la solicitud"
 estadoSistema: "PROCESO FINALIZADO CON ERRORES"
 
 --
@@ -286,10 +279,9 @@ Uso de callback → validación básica de datos simulada.
 Uso de Promesas → validación de prioridad y atención asincrónica.
 Uso de async/await → coordinación del flujo completo.
 Uso de try/catch → manejo de errores sin bloquear el sistema.
-Uso de ciclo for...of → procesamiento secuencial de solicitudes.
+Uso de ciclo for clásico → procesamiento secuencial de solicitudes.
 Uso de spread operator → garantía de inmutabilidad.
 Función pura para clasificación → resultado predecible sin efectos secundarios.
 Tiempo variable según prioridad → simulación realista de atención.
-Console.log → seguimiento del proceso en tiempo real.
 Validación de arreglo vacío → prevención de errores antes de procesar.
 Operador ternario → cálculo condicional de tiempo de atención.
