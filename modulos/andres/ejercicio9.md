@@ -55,7 +55,7 @@ Retorna únicamente el resultado del cálculo.
 
 ## 5. Procesamiento de órdenes
 
-Se recorre el arreglo usando un ciclo for...of.
+Se recorre el arreglo usando un ciclo for.
 Cada orden se valida y procesa de forma independiente.
 Las órdenes válidas se agregan al arreglo de procesadas.
 Las órdenes con errores se agregan al arreglo de errores.
@@ -112,13 +112,11 @@ estado → Mensaje indicando que el proceso completó
 ### Caso 1: Orden válida - mantenimiento
 
 Datos de entrada:
-{
-  id: 1,
-  cliente: "Carlos Mendez",
-  tipoServicio: "mantenimiento",
-  horas: 3,
-  pagado: true
-}
+id: 1
+cliente: "Carlos Mendez"
+tipoServicio: "mantenimiento"
+horas: 3
+pagado: true
 
 Resultado esperado:
 id: 1
@@ -133,13 +131,11 @@ costoTotal: 120000 (40000 x 3)
 ### Caso 2: Orden válida - instalacion
 
 Datos de entrada:
-{
-  id: 2,
-  cliente: "Ana Lopez",
-  tipoServicio: "instalacion",
-  horas: 2,
-  pagado: false
-}
+id: 2
+cliente: "Ana Lopez"
+tipoServicio: "instalacion"
+horas: 2
+pagado: false
 
 Resultado esperado:
 id: 2
@@ -154,13 +150,11 @@ costoTotal: 120000 (60000 x 2)
 ### Caso 3: Orden válida - soporte
 
 Datos de entrada:
-{
-  id: 3,
-  cliente: "Luis Garcia",
-  tipoServicio: "soporte",
-  horas: 4,
-  pagado: true
-}
+id: 3
+cliente: "Luis Garcia"
+tipoServicio: "soporte"
+horas: 4
+pagado: true
 
 Resultado esperado:
 id: 3
@@ -172,52 +166,46 @@ costoTotal: 120000 (30000 x 4)
 
 --
 
-### Caso 4: Error - ID inválido (no entero)
+### Caso 4: Error - ID no entero
 
 Datos de entrada:
-{
-  id: 4.5,
-  cliente: "Maria Torres",
-  tipoServicio: "mantenimiento",
-  horas: 2,
-  pagado: true
-}
+id: 4.5
+cliente: "Maria Torres"
+tipoServicio: "mantenimiento"
+horas: 2
+pagado: true
 
 Resultado esperado:
 id: 4.5
-mensaje: "ID inválido"
+mensaje: "ID invalido"
 Orden no procesada
 
 --
 
-### Caso 5: Error - Cliente vacío (validación con callback)
+### Caso 5: Error - Cliente vacío
 
 Datos de entrada:
-{
-  id: 5,
-  cliente: "",
-  tipoServicio: "soporte",
-  horas: 3,
-  pagado: false
-}
+id: 5
+cliente: [presionar enter sin escribir]
+tipoServicio: "soporte"
+horas: 3
+pagado: false
 
 Resultado esperado:
 id: 5
-mensaje: "El cliente no es válido"
+mensaje: "El cliente no es valido"
 Orden no procesada
 
 --
 
-### Caso 6: Error - Tipo de servicio no permitido (validación con promesa)
+### Caso 6: Error - Tipo de servicio no permitido
 
 Datos de entrada:
-{
-  id: 6,
-  cliente: "Pedro Ruiz",
-  tipoServicio: "reparacion",
-  horas: 5,
-  pagado: true
-}
+id: 6
+cliente: "Pedro Ruiz"
+tipoServicio: "reparacion"
+horas: 5
+pagado: true
 
 Resultado esperado:
 id: 6
@@ -226,34 +214,30 @@ Orden no procesada
 
 --
 
-### Caso 7: Error - Horas inválidas (validación con promesa)
+### Caso 7: Error - Horas inválidas
 
 Datos de entrada:
-{
-  id: 7,
-  cliente: "Sandra Diaz",
-  tipoServicio: "instalacion",
-  horas: 0,
-  pagado: true
-}
+id: 7
+cliente: "Sandra Diaz"
+tipoServicio: "instalacion"
+horas: 0
+pagado: true
 
 Resultado esperado:
 id: 7
-mensaje: "Horas inválidas"
+mensaje: "Horas invalidas"
 Orden no procesada
 
 --
 
-### Caso 8: Error - Campo pagado no booleano (validación con promesa)
+### Caso 8: Error - Campo pagado no booleano
 
 Datos de entrada:
-{
-  id: 8,
-  cliente: "Roberto Castro",
-  tipoServicio: "mantenimiento",
-  horas: 2,
-  pagado: "si"
-}
+id: 8
+cliente: "Roberto Castro"
+tipoServicio: "mantenimiento"
+horas: 2
+pagado: "si"
 
 Resultado esperado:
 id: 8
@@ -264,13 +248,13 @@ Orden no procesada
 
 ## 10. Justificación técnica
 
-Uso de callback → validación de cliente externa simulada.
-Uso de Promesas → validación completa del servicio.
-Uso de async/await → coordinación del flujo completo.
+Uso de callback → validacion de cliente externa simulada.
+Uso de Promesas → validacion completa del servicio.
+Uso de async/await → coordinacion del flujo completo.
 Uso de try/catch → manejo de errores sin bloquear el sistema.
-Uso de ciclo for...of → procesamiento secuencial de órdenes.
-Función pura para cálculo → resultado predecible sin efectos secundarios.
-Objeto de tarifas → configuración centralizada y mantenible.
-Number.isInteger → validación precisa de números enteros.
-Includes → validación de valores permitidos.
-Separación de responsabilidades → funciones con propósitos específicos.
+Uso de ciclo for → procesamiento secuencial de ordenes.
+Funcion pura para calculo → resultado predecible sin efectos secundarios.
+Objeto de tarifas → configuracion centralizada y mantenible.
+Number.isInteger → validacion precisa de numeros enteros.
+Includes → validacion de valores permitidos.
+Separacion de responsabilidades → funciones con propositos especificos.

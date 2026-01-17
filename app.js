@@ -616,73 +616,271 @@ async function ejecutarEjercicio6() {                                           
   console.log("\n");
 }
 
-async function ejecutarEjercicio7() {
+async function ejecutarEjercicio7() {                                                     //EJERCICIO 7
+  
+  // Se crea el arreglo para guardar transacciones
   const transacciones = [];
+  
+  // Se pregunta cuantas transacciones va a ingresar
   const cantidad = parseInt(prompt("¿Cuántas transacciones? "));
 
+  // Se recorre para capturar cada transaccion
   for (let i = 0; i < cantidad; i++) {
+    
+    // Se capturan los datos basicos
+    const idUsuario = parseInt(prompt("ID Usuario: "));
+    const tipo = prompt("Tipo (ingreso/egreso): ");
+    const monto = parseFloat(prompt("Monto: "));
+    const categoria = prompt("Categoría: ");
+    const fecha = prompt("Fecha: ");
+    
+    // Se agrega al arreglo
     transacciones.push({
-      idUsuario: parseInt(prompt("ID Usuario: ")),
-      tipo: prompt("Tipo (ingreso/egreso): "),
-      monto: parseFloat(prompt("Monto: ")),
-      categoria: prompt("Categoría: "),
-      fecha: prompt("Fecha: ")
+      idUsuario: idUsuario,
+      tipo: tipo,
+      monto: monto,
+      categoria: categoria,
+      fecha: fecha
     });
   }
 
-  console.log(await procesarTransaccionesEj7(transacciones));
+  // Se procesa el arreglo completo
+  const resultado = await procesarTransaccionesEj7(transacciones);
+
+  console.log("\n");
+  console.log("RESULTADOS DEL PROCESAMIENTO");
+  console.log("\n");
+
+  // Se muestran las transacciones validas
+  console.log("TRANSACCIONES VALIDAS: " + resultado.validas.length);
+  console.log("\n");
+
+  // Se muestran saldos por usuario
+  console.log("SALDOS POR USUARIO");
+  console.log("\n");
+  
+  // Se recorren los usuarios con saldo
+  const usuarios = Object.keys(resultado.saldos);
+  for (let i = 0; i < usuarios.length; i++) {
+    const userId = usuarios[i];
+    const saldo = resultado.saldos[userId];
+    console.log("Usuario " + userId + ": $" + saldo);
+    
+    // Se verifica si tiene saldo negativo
+    if (resultado.saldoNegativo[userId]) {
+      console.log("  ALERTA: Saldo negativo");
+    }
+    
+    // Se verifica si tiene patron de riesgo
+    if (resultado.patronesRiesgo[userId]) {
+      console.log("  ALERTA: Multiples egresos consecutivos detectados");
+    }
+  }
+  
+  console.log("\n");
+
+  // Se muestran las transacciones invalidas
+  if (resultado.invalidas && resultado.invalidas.length > 0) {
+    console.log("TRANSACCIONES INVALIDAS");
+    console.log("\n");
+    
+    // Se recorre cada transaccion invalida
+    for (let i = 0; i < resultado.invalidas.length; i++) {
+      const item = resultado.invalidas[i];
+      console.log("Motivo: " + item.motivo);
+    }
+    console.log("\n");
+  }
+
+  // Se muestra resumen
+  console.log("RESUMEN");
+  console.log("\n");
+  console.log("Total procesadas: " + resultado.totalProcesadas);
+  console.log("Validas: " + resultado.validas.length);
+  console.log("Invalidas: " + resultado.invalidas.length);
+  console.log("\n");
 }
 
-async function ejecutarEjercicio8() {
+async function ejecutarEjercicio8() {                                                      //EJERCICIO 8
+  
+  // Se crea el arreglo para guardar movimientos
   const movimientos = [];
+  
+  // Se pregunta cuantos movimientos va a ingresar
   const cantidad = parseInt(prompt("¿Cuántos movimientos? "));
 
+  // Se recorre para capturar cada movimiento
   for (let i = 0; i < cantidad; i++) {
+    
+    // Se capturan los datos basicos
+    const idProducto = parseInt(prompt("ID Producto: "));
+    const nombreProducto = prompt("Nombre Producto: ");
+    const tipoMovimiento = prompt("Tipo Movimiento (entrada/salida): ");
+    const cantidadMov = parseFloat(prompt("Cantidad: "));
+    const lote = prompt("Lote: ");
+    
+    // Se captura activo como texto
+    const activoTexto = prompt("Activo (true/false): ");
+    
+    // Se convierte a booleano
+    let activo;
+    if (activoTexto === "true") {
+      activo = true;
+    } else if (activoTexto === "false") {
+      activo = false;
+    } else {
+      activo = activoTexto;
+    }
+    
+    // Se agrega al arreglo
     movimientos.push({
-      idProducto: parseInt(prompt("ID Producto: ")),
-      nombreProducto: prompt("Nombre Producto: "),
-      tipoMovimiento: prompt("Tipo Movimiento: "),
-      cantidad: parseFloat(prompt("Cantidad: ")),
-      lote: prompt("Lote: "),
-      activo: prompt("Activo (true/false): ") === "true"
+      idProducto: idProducto,
+      nombreProducto: nombreProducto,
+      tipoMovimiento: tipoMovimiento,
+      cantidad: cantidadMov,
+      lote: lote,
+      activo: activo
     });
   }
 
-  console.log(await procesarInventarioEj8(movimientos));
+  // Se procesa el arreglo completo
+  const resultado = await procesarInventarioEj8(movimientos);
+
+  console.log("\n");
+  console.log("RESULTADOS DEL PROCESAMIENTO");
+  console.log("\n");
+
+  // Se muestra el inventario final
+  console.log("INVENTARIO FINAL POR PRODUCTO");
+  console.log("\n");
+  
+  // Se recorren los productos del inventario
+  const productosIds = Object.keys(resultado.inventarioFinal);
+  for (let i = 0; i < productosIds.length; i++) {
+    const id = productosIds[i];
+    const info = resultado.inventarioFinal[id];
+    console.log("Producto " + id + " (" + info.nombreProducto + "): " + info.cantidad + " unidades");
+  }
+  
+  console.log("\n");
+
+  // Se muestran alertas de inventario negativo
+  if (resultado.inventarioNegativo && resultado.inventarioNegativo.length > 0) {
+    console.log("ALERTAS - INVENTARIO NEGATIVO");
+    console.log("\n");
+    
+    // Se recorre cada producto con inventario negativo
+    for (let i = 0; i < resultado.inventarioNegativo.length; i++) {
+      const prod = resultado.inventarioNegativo[i];
+      console.log("ALERTA: Producto " + prod.idProducto + " (" + prod.nombreProducto + ") tiene inventario negativo: " + prod.cantidad + " unidades");
+    }
+    console.log("\n");
+  }
+
+  // Se muestran los movimientos rechazados
+  if (resultado.rechazados && resultado.rechazados.length > 0) {
+    console.log("MOVIMIENTOS RECHAZADOS");
+    console.log("\n");
+    
+    // Se recorre cada movimiento rechazado
+    for (let i = 0; i < resultado.rechazados.length; i++) {
+      const item = resultado.rechazados[i];
+      console.log("Motivo: " + item.motivo);
+    }
+    console.log("\n");
+  }
+
+  // Se muestra resumen
+  console.log("RESUMEN");
+  console.log("\n");
+  console.log("Movimientos validos: " + resultado.validos.length);
+  console.log("Movimientos rechazados: " + resultado.rechazados.length);
+  console.log("\n");
 }
 
-async function ejecutarEjercicio9() {
+async function ejecutarEjercicio9() {                                                         //EJERCICIO 9
+  
+  // Se crea el arreglo para guardar ordenes
   const ordenes = [];
-  const cantidad = parseInt(prompt("¿Cuántas órdenes desea ingresar? "));
+  
+  // Se pregunta cuantas ordenes va a ingresar
+  const cantidad = parseInt(prompt("¿Cuántas órdenes? "));
 
+  // Se recorre para capturar cada orden
   for (let i = 0; i < cantidad; i++) {
+    
+    // Se captura el ID como numero 
+    const id = parseFloat(prompt("ID: "));
+    
+    const cliente = prompt("Cliente: ");
+    const tipoServicio = prompt("Tipo de servicio (mantenimiento/instalacion/soporte): ");
+    const horas = parseFloat(prompt("Horas: "));
+    
+    // Se captura pagado como texto
+    const pagadoTexto = prompt("Pagado (true/false): ");
+    
+    // Se convierte a booleano
+    let pagado;
+    if (pagadoTexto === "true") {
+      pagado = true;
+    } else if (pagadoTexto === "false") {
+      pagado = false;
+    } else {
+      pagado = pagadoTexto;
+    }
+    
+    // Se agrega al arreglo
     ordenes.push({
-      id: parseInt(prompt("ID: ")),
-      cliente: prompt("Cliente: "),
-      tipoServicio: prompt("Tipo de servicio: "),
-      horas: parseFloat(prompt("Horas: ")),
-      pagado: prompt("Pagado (true/false): ") === "true"
+      id: id,
+      cliente: cliente,
+      tipoServicio: tipoServicio,
+      horas: horas,
+      pagado: pagado
     });
   }
 
+  // Se procesa el arreglo completo
   const resultado = await procesarOrdenesEj9(ordenes);
 
-  console.log("\nÓRDENES PROCESADAS\n");
+  console.log("\n");
+  console.log("RESULTADOS DEL PROCESAMIENTO");
+  console.log("\n");
 
-  resultado.procesadas.forEach(o => {
-    console.log(`Orden ${o.id}`);
-    console.log(`Cliente: ${o.cliente}`);
-    console.log(`Servicio: ${o.servicio}`);
-    console.log(`Costo: $${o.costoTotal}`);
-    console.log("------------------");
-  });
-
-  if (resultado.errores.length > 0) {
-    console.log("\nÓRDENES CON ERROR\n");
-    resultado.errores.forEach(e => {
-      console.log(`Orden ${e.id}: ${e.mensaje}`);
-    });
+  // Se muestran las ordenes procesadas
+  if (resultado.procesadas && resultado.procesadas.length > 0) {
+    console.log("ORDENES PROCESADAS CORRECTAMENTE");
+    console.log("\n");
+    
+    // Se recorre cada orden procesada
+    for (let i = 0; i < resultado.procesadas.length; i++) {
+      const orden = resultado.procesadas[i];
+      console.log("Orden " + orden.id);
+      console.log("  Cliente: " + orden.cliente);
+      console.log("  Servicio: " + orden.servicio);
+      console.log("  Horas: " + orden.horas);
+      console.log("  Pagado: " + orden.pagado);
+      console.log("  Costo total: $" + orden.costoTotal);
+      console.log("");
+    }
   }
+
+  // Se muestran los errores
+  if (resultado.errores && resultado.errores.length > 0) {
+    console.log("ORDENES CON ERRORES");
+    console.log("\n");
+    
+    // Se recorre cada error
+    for (let i = 0; i < resultado.errores.length; i++) {
+      const error = resultado.errores[i];
+      console.log("Error en orden " + error.id);
+      console.log("  Mensaje: " + error.mensaje);
+      console.log("");
+    }
+  }
+
+  // Se muestra estado final
+  console.log("Estado: " + resultado.estado);
+  console.log("\n");
 }
 
 async function ejecutarEjercicio10() {

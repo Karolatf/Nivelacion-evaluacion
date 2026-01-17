@@ -1,19 +1,19 @@
-// EJERCICIO 9 - SISTEMA DE GESTIÓN Y VALIDACIÓN DE ÓRDENES DE SERVICIO
-// Este archivo contiene TODA la lógica del ejercicio
+// SISTEMA DE GESTION Y VALIDACION DE ORDENES DE SERVICIO
+// Este archivo contiene la logica completa del Ejercicio 9 (ejercicio 3 de Andres)
 
 
-// FUNCIÓN CALLBACK (NO SE EXPORTA)
-// Valida que el cliente sea un string válido
+// FUNCION CALLBACK (NO SE EXPORTA)
+// Valida que el cliente sea un string valido
 function validarClienteCallback(orden, callback) {
 
-  // setTimeout simula un proceso asincrónico
+  // setTimeout simula un proceso asincronico
   setTimeout(() => {
 
-    // Se valida que el cliente sea un string no vacío
+    // Se valida que el cliente sea un string no vacio
     if (typeof orden.cliente !== "string" || orden.cliente.trim() === "") {
 
-      // Si el cliente no es válido, se retorna un error
-      callback(new Error("El cliente no es válido"), null);
+      // Si el cliente no es valido, se retorna un error
+      callback(new Error("El cliente no es valido"), null);
 
     } else {
 
@@ -21,11 +21,11 @@ function validarClienteCallback(orden, callback) {
       callback(null, orden);
     }
 
-  }, 200); // Retardo artificial para simular asincronía
+  }, 200);
 }
 
 
-// FUNCIÓN CON PROMESA (NO SE EXPORTA)
+// PROMESA ASINCRONICA (NO SE EXPORTA)
 // Valida el tipo de servicio, horas y estado de pago
 function validarServicioPromesa(orden) {
 
@@ -35,15 +35,15 @@ function validarServicioPromesa(orden) {
     // Se define un arreglo con los tipos de servicio permitidos
     const servicios = ["mantenimiento", "instalacion", "soporte"];
 
-    // Se valida que el tipo de servicio esté en la lista
+    // Se valida que el tipo de servicio este en la lista
     if (!servicios.includes(orden.tipoServicio)) {
       reject(new Error("Tipo de servicio no permitido"));
       return;
     }
 
-    // Se valida que las horas sean un número mayor a cero
+    // Se valida que las horas sean un numero mayor a cero
     if (typeof orden.horas !== "number" || orden.horas <= 0) {
-      reject(new Error("Horas inválidas"));
+      reject(new Error("Horas invalidas"));
       return;
     }
 
@@ -59,8 +59,9 @@ function validarServicioPromesa(orden) {
 }
 
 
-// FUNCIÓN DE CÁLCULO (NO SE EXPORTA)
-// Calcula el costo total según el tipo de servicio y las horas
+// FUNCION DE CALCULO (FUNCION PURA)
+// Calcula el costo total segun el tipo de servicio y las horas
+// No modifica datos externos
 function calcularCosto(tipo, horas) {
 
   // Se define un objeto con las tarifas por hora de cada servicio
@@ -70,82 +71,101 @@ function calcularCosto(tipo, horas) {
     soporte: 30000
   };
 
-  // Se retorna el costo total (tarifa por hora * cantidad de horas)
+  // Se retorna el costo total
   return tarifas[tipo] * horas;
 }
 
 
-// FUNCIÓN PRINCIPAL ASYNC / AWAIT
-// ESTA FUNCIÓN SÍ SE EXPORTA
-// Es la única función visible para el menú general
+// FUNCION PRINCIPAL ASYNC / AWAIT
+// ESTA FUNCION SI SE EXPORTA
+// Es la unica funcion visible para el menu general
 export async function procesarOrdenesEj9(ordenes) {
 
-  // Arreglo para almacenar órdenes procesadas correctamente
+  // Arreglo para almacenar ordenes procesadas correctamente
   const procesadas = [];
 
-  // Arreglo para almacenar órdenes con errores
+  // Arreglo para almacenar ordenes con errores
   const errores = [];
 
-  // Se recorre el arreglo usando un ciclo for...of
-  for (const orden of ordenes) {
+  try {
 
-    try {
-
-      // VALIDACIÓN DEL ID
-      // Se valida que el ID sea un número entero positivo
-      if (!Number.isInteger(orden.id) || orden.id <= 0) {
-        throw new Error("ID inválido");
-      }
-
-      // VALIDACIÓN CON CALLBACK
-      // Se envuelve la función callback dentro de una promesa
-      const clienteValido = await new Promise((resolve, reject) => {
-
-        // Se llama a la validación del cliente
-        validarClienteCallback(orden, (err, data) =>
-
-          // Si hay error se rechaza la promesa, si no se resuelve
-          err ? reject(err) : resolve(data)
-        );
-      });
-
-      // VALIDACIÓN CON PROMESA
-      // Se valida el servicio usando promesas
-      const ordenValida = await validarServicioPromesa(clienteValido);
-
-      // CÁLCULO DEL COSTO
-      // Se calcula el costo total de la orden
-      const costo = calcularCosto(
-        ordenValida.tipoServicio,
-        ordenValida.horas
-      );
-
-      // Se agrega la orden procesada al arreglo
-      procesadas.push({
-        id: ordenValida.id,
-        cliente: ordenValida.cliente,
-        servicio: ordenValida.tipoServicio,
-        horas: ordenValida.horas,
-        pagado: ordenValida.pagado,
-        costoTotal: costo
-      });
-
-    } catch (error) {
-
-      // Si falla una orden
-      // se almacena el error sin detener el sistema
-      errores.push({
-        id: orden.id,
-        mensaje: error.message
-      });
+    // Se valida que la entrada sea un arreglo
+    if (!Array.isArray(ordenes)) {
+      throw new Error("Las ordenes deben ser un arreglo");
     }
-  }
 
-  // RESULTADO FINAL
-  // Se retorna un objeto con todos los resultados
-  return {
-    procesadas: procesadas,
-    errores: errores,
-    estado: "PROCESO COMPLETADO"
-  };
+    // Se recorre el arreglo usando un ciclo for clasico
+    for (let i = 0; i < ordenes.length; i++) {
+
+      // Se obtiene la orden actual
+      const orden = ordenes[i];
+
+      try {
+
+        // VALIDACION DEL ID
+        // Se valida que el ID sea un numero entero positivo
+        if (!Number.isInteger(orden.id) || orden.id <= 0) {
+          throw new Error("ID invalido");
+        }
+
+        // VALIDACION CON CALLBACK
+        // Se envuelve la funcion callback dentro de una promesa
+        const clienteValido = await new Promise((resolve, reject) => {
+
+          // Se llama a la validacion del cliente
+          validarClienteCallback(orden, (error, data) => {
+
+            // Si hay error se rechaza la promesa
+            if (error) {
+              reject(error);
+            } else {
+              // Si no hay error se resuelve
+              resolve(data);
+            }
+          });
+        });
+
+        // VALIDACION CON PROMESA
+        // Se valida el servicio usando promesas
+        const ordenValida = await validarServicioPromesa(clienteValido);
+
+        // CALCULO DEL COSTO
+        // Se calcula el costo total de la orden
+        const costo = calcularCosto(ordenValida.tipoServicio, ordenValida.horas);
+
+        // Se agrega la orden procesada al arreglo
+        procesadas.push({
+          id: ordenValida.id,
+          cliente: ordenValida.cliente,
+          servicio: ordenValida.tipoServicio,
+          horas: ordenValida.horas,
+          pagado: ordenValida.pagado,
+          costoTotal: costo
+        });
+
+      } catch (errorInterno) {
+
+        // Si falla una orden, se almacena el error
+        errores.push({
+          id: orden.id,
+          mensaje: errorInterno.message
+        });
+      }
+    }
+
+    // Se retorna un objeto con todos los resultados
+    return {
+      procesadas: procesadas,
+      errores: errores,
+      estado: "PROCESO COMPLETADO"
+    };
+
+  } catch (errorGeneral) {
+
+    // Si ocurre un error critico, se retorna error controlado
+    return {
+      estado: "ERROR",
+      mensaje: errorGeneral.message
+    };
+  }
 }

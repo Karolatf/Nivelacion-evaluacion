@@ -1,19 +1,19 @@
-// EJERCICIO 8 - SISTEMA DE ANÁLISIS Y CONTROL DE INVENTARIO POR LOTES
-// Este archivo contiene TODA la lógica del ejercicio
+// SISTEMA DE ANALISIS Y CONTROL DE INVENTARIO POR LOTES
+// Este archivo contiene la logica completa del Ejercicio 8 (ejercicio 2 de Andres)
 
 
-// FUNCIÓN CALLBACK (NO SE EXPORTA)
-// Simula la validación externa de un lote
+// FUNCION CALLBACK (NO SE EXPORTA)
+// Simula la validacion externa de un lote
 function validarLoteCallback(movimiento, callback) {
 
-  // setTimeout simula un proceso asincrónico
+  // setTimeout simula un proceso asincronico
   setTimeout(() => {
 
     try {
 
-      // Se valida que el lote sea un string no vacío
+      // Se valida que el lote sea un string no vacio
       if (typeof movimiento.lote !== "string" || movimiento.lote.trim() === "") {
-        throw new Error("Lote inválido");
+        throw new Error("Lote invalido");
       }
 
       // Se valida que el estado activo sea booleano
@@ -21,36 +21,34 @@ function validarLoteCallback(movimiento, callback) {
         throw new Error("Producto inactivo o dato de estado incorrecto");
       }
 
-      // Si todas las validaciones son correctas
-      // se retorna el movimiento sin modificar
+      // Si todas las validaciones son correctas, se retorna el movimiento
       callback(null, movimiento);
 
     } catch (error) {
 
-      // Si ocurre un error
-      // se retorna de forma controlada por callback
+      // Si ocurre un error, se retorna de forma controlada por callback
       callback(error, null);
     }
 
-  }, 300); // Retardo artificial para simular asincronía
+  }, 300);
 }
 
 
-// FUNCIÓN CON PROMESA (NO SE EXPORTA)
-// Valida que la cantidad sea un número mayor a cero
+// PROMESA ASINCRONICA (NO SE EXPORTA)
+// Valida que la cantidad sea un numero mayor a cero
 function validarCantidadPromesa(movimiento) {
 
   // Se retorna una promesa
   return new Promise((resolve, reject) => {
 
-    // setTimeout simula un proceso asincrónico
+    // setTimeout simula un proceso asincronico
     setTimeout(() => {
 
-      // Se verifica que la cantidad sea numérica y positiva
+      // Se verifica que la cantidad sea numerica y positiva
       if (typeof movimiento.cantidad !== "number" || movimiento.cantidad <= 0) {
 
-        // Si la cantidad no es válida se rechaza la promesa
-        reject(new Error("Cantidad inválida"));
+        // Si la cantidad no es valida se rechaza la promesa
+        reject(new Error("Cantidad invalida"));
 
       } else {
 
@@ -63,23 +61,23 @@ function validarCantidadPromesa(movimiento) {
 }
 
 
-// FUNCIÓN PRINCIPAL ASYNC / AWAIT
-// ESTA FUNCIÓN SÍ SE EXPORTA
-// Es la única función visible para el menú general
+// FUNCION PRINCIPAL ASYNC / AWAIT
+// ESTA FUNCION SI SE EXPORTA
+// Es la unica funcion visible para el menu general
 export async function procesarInventarioEj8(movimientos) {
 
-  // Arreglo de movimientos válidos
+  // Arreglo de movimientos validos
   const validos = [];
 
   // Arreglo de movimientos rechazados
   const rechazados = [];
 
-  // Objeto que almacenará el inventario final por producto
+  // Objeto que almacenara el inventario final por producto
   const inventarioFinal = {};
 
   try {
 
-    // Validación inicial: debe ser un arreglo
+    // Se valida que la entrada sea un arreglo
     if (!Array.isArray(movimientos)) {
       throw new Error("Los movimientos deben ser un arreglo");
     }
@@ -87,7 +85,7 @@ export async function procesarInventarioEj8(movimientos) {
     // Se crea una copia para garantizar inmutabilidad
     const copiaMovimientos = [...movimientos];
 
-    // Se recorre el arreglo usando un ciclo for clásico
+    // Se recorre el arreglo usando un ciclo for clasico
     for (let i = 0; i < copiaMovimientos.length; i++) {
 
       // Se obtiene el movimiento actual
@@ -95,33 +93,32 @@ export async function procesarInventarioEj8(movimientos) {
 
       try {
 
-        // VALIDACIÓN CON CALLBACK
-        // Se envuelve la función callback dentro de una promesa
+        // VALIDACION CON CALLBACK
+        // Se envuelve la funcion callback dentro de una promesa
         const movimientoCallback = await new Promise((resolve, reject) => {
 
-          // Se llama a la validación del lote
+          // Se llama a la validacion del lote
           validarLoteCallback(movimiento, (error, data) => {
 
             // Si hay error se rechaza la promesa
             if (error) {
               reject(error);
-            } 
-            // Si no hay error se continúa
-            else {
+            } else {
+              // Si no hay error se continua
               resolve(data);
             }
           });
         });
 
-        // VALIDACIÓN CON PROMESA
+        // VALIDACION CON PROMESA
         // Se valida la cantidad usando promesas
         const movimientoValido = await validarCantidadPromesa(movimientoCallback);
 
-        // CLASIFICACIÓN LÓGICA
+        // CLASIFICACION LOGICA
         // Solo se procesan productos activos
         if (movimientoValido.activo) {
 
-          // Se agrega al arreglo de válidos
+          // Se agrega al arreglo de validos
           validos.push(movimientoValido);
 
           // Se inicializa el inventario del producto si no existe
@@ -132,29 +129,31 @@ export async function procesarInventarioEj8(movimientos) {
             };
           }
 
-          // Se suma o resta cantidad según tipo de movimiento
+          // Se suma o resta cantidad segun tipo de movimiento
           if (movimientoValido.tipoMovimiento === "entrada") {
 
             // Si es entrada, se suma al inventario
-            inventarioFinal[movimientoValido.idProducto].cantidad += movimientoValido.cantidad;
+            inventarioFinal[movimientoValido.idProducto].cantidad = 
+              inventarioFinal[movimientoValido.idProducto].cantidad + movimientoValido.cantidad;
 
           } else if (movimientoValido.tipoMovimiento === "salida") {
 
             // Si es salida, se resta del inventario
-            inventarioFinal[movimientoValido.idProducto].cantidad -= movimientoValido.cantidad;
+            inventarioFinal[movimientoValido.idProducto].cantidad = 
+              inventarioFinal[movimientoValido.idProducto].cantidad - movimientoValido.cantidad;
 
           } else {
 
-            // Si el tipo de movimiento no es válido, se rechaza
+            // Si el tipo de movimiento no es valido, se rechaza
             rechazados.push({
               movimiento: movimientoValido,
-              motivo: "Tipo de movimiento inválido"
+              motivo: "Tipo de movimiento invalido"
             });
           }
 
         } else {
 
-          // Si el producto está inactivo, se rechaza
+          // Si el producto esta inactivo, se rechaza
           rechazados.push({
             movimiento: movimientoValido,
             motivo: "Producto inactivo"
@@ -163,8 +162,7 @@ export async function procesarInventarioEj8(movimientos) {
 
       } catch (errorInterno) {
 
-        // Si falla un movimiento
-        // se almacena como rechazado sin detener el sistema
+        // Si falla un movimiento, se almacena como rechazado
         rechazados.push({
           movimiento: movimiento,
           motivo: errorInterno.message
@@ -172,17 +170,26 @@ export async function procesarInventarioEj8(movimientos) {
       }
     }
 
-    // DETECCIÓN DE INVENTARIO NEGATIVO
+    // DETECCION DE INVENTARIO NEGATIVO
     // Se filtran productos con cantidad negativa
-    const inventarioNegativo = Object.entries(inventarioFinal)
-      .filter(([id, info]) => info.cantidad < 0)
-      .map(([id, info]) => ({ 
-        idProducto: id, 
-        nombreProducto: info.nombreProducto, 
-        cantidad: info.cantidad 
-      }));
+    const inventarioNegativo = [];
+    
+    // Se recorren los productos del inventario
+    const productosIds = Object.keys(inventarioFinal);
+    for (let i = 0; i < productosIds.length; i++) {
+      const id = productosIds[i];
+      const info = inventarioFinal[id];
+      
+      // Si la cantidad es negativa, se agrega al arreglo
+      if (info.cantidad < 0) {
+        inventarioNegativo.push({
+          idProducto: id,
+          nombreProducto: info.nombreProducto,
+          cantidad: info.cantidad
+        });
+      }
+    }
 
-    // RESULTADO FINAL
     // Se retorna un objeto con todos los resultados
     return {
       validos: validos,
@@ -193,8 +200,7 @@ export async function procesarInventarioEj8(movimientos) {
 
   } catch (errorGeneral) {
 
-    // Si ocurre un error crítico
-    // se retorna un error controlado
+    // Si ocurre un error critico, se retorna de forma controlada
     return {
       estado: "ERROR",
       mensaje: errorGeneral.message

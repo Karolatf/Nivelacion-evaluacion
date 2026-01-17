@@ -103,17 +103,15 @@ En caso de error crítico, retorna un objeto con estado ERROR y mensaje.
 ### Caso 1: Movimiento válido tipo entrada
 
 Datos de entrada:
-{
-  idProducto: 1,
-  nombreProducto: "Laptop HP",
-  tipoMovimiento: "entrada",
-  cantidad: 10,
-  lote: "LT-2025-001",
-  activo: true
-}
+idProducto: 1
+nombreProducto: "Laptop HP"
+tipoMovimiento: "entrada"
+cantidad: 10
+lote: "LT-2025-001"
+activo: true
 
 Resultado esperado:
-Clasificado como válido
+Clasificado como valido
 Inventario producto 1: 10 unidades
 
 --
@@ -121,46 +119,43 @@ Inventario producto 1: 10 unidades
 ### Caso 2: Movimiento válido tipo salida
 
 Datos de entrada:
-{
-  idProducto: 1,
-  nombreProducto: "Laptop HP",
-  tipoMovimiento: "salida",
-  cantidad: 3,
-  lote: "LT-2025-001",
-  activo: true
-}
+idProducto: 2
+nombreProducto: "Laptop HP"
+tipoMovimiento: "salida"
+cantidad: 3
+lote: "LT-2025-001"
+activo: true
 
 Resultado esperado:
-Clasificado como válido
-Inventario producto 1: 7 unidades (si tenía 10)
+Clasificado como valido
+Inventario producto 2: -3 unidades
+                     
 
 --
 
 ### Caso 3: Producto con inventario negativo
 
 Datos de entrada:
-Producto 2 con movimientos:
-- Entrada: 5 unidades
-- Salida: 12 unidades
+Producto 3 con movimientos:
+- idProducto: 3, tipo: "entrada", cantidad: 5
+- idProducto: 3, tipo: "salida", cantidad: 12
 
 Resultado esperado:
-Inventario producto 2: -7 unidades
-Producto 2 incluido en inventarioNegativo
-Alerta de inventario crítico
+Inventario producto 3: -7 unidades
+Producto 3 incluido en inventarioNegativo
+Alerta de inventario critico
 
 --
 
 ### Caso 4: Movimiento rechazado - producto inactivo
 
 Datos de entrada:
-{
-  idProducto: 3,
-  nombreProducto: "Mouse Logitech",
-  tipoMovimiento: "entrada",
-  cantidad: 20,
-  lote: "LT-2025-002",
-  activo: false
-}
+idProducto: 4
+nombreProducto: "Mouse Logitech"
+tipoMovimiento: "entrada"
+cantidad: 20
+lote: "LT-2025-002"
+activo: false
 
 Resultado esperado:
 Clasificado como rechazado
@@ -169,21 +164,19 @@ No procesado en el inventario
 
 --
 
-### Caso 5: Error - lote vacío (validación con callback)
+### Caso 5: Error - lote vacío
 
 Datos de entrada:
-{
-  idProducto: 4,
-  nombreProducto: "Teclado Mecánico",
-  tipoMovimiento: "entrada",
-  cantidad: 15,
-  lote: "",
-  activo: true
-}
+idProducto: 5
+nombreProducto: "Teclado Mecanico"
+tipoMovimiento: "entrada"
+cantidad: 15
+lote: [presionar enter sin escribir]
+activo: true
 
 Resultado esperado:
 Clasificado como rechazado
-Motivo: "Lote inválido"
+Motivo: "Lote invalido"
 No procesado en el inventario
 
 --
@@ -191,14 +184,12 @@ No procesado en el inventario
 ### Caso 6: Error - estado activo no booleano
 
 Datos de entrada:
-{
-  idProducto: 5,
-  nombreProducto: "Monitor Samsung",
-  tipoMovimiento: "salida",
-  cantidad: 5,
-  lote: "LT-2025-003",
-  activo: "si"
-}
+idProducto: 6
+nombreProducto: "Monitor Samsung"
+tipoMovimiento: "salida"
+cantidad: 5
+lote: "LT-2025-003"
+activo: "si"
 
 Resultado esperado:
 Clasificado como rechazado
@@ -207,21 +198,19 @@ No procesado en el inventario
 
 --
 
-### Caso 7: Error - cantidad cero o negativa (validación con promesa)
+### Caso 7: Error - cantidad cero
 
 Datos de entrada:
-{
-  idProducto: 6,
-  nombreProducto: "Impresora HP",
-  tipoMovimiento: "entrada",
-  cantidad: 0,
-  lote: "LT-2025-004",
-  activo: true
-}
+idProducto: 7
+nombreProducto: "Impresora HP"
+tipoMovimiento: "entrada"
+cantidad: 0
+lote: "LT-2025-004"
+activo: true
 
 Resultado esperado:
 Clasificado como rechazado
-Motivo: "Cantidad inválida"
+Motivo: "Cantidad invalida"
 No procesado en el inventario
 
 --
@@ -229,31 +218,29 @@ No procesado en el inventario
 ### Caso 8: Error - tipo de movimiento inválido
 
 Datos de entrada:
-{
-  idProducto: 7,
-  nombreProducto: "Webcam Logitech",
-  tipoMovimiento: "transferencia",
-  cantidad: 8,
-  lote: "LT-2025-005",
-  activo: true
-}
+idProducto: 8
+nombreProducto: "Camara Logitech"
+tipoMovimiento: "transferencia"
+cantidad: 8
+lote: "LT-2025-005"
+activo: true
 
 Resultado esperado:
 Clasificado como rechazado
-Motivo: "Tipo de movimiento inválido"
-No procesado en el inventario
+Motivo: "Tipo de movimiento invalido"
+
 
 --
 
 ## 10. Justificación técnica
 
-Uso de callback → validación externa de lote simulada.
-Uso de Promesas → validación asincrónica de cantidad.
-Uso de async/await → coordinación del flujo completo.
+Uso de callback → validacion externa de lote simulada.
+Uso de Promesas → validacion asincronica de cantidad.
+Uso de async/await → coordinacion del flujo completo.
 Uso de try/catch → manejo de errores sin bloquear el sistema.
 Uso de ciclo for → procesamiento secuencial de movimientos.
-Uso de spread operator → garantía de inmutabilidad.
-Operadores matemáticos → cálculo de inventario por producto.
-Uso de objetos para inventario → organización eficiente por idProducto.
-Object.entries y filter → detección de inventario negativo.
-Inicialización condicional → prevención de errores por productos nuevos.
+Uso de spread operator → garantia de inmutabilidad.
+Operadores matematicos → calculo de inventario por producto.
+Uso de objetos para inventario → organizacion eficiente por idProducto.
+Deteccion de inventario negativo → identificacion de productos criticos.
+Inicializacion condicional → prevencion de errores por productos nuevos.

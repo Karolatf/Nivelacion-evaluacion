@@ -108,16 +108,14 @@ En caso de error crítico, retorna un objeto con estado ERROR y mensaje.
 ### Caso 1: Transacción válida tipo ingreso
 
 Datos de entrada:
-{
-  idUsuario: 1,
-  tipo: "ingreso",
-  monto: 50000,
-  categoria: "Salario",
-  fecha: "2025-01-15"
-}
+idUsuario: 1
+tipo: "ingreso"
+monto: 50000
+categoria: "Salario"
+fecha: "2025-01-15"
 
 Resultado esperado:
-Clasificada como válida
+Clasificada como valida
 Sumada al saldo del usuario 1
 Saldo usuario 1: 50000
 
@@ -126,129 +124,103 @@ Saldo usuario 1: 50000
 ### Caso 2: Transacción válida tipo egreso
 
 Datos de entrada:
-{
-  idUsuario: 1,
-  tipo: "egreso",
-  monto: 20000,
-  categoria: "Compras",
-  fecha: "2025-01-15"
-}
+idUsuario: 2
+tipo: "egreso"
+monto: 20000
+categoria: "Compras"
+fecha: "2025-01-15"
 
 Resultado esperado:
-Clasificada como válida
-Restada del saldo del usuario 1
-Saldo usuario 1: 30000 (si tenía 50000)
+Clasificada como valida
+Restada del saldo del usuario 2
+Saldo usuario 2: 30000 (si tenia 50000)
 
 --
 
 ### Caso 3: Usuario con saldo negativo
 
 Datos de entrada:
-Usuario 2 con transacciones:
-- Ingreso: 10000
-- Egreso: 30000
+Usuario 3 con transacciones:
+- idUsuario: 3, tipo: "ingreso", monto: 10000
+- idUsuario: 3, tipo: "egreso", monto: 30000
 
 Resultado esperado:
-Saldo usuario 2: -20000
-Usuario 2 marcado en saldoNegativo
+Saldo usuario 3: -20000
+Usuario 3 marcado en saldoNegativo
 Alerta de saldo negativo generada
 
 --
 
-### Caso 4: Patrón de riesgo - múltiples egresos consecutivos
+### Caso 4: Patron de riesgo - multiples egresos consecutivos
 
 Datos de entrada:
-Usuario 3 con transacciones consecutivas:
-- Egreso: 5000
-- Egreso: 8000
+Usuario 4 con transacciones consecutivas:
+- idUsuario: 4, tipo: "egreso", monto: 5000
+- idUsuario: 4, tipo: "egreso", monto: 8000
 
 Resultado esperado:
 Usuario 3 marcado en patronesRiesgo
-Alerta de patrón de riesgo generada
+Alerta de patron de riesgo generada
 
 --
 
-### Caso 5: Error - idUsuario inválido (validación con callback)
+### Caso 5: Error - tipo de transaccion invalido
 
 Datos de entrada:
-{
-  idUsuario: "ABC",
-  tipo: "ingreso",
-  monto: 15000,
-  categoria: "Venta",
-  fecha: "2025-01-15"
-}
+idUsuario: 5
+tipo: "transferencia"
+monto: 25000
+categoria: "Pago"
+fecha: "2025-01-15"
 
 Resultado esperado:
-Clasificada como inválida
-Motivo: "ID de usuario inválido"
-No procesada en los cálculos
+Clasificada como invalida
+Motivo: "Tipo de transaccion invalido"
+No procesada en los calculos
 
 --
 
-### Caso 6: Error - tipo de transacción inválido
+### Caso 6: Error - monto cero
 
 Datos de entrada:
-{
-  idUsuario: 2,
-  tipo: "transferencia",
-  monto: 25000,
-  categoria: "Pago",
-  fecha: "2025-01-15"
-}
+idUsuario: 6
+tipo: "ingreso"
+monto: 0
+categoria: "Bono"
+fecha: "2025-01-15"
 
 Resultado esperado:
-Clasificada como inválida
-Motivo: "Tipo de transacción inválido"
-No procesada en los cálculos
+Clasificada como invalida
+Motivo: "Monto invalido"
+No procesada en los calculos
 
 --
 
-### Caso 7: Error - monto cero o negativo (validación con promesa)
+### Caso 7: Error - categoria vacia
 
 Datos de entrada:
-{
-  idUsuario: 3,
-  tipo: "ingreso",
-  monto: 0,
-  categoria: "Bono",
-  fecha: "2025-01-15"
-}
+idUsuario: 7
+tipo: "egreso"
+monto: 12000
+categoria: [presionar enter sin escribir]
+fecha: "2025-01-15"
 
 Resultado esperado:
-Clasificada como inválida
-Motivo: "Monto inválido"
-No procesada en los cálculos
-
---
-
-### Caso 8: Error - categoría vacía
-
-Datos de entrada:
-{
-  idUsuario: 4,
-  tipo: "egreso",
-  monto: 12000,
-  categoria: "",
-  fecha: "2025-01-15"
-}
-
-Resultado esperado:
-Clasificada como inválida
-Motivo: "Categoría inválida"
-No procesada en los cálculos
+Clasificada como invalida
+Motivo: "Categoria invalida"
+No procesada en los calculos
 
 --
 
 ## 10. Justificación técnica
 
-Uso de callback → validación estructural externa simulada.
-Uso de Promesas → validación asincrónica del monto.
-Uso de async/await → coordinación del flujo completo.
+Uso de callback → validacion estructural externa simulada.
+Uso de Promesas → validacion asincronica del monto.
+Uso de async/await → coordinacion del flujo completo.
 Uso de try/catch → manejo de errores sin bloquear el sistema.
 Uso de ciclo for → procesamiento secuencial de transacciones.
-Uso de spread operator → garantía de inmutabilidad.
-Operadores matemáticos → cálculo de saldos por usuario.
-Uso de objetos para saldos → organización eficiente por idUsuario.
-Contadores auxiliares → detección de patrones de riesgo.
-Operador nullish coalescing (??) → inicialización segura de valores.
+Uso de spread operator → garantia de inmutabilidad.
+Operadores matematicos → calculo de saldos por usuario.
+Uso de objetos para saldos → organizacion eficiente por idUsuario.
+Contadores auxiliares → deteccion de patrones de riesgo.
+Destructuring → extraccion limpia de datos de transacciones.
