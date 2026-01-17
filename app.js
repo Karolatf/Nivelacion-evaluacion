@@ -1952,117 +1952,364 @@ async function ejecutarEjercicio21() {                                          
   console.log("\n");
 }
 
-async function ejecutarEjercicio22() {
-  console.log("\n--- EJERCICIO 22 ---");
-  console.log("Sistema de validación básica de solicitudes\n");
-
+async function ejecutarEjercicio22() {                                                            //EJERCICIO 22
+  
+  // Se crea el arreglo para guardar solicitudes
   const solicitudes = [];
-  const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
+  
+  // Se pregunta cuantas solicitudes va a ingresar
+  const cantidad = parseInt(prompt("¿Cuántas solicitudes? "));
 
+  // Se recorre para capturar cada solicitud
   for (let i = 0; i < cantidad; i++) {
-    console.log(`\nSolicitud ${i + 1}`);
-
+    
+    // Se capturan los datos basicos
+    const id = parseInt(prompt("ID: "));
+    const nombre = prompt("Nombre del solicitante: ");
+    const tipo = prompt("Tipo de solicitud: ");
+    const prioridad = parseInt(prompt("Prioridad (1-5): "));
+    
+    // Se captura estado como texto
+    const estadoTexto = prompt("Estado (true/false): ");
+    
+    // Se convierte a booleano
+    let estado;
+    if (estadoTexto === "true") {
+      estado = true;
+    } else if (estadoTexto === "false") {
+      estado = false;
+    } else {
+      estado = estadoTexto;
+    }
+    
+    // Se capturan los requisitos
+    const cantidadRequisitos = parseInt(prompt("Cuantos requisitos: "));
+    const requisitos = [];
+    
+    // Se recorre para pedir cada requisito
+    for (let j = 0; j < cantidadRequisitos; j++) {
+      const requisito = prompt("Requisito " + (j + 1) + " (true/false): ") === "true";
+      requisitos.push(requisito);
+    }
+    
+    // Se agrega la solicitud completa
     solicitudes.push({
-      id: parseInt(prompt("ID: ")),
-      tipo: prompt("Tipo de operación: "),
-      valor: parseFloat(prompt("Valor asociado: ")),
-      estado: prompt("Estado (true/false): "),
-      prioridad: parseInt(prompt("Prioridad (1-5): "))
+      id: id,
+      nombre: nombre,
+      tipo: tipo,
+      prioridad: prioridad,
+      estado: estado,
+      requisitos: requisitos
     });
   }
 
-  try {
-    const resultado = await procesarSolicitudesEj22(solicitudes);
+  // Se procesa el arreglo completo
+  const resultado = await procesarSolicitudesEj22(solicitudes);
 
-    console.log("\n--- RESULTADOS ---");
-    resultado.detalle.forEach(r => {
-      console.log(`ID ${r.id} → Estado: ${r.estado} | Motivo: ${r.motivo}`);
-    });
+  console.log("\n");
+  console.log("RESULTADOS DEL PROCESAMIENTO");
+  console.log("\n");
 
-    console.log("\n--- RESUMEN FINAL ---");
-    console.log(resultado.resumen);
+  // Se muestra el resumen general
+  console.log("RESUMEN");
+  console.log("\n");
+  console.log("Total recibidas: " + resultado.resumen.totalRecibidas);
+  console.log("Validas: " + resultado.resumen.validas);
+  console.log("Invalidas: " + resultado.resumen.invalidas);
+  console.log("Aprobadas: " + resultado.resumen.aprobadas);
+  console.log("Rechazadas: " + resultado.resumen.rechazadas);
+  console.log("\n");
 
-  } catch (error) {
-    console.log("Error controlado:", error.message);
+  // Se muestran las solicitudes invalidas
+  if (resultado.solicitudesInvalidas && resultado.solicitudesInvalidas.length > 0) {
+    console.log("SOLICITUDES INVALIDAS");
+    console.log("\n");
+    
+    // Se recorre cada solicitud invalida
+    for (let i = 0; i < resultado.solicitudesInvalidas.length; i++) {
+      const sol = resultado.solicitudesInvalidas[i];
+      console.log("ID " + sol.id + ": " + sol.error);
+      console.log("");
+    }
   }
+
+  // Se muestran las solicitudes rechazadas
+  if (resultado.solicitudesRechazadas && resultado.solicitudesRechazadas.length > 0) {
+    console.log("SOLICITUDES RECHAZADAS");
+    console.log("\n");
+    
+    // Se recorre cada solicitud rechazada
+    for (let i = 0; i < resultado.solicitudesRechazadas.length; i++) {
+      const sol = resultado.solicitudesRechazadas[i];
+      console.log("ID " + sol.id + ": " + sol.motivo);
+      console.log("");
+    }
+  }
+
+  // Se muestran las solicitudes aprobadas
+  if (resultado.solicitudesAprobadas && resultado.solicitudesAprobadas.length > 0) {
+    console.log("SOLICITUDES APROBADAS");
+    console.log("\n");
+    
+    // Se recorre cada solicitud aprobada
+    for (let i = 0; i < resultado.solicitudesAprobadas.length; i++) {
+      const sol = resultado.solicitudesAprobadas[i];
+      console.log("Solicitud " + sol.id);
+      console.log("  Nombre: " + sol.nombre);
+      console.log("  Tipo: " + sol.tipo);
+      console.log("  Prioridad: " + sol.prioridad);
+      console.log("  Clasificacion: " + sol.clasificacion);
+      console.log("  Estado: " + sol.estadoFinal);
+      console.log("");
+    }
+  }
+
+  console.log("\n");
 }
 
-async function ejecutarEjercicio23() {
-  console.log("\n--- EJERCICIO 23 ---");
-  console.log("Sistema de Procesos y Validación de Operaciones\n");
+async function ejecutarEjercicio23() {                                                            //EJERCICIO 23
+  
+  // Se crea el arreglo para guardar operaciones
+  const operaciones = [];
+  
+  // Se pregunta cuantas operaciones va a ingresar
+  const cantidad = parseInt(prompt("¿Cuántas operaciones? "));
 
-  const solicitudes = [];
-  const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
-
+  // Se recorre para capturar cada operacion
   for (let i = 0; i < cantidad; i++) {
-    console.log(`\nSolicitud ${i + 1}`);
-
-    solicitudes.push({
-      id: parseInt(prompt("ID: ")),
-      tipoOperacion: prompt("Tipo de operación: "),
-      valor: parseFloat(prompt("Valor: ")),
-      estado: prompt("Estado (true/false): "),
-      prioridad: parseInt(prompt("Prioridad (1-5): "))
+    
+    // Se capturan los datos basicos
+    const id = parseInt(prompt("ID: "));
+    const tipoOperacion = prompt("Tipo de operación: ");
+    const valor = parseFloat(prompt("Valor: "));
+    
+    // Se captura estado como texto
+    const estadoTexto = prompt("Estado (true/false): ");
+    
+    // Se convierte a booleano
+    let estado;
+    if (estadoTexto === "true") {
+      estado = true;
+    } else if (estadoTexto === "false") {
+      estado = false;
+    } else {
+      estado = estadoTexto;
+    }
+    
+    const prioridad = parseInt(prompt("Prioridad (1-5): "));
+    
+    // Se agrega la operacion completa
+    operaciones.push({
+      id: id,
+      tipoOperacion: tipoOperacion,
+      valor: valor,
+      estado: estado,
+      prioridad: prioridad
     });
   }
 
-  try {
-    const resultado = await procesarSolicitudesEj23(solicitudes);
+  // Se procesa el arreglo completo
+  const resultado = await procesarSolicitudesEj23(operaciones);
 
-    console.log("\n--- RESULTADOS INDIVIDUALES ---");
-    resultado.resultados.forEach(r => {
-      console.log(`ID ${r.id} → ${r.resultado} | ${r.motivo}`);
-    });
+  console.log("\n");
+  console.log("RESULTADOS DEL PROCESAMIENTO");
+  console.log("\n");
 
-    console.log("\n--- RESUMEN FINAL ---");
-    console.log(resultado.resumen);
+  // Se muestra el resumen general
+  console.log("RESUMEN");
+  console.log("\n");
+  console.log("Total procesadas: " + resultado.resumen.totalProcesadas);
+  console.log("Validas: " + resultado.resumen.validas);
+  console.log("Invalidas: " + resultado.resumen.invalidas);
+  console.log("Aprobadas: " + resultado.resumen.aprobadas);
+  console.log("Rechazadas: " + resultado.resumen.rechazadas);
+  console.log("\n");
 
-  } catch (error) {
-    console.log("Error capturado correctamente:", error.message);
+  // Se muestran las operaciones invalidas
+  if (resultado.operacionesInvalidas && resultado.operacionesInvalidas.length > 0) {
+    console.log("OPERACIONES INVALIDAS");
+    console.log("\n");
+    
+    // Se recorre cada operacion invalida
+    for (let i = 0; i < resultado.operacionesInvalidas.length; i++) {
+      const op = resultado.operacionesInvalidas[i];
+      console.log("ID " + op.id + ": " + op.error);
+      console.log("");
+    }
   }
+
+  // Se muestran las operaciones rechazadas
+  if (resultado.operacionesRechazadas && resultado.operacionesRechazadas.length > 0) {
+    console.log("OPERACIONES RECHAZADAS");
+    console.log("\n");
+    
+    // Se recorre cada operacion rechazada
+    for (let i = 0; i < resultado.operacionesRechazadas.length; i++) {
+      const op = resultado.operacionesRechazadas[i];
+      console.log("ID " + op.id + ": " + op.motivo);
+      console.log("");
+    }
+  }
+
+  // Se muestran las operaciones aprobadas
+  if (resultado.operacionesAprobadas && resultado.operacionesAprobadas.length > 0) {
+    console.log("OPERACIONES APROBADAS");
+    console.log("\n");
+    
+    // Se recorre cada operacion aprobada
+    for (let i = 0; i < resultado.operacionesAprobadas.length; i++) {
+      const op = resultado.operacionesAprobadas[i];
+      console.log("Operacion " + op.id);
+      console.log("  Tipo: " + op.tipoOperacion);
+      console.log("  Valor: " + op.valor);
+      console.log("  Prioridad: " + op.prioridad);
+      console.log("  Clasificacion: " + op.clasificacion);
+      console.log("  Estado: " + op.estadoFinal);
+      console.log("");
+    }
+  }
+
+  console.log("\n");
 }
 
-async function ejecutarEjercicio24() {
-  console.log("\n--- EJERCICIO 24 ---");
-  console.log("Sistema de Gestión y Validación de Solicitudes de Acceso\n");
-
+async function ejecutarEjercicio24() {                                                            //EJERCICIO 24
+  
+  // Se crea el arreglo para guardar solicitudes
   const solicitudes = [];
-  const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
+  
+  // Se pregunta cuantas solicitudes va a ingresar
+  const cantidad = parseInt(prompt("¿Cuántas solicitudes? "));
 
+  // Se recorre para capturar cada solicitud
   for (let i = 0; i < cantidad; i++) {
-    console.log(`\nSolicitud ${i + 1}`);
-
+    
+    // Se capturan los datos basicos
+    const id = parseInt(prompt("ID: "));
+    const nombre = prompt("Nombre del solicitante: ");
+    const edad = parseInt(prompt("Edad: "));
+    const rol = prompt("Rol solicitado: ");
+    
+    // Se capturan los permisos
     const permisosTexto = prompt("Permisos (separados por coma): ");
-    const permisos = permisosTexto.trim() === ""
-      ? []
-      : permisosTexto.split(",").map(p => p.trim());
-
+    
+    // Se procesan los permisos
+    let permisos;
+    
+    // Si esta vacio, se asigna array vacio
+    if (permisosTexto.trim() === "") {
+      permisos = [];
+    } else {
+      // Se separa por comas y se elimina espacios
+      permisos = permisosTexto.split(",").map(p => p.trim());
+    }
+    
+    const estado = prompt("Estado: ");
+    
+    // Se captura aceptaCondiciones como texto
+    const aceptaTexto = prompt("Acepta condiciones (true/false): ");
+    
+    // Se convierte a booleano
+    let aceptaCondiciones;
+    if (aceptaTexto === "true") {
+      aceptaCondiciones = true;
+    } else if (aceptaTexto === "false") {
+      aceptaCondiciones = false;
+    } else {
+      aceptaCondiciones = aceptaTexto;
+    }
+    
+    // Se agrega la solicitud completa
     solicitudes.push({
-      id: parseInt(prompt("ID solicitud: ")),
-      nombre: prompt("Nombre del solicitante: "),
-      edad: parseInt(prompt("Edad: ")),
-      rol: prompt("Rol solicitado: "),
+      id: id,
+      nombre: nombre,
+      edad: edad,
+      rol: rol,
       permisos: permisos,
-      estado: "pendiente",
-      aceptaCondiciones: prompt("Acepta condiciones (true/false): ") === "true"
+      estado: estado,
+      aceptaCondiciones: aceptaCondiciones
     });
   }
 
-  try {
-    const resultado = await procesarSolicitudesEj24(solicitudes);
+  // Se procesa el arreglo completo
+  const resultado = await procesarSolicitudesEj24(solicitudes);
 
-    console.log("\n--- RESULTADOS ---");
-    resultado.resultados.forEach(r => {
-      console.log(`ID ${r.id}`);
-      console.log(`Estado final: ${r.estado}`);
-      console.log(`Motivo: ${r.motivo}`);
-      console.log("-----------------------------");
-    });
+  console.log("\n");
+  console.log("RESULTADOS DEL PROCESAMIENTO");
+  console.log("\n");
 
-  } catch (error) {
-    console.log("Error controlado:", error.message);
+  // Se muestra el resumen general
+  console.log("RESUMEN");
+  console.log("\n");
+  console.log("Total recibidas: " + resultado.resumen.totalRecibidas);
+  console.log("Validas: " + resultado.resumen.validas);
+  console.log("Invalidas: " + resultado.resumen.invalidas);
+  console.log("Aprobadas: " + resultado.resumen.aprobadas);
+  console.log("Rechazadas: " + resultado.resumen.rechazadas);
+  console.log("En revision: " + resultado.resumen.enRevision);
+  console.log("\n");
+
+  // Se muestran las solicitudes invalidas
+  if (resultado.solicitudesInvalidas && resultado.solicitudesInvalidas.length > 0) {
+    console.log("SOLICITUDES INVALIDAS");
+    console.log("\n");
+    
+    // Se recorre cada solicitud invalida
+    for (let i = 0; i < resultado.solicitudesInvalidas.length; i++) {
+      const sol = resultado.solicitudesInvalidas[i];
+      console.log("ID " + sol.id + ": " + sol.error);
+      console.log("");
+    }
   }
+
+  // Se muestran las solicitudes rechazadas
+  if (resultado.solicitudesRechazadas && resultado.solicitudesRechazadas.length > 0) {
+    console.log("SOLICITUDES RECHAZADAS");
+    console.log("\n");
+    
+    // Se recorre cada solicitud rechazada
+    for (let i = 0; i < resultado.solicitudesRechazadas.length; i++) {
+      const sol = resultado.solicitudesRechazadas[i];
+      console.log("ID " + sol.id + ": " + sol.motivo);
+      console.log("");
+    }
+  }
+
+  // Se muestran las solicitudes en revision
+  if (resultado.solicitudesEnRevision && resultado.solicitudesEnRevision.length > 0) {
+    console.log("SOLICITUDES EN REVISION");
+    console.log("\n");
+    
+    // Se recorre cada solicitud en revision
+    for (let i = 0; i < resultado.solicitudesEnRevision.length; i++) {
+      const sol = resultado.solicitudesEnRevision[i];
+      console.log("ID " + sol.id);
+      console.log("  Nombre: " + sol.nombre);
+      console.log("  Motivo: " + sol.motivo);
+      console.log("");
+    }
+  }
+
+  // Se muestran las solicitudes aprobadas
+  if (resultado.solicitudesAprobadas && resultado.solicitudesAprobadas.length > 0) {
+    console.log("SOLICITUDES APROBADAS");
+    console.log("\n");
+    
+    // Se recorre cada solicitud aprobada
+    for (let i = 0; i < resultado.solicitudesAprobadas.length; i++) {
+      const sol = resultado.solicitudesAprobadas[i];
+      console.log("Solicitud " + sol.id);
+      console.log("  Nombre: " + sol.nombre);
+      console.log("  Edad: " + sol.edad);
+      console.log("  Rol: " + sol.rol);
+      console.log("  Permisos: " + sol.permisos.join(", "));
+      console.log("  Estado: " + sol.estadoFinal);
+      console.log("");
+    }
+  }
+
+  console.log("\n");
 }
+
 // EJECUCIÓN
 menuGeneral();
 
