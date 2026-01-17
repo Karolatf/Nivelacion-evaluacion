@@ -19,7 +19,14 @@ import {
   procesarOrdenesEj9,
   procesarSolicitudesEj10,
   procesarSolicitudesEj11,
-  procesarSolicitudesEj12   
+  procesarSolicitudesEj12,
+  procesarSolicitudesEj13,
+  procesarTransaccionesEj14,
+  procesarSolicitudesEj15,
+  procesarSolicitudesEj16,
+  procesarTransaccionesEj17,
+  procesarSolicitudesEj18,
+  procesarSolicitudesEj19
 } from "./modulos/barril.js";
 
 // CONFIGURACIÓN DE MENÚS
@@ -27,7 +34,10 @@ const ejerciciosPorCarpeta = {
   karol: [1, 2, 3],
   sebastian: [4, 5, 6],
   andres: [7, 8, 9],
-  isabella: [10, 11, 12]
+  isabella: [10, 11, 12],
+  jhon: [13, 14, 15],
+  manuel: [16, 17, 18], 
+  paulo: [19, 20, 21]    
 };
 
 // MAPEO DE FUNCIONES POR EJERCICIO
@@ -43,10 +53,15 @@ const funcionesEjercicio = {
   9: ejecutarEjercicio9,
   10: ejecutarEjercicio10,
   11: ejecutarEjercicio11,
-  12: ejecutarEjercicio12  
+  12: ejecutarEjercicio12,
+  13: ejecutarEjercicio13,
+  14: ejecutarEjercicio14,
+  15: ejecutarEjercicio15,
+  16: ejecutarEjercicio16,
+  17: ejecutarEjercicio17,
+  18: ejecutarEjercicio18,
+  19: procesarSolicitudesEj19
 };
-
-
 
 // MENÚ GENERAL
 async function menuGeneral() {
@@ -567,6 +582,358 @@ async function ejecutarEjercicio12() {
 
   } catch (error) {
     console.log("Error crítico del sistema:", error.message);
+  }
+}
+
+async function ejecutarEjercicio13() {
+  console.log("\n--- EJERCICIO 13 ---");
+
+  const solicitudes = [];
+  const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
+
+  for (let i = 0; i < cantidad; i++) {
+    console.log(`\nSolicitud ${i + 1}`);
+
+    solicitudes.push({
+      id: parseInt(prompt("ID: ")),
+      usuario: prompt("Usuario: "),
+      tipo: prompt("Tipo (hardware/software/red): "),
+      prioridad: parseInt(prompt("Prioridad (1-5): ")),
+      descripcion: prompt("Descripción (mínimo 10 caracteres): "),
+      activo: prompt("Activo (true/false): ") === "true"
+    });
+  }
+
+  console.log("\nPROCESANDO SOLICITUDES...\n");
+
+  try {
+    const resultado = await procesarSolicitudesEj13(solicitudes);
+
+    console.log("\n--- RESUMEN ---");
+    console.log(resultado.resumen);
+
+    if (resultado.solicitudesInvalidas.length > 0) {
+      console.log("\nSOLICITUDES INVÁLIDAS\n");
+      resultado.solicitudesInvalidas.forEach(s => {
+        console.log(`ID ${s.id}: ${s.error}`);
+      });
+    }
+
+    if (resultado.solicitudesProcesadas.length > 0) {
+      console.log("\nSOLICITUDES PROCESADAS\n");
+      resultado.solicitudesProcesadas.forEach(s => {
+        console.log(`Solicitud ${s.id}`);
+        console.log(`Tipo: ${s.tipo}`);
+        console.log(`Prioridad: ${s.prioridad}`);
+        console.log(`Clasificación: ${s.clasificacion}`);
+        console.log(`Estado: ${s.estadoFinal}`);
+        console.log("-----------------------------");
+      });
+    }
+
+    console.log("\n✔ Ejercicio 13 ejecutado correctamente");
+
+  } catch (error) {
+    console.log("Error crítico controlado:", error.message);
+  }
+}
+
+async function ejecutarEjercicio14() {
+  console.log("\n--- EJERCICIO 14 ---");
+
+  const transacciones = [];
+  const cantidad = parseInt(prompt("¿Cuántas transacciones desea ingresar? "));
+
+  for (let i = 0; i < cantidad; i++) {
+    console.log(`\nTransacción ${i + 1}`);
+
+    transacciones.push({
+      id: parseInt(prompt("ID: ")),
+      cliente: prompt("Cliente: "),
+      tipo: prompt("Tipo (deposito/retiro/transferencia): "),
+      monto: parseFloat(prompt("Monto: ")),
+      autorizado: prompt("Autorizado (true/false): ") === "true"
+    });
+  }
+
+  console.log("\nCARGANDO Y ANALIZANDO TRANSACCIONES...\n");
+
+  try {
+    const resultado = await procesarTransaccionesEj14(transacciones);
+
+    console.log("\n--- RESUMEN GENERAL ---");
+    console.log(`Transacciones procesadas: ${resultado.totalProcesadas}`);
+    console.log(`Transacciones válidas: ${resultado.validas}`);
+    console.log(`Transacciones rechazadas: ${resultado.rechazadas}`);
+    console.log(`Total en depósitos: $${resultado.totalDepositos}`);
+    console.log(`Total en retiros: $${resultado.totalRetiros}`);
+
+    if (resultado.errores.length > 0) {
+      console.log("\n--- TRANSACCIONES RECHAZADAS ---");
+      resultado.errores.forEach(e => {
+        console.log(`ID ${e.id}: ${e.motivo}`);
+      });
+    }
+
+    console.log("\n✔ Ejercicio 14 ejecutado correctamente");
+
+  } catch (error) {
+    console.log("Error crítico controlado:", error.message);
+  }
+}
+
+async function ejecutarEjercicio15() {
+  console.log("\n--- EJERCICIO 15 ---");
+
+  const solicitudes = [];
+  const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
+
+  for (let i = 0; i < cantidad; i++) {
+    console.log(`\nSolicitud ${i + 1}`);
+
+    solicitudes.push({
+      id: parseInt(prompt("ID: ")),
+      usuario: prompt("Usuario: "),
+      rol: prompt("Rol (admin/tecnico/usuario): "),
+      nivelAcceso: parseInt(prompt("Nivel de acceso (1-5): ")),
+      activo: prompt("Activo (true/false): ") === "true"
+    });
+  }
+
+  console.log("\nPROCESANDO SOLICITUDES...\n");
+
+  try {
+    const resultado = await procesarSolicitudesEj15(solicitudes);
+
+    console.log("\n--- RESUMEN ---");
+    console.log(resultado.resumen);
+
+    if (resultado.solicitudesInvalidas.length > 0) {
+      console.log("\nSOLICITUDES INVÁLIDAS\n");
+      resultado.solicitudesInvalidas.forEach(s => {
+        console.log(`ID ${s.id}: ${s.error}`);
+      });
+    }
+
+    if (resultado.solicitudesProcesadas.length > 0) {
+      console.log("\nSOLICITUDES PROCESADAS\n");
+      resultado.solicitudesProcesadas.forEach(s => {
+        console.log(`Solicitud ${s.id}`);
+        console.log(`Usuario: ${s.usuario}`);
+        console.log(`Rol: ${s.rol}`);
+        console.log(`Nivel de acceso: ${s.nivelAcceso}`);
+        console.log(`Estado final: ${s.estadoFinal}`);
+        console.log(`Motivo: ${s.motivo}`);
+        console.log("-----------------------------");
+      });
+    }
+
+    console.log("\n✔ Ejercicio 15 ejecutado correctamente");
+
+  } catch (error) {
+    console.log("Error crítico controlado:", error.message);
+  }
+}
+
+async function ejecutarEjercicio16() {
+  console.log("\n--- EJERCICIO 16 ---");
+
+  const solicitudes = [];
+  const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
+
+  for (let i = 0; i < cantidad; i++) {
+    console.log(`\nSolicitud ${i + 1}`);
+
+    solicitudes.push({
+      id: parseInt(prompt("ID: ")),
+      usuario: prompt("Usuario: "),
+      tipo: prompt("Tipo (hardware/software/red): "),
+      prioridad: parseInt(prompt("Prioridad (1-5): ")),
+      descripcion: prompt("Descripción (mínimo 10 caracteres): "),
+      activo: prompt("Activo (true/false): ") === "true"
+    });
+  }
+
+  console.log("\nPROCESANDO SOLICITUDES...\n");
+
+  try {
+    const resultado = await procesarSolicitudesEj16(solicitudes);
+
+    console.log("\n--- RESUMEN GENERAL ---");
+    console.log(`Total recibidas: ${resultado.total}`);
+    console.log(`Solicitudes válidas: ${resultado.validas}`);
+    console.log(`Solicitudes inválidas: ${resultado.invalidas}`);
+
+    if (resultado.invalidasDetalle.length > 0) {
+      console.log("\n--- SOLICITUDES INVÁLIDAS ---");
+      resultado.invalidasDetalle.forEach(s => {
+        console.log(`ID ${s.id}: ${s.motivo}`);
+      });
+    }
+
+    if (resultado.procesadas.length > 0) {
+      console.log("\n--- SOLICITUDES PROCESADAS ---");
+      resultado.procesadas.forEach(s => {
+        console.log(`Solicitud ${s.id}`);
+        console.log(`Tipo: ${s.tipo}`);
+        console.log(`Prioridad: ${s.prioridad}`);
+        console.log(`Clasificación: ${s.clasificacion}`);
+        console.log(`Estado final: ${s.estado}`);
+        console.log("-----------------------------");
+      });
+    }
+
+    console.log("\n✔ Ejercicio 16 ejecutado correctamente");
+
+  } catch (error) {
+    console.log("Error crítico controlado:", error.message);
+  }
+}
+async function ejecutarEjercicio17() {
+  console.log("\n--- EJERCICIO 17 ---");
+
+  const transacciones = [];
+  const cantidad = parseInt(prompt("¿Cuántas transacciones desea ingresar? "));
+
+  for (let i = 0; i < cantidad; i++) {
+    console.log(`\nTransacción ${i + 1}`);
+
+    transacciones.push({
+      id: parseInt(prompt("ID: ")),
+      cliente: prompt("Cliente: "),
+      tipo: prompt("Tipo (deposito/retiro/transferencia): "),
+      monto: parseFloat(prompt("Monto: ")),
+      autorizado: prompt("Autorizado (true/false): ") === "true"
+    });
+  }
+
+  console.log("\nCARGANDO Y ANALIZANDO TRANSACCIONES...\n");
+
+  try {
+    const resultado = await procesarTransaccionesEj17(transacciones);
+
+    console.log("\n--- RESUMEN FINAL ---");
+    console.log(`Transacciones procesadas: ${resultado.totalProcesadas}`);
+    console.log(`Transacciones válidas: ${resultado.validas}`);
+    console.log(`Transacciones rechazadas: ${resultado.rechazadas}`);
+    console.log(`Total depósitos: $${resultado.totalDepositos}`);
+    console.log(`Total retiros: $${resultado.totalRetiros}`);
+
+    if (resultado.errores.length > 0) {
+      console.log("\n--- TRANSACCIONES RECHAZADAS ---");
+      resultado.errores.forEach(e => {
+        console.log(`ID ${e.id}: ${e.motivo}`);
+      });
+    }
+
+    console.log("\n✔ Ejercicio 17 ejecutado correctamente");
+
+  } catch (error) {
+    console.log("Error crítico controlado:", error.message);
+  }
+}
+
+async function ejecutarEjercicio18() {
+  console.log("\n--- EJERCICIO 18 ---");
+
+  const solicitudes = [];
+  const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
+
+  for (let i = 0; i < cantidad; i++) {
+    console.log(`\nSolicitud ${i + 1}`);
+
+    solicitudes.push({
+      id: parseInt(prompt("ID: ")),
+      usuario: prompt("Usuario: "),
+      tipo: prompt("Tipo (hardware/software/red): "),
+      nivel: parseInt(prompt("Nivel de urgencia (1-5): ")),
+      activo: prompt("Activo (true/false): ") === "true"
+    });
+  }
+
+  console.log("\nPROCESANDO SOLICITUDES...\n");
+
+  try {
+    const resultado = await procesarSolicitudesEj18(solicitudes);
+
+    if (resultado.validas.length > 0) {
+      console.log("\n--- SOLICITUDES VÁLIDAS ---");
+      resultado.validas.forEach(s => {
+        console.log(`Solicitud ${s.id}`);
+        console.log(`Usuario: ${s.usuario}`);
+        console.log(`Tipo: ${s.tipo}`);
+        console.log(`Prioridad: ${s.prioridad}`);
+        console.log("-----------------------------");
+      });
+    }
+
+    if (resultado.invalidas.length > 0) {
+      console.log("\n--- SOLICITUDES RECHAZADAS ---");
+      resultado.invalidas.forEach(s => {
+        console.log(`ID ${s.id}: ${s.motivo}`);
+      });
+    }
+
+    console.log("\n✔ Ejercicio 18 ejecutado correctamente");
+
+  } catch (error) {
+    console.log("Error crítico controlado:", error.message);
+  }
+}
+
+async function ejecutarEjercicio19() {
+  console.log("\n--- EJERCICIO 19 ---");
+  console.log("Sistema de Simulación de procesamiento de solicitudes de soporte técnico\n");
+
+  const solicitudes = [];
+  const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
+
+  for (let i = 0; i < cantidad; i++) {
+    console.log(`\nSolicitud ${i + 1}`);
+
+    solicitudes.push({
+      id: parseInt(prompt("ID: ")),
+      usuario: prompt("Usuario: "),
+      area: prompt("Área: "),
+      tipoProblema: prompt("Tipo de problema: "),
+      prioridad: parseInt(prompt("Prioridad (1-5): ")),
+      estado: "pendiente"
+    });
+  }
+
+  console.log("\nPROCESANDO SOLICITUDES...\n");
+
+  try {
+    const resultado = await procesarSolicitudesEj19(solicitudes);
+
+    if (resultado.atendidas.length > 0) {
+      console.log("\n--- SOLICITUDES ATENDIDAS ---");
+      resultado.atendidas.forEach(s => {
+        console.log(`Solicitud ${s.id}`);
+        console.log(`Usuario: ${s.usuario}`);
+        console.log(`Área: ${s.area}`);
+        console.log(`Prioridad final: ${s.prioridad}`);
+        console.log(`Estado: ${s.estado}`);
+        console.log("-----------------------------");
+      });
+    }
+
+    if (resultado.rechazadas.length > 0) {
+      console.log("\n--- SOLICITUDES RECHAZADAS ---");
+      resultado.rechazadas.forEach(s => {
+        console.log(`ID ${s.id}: ${s.motivo}`);
+      });
+    }
+
+    console.log("\n--- RESUMEN FINAL ---");
+    console.log(`Total procesadas: ${resultado.total}`);
+    console.log(`Atendidas: ${resultado.atendidas.length}`);
+    console.log(`Rechazadas: ${resultado.rechazadas.length}`);
+
+    console.log("\n✔ Ejercicio 19 ejecutado correctamente");
+
+  } catch (error) {
+    console.log("Error crítico controlado:", error.message);
   }
 }
 
