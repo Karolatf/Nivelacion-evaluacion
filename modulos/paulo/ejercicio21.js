@@ -1,150 +1,237 @@
-// EJERCICIO 21
-// Sistema de Gestión de Solicitudes de Soporte Técnico
-// Este archivo contiene TODA la lógica del ejercicio
+// SISTEMA DE GESTION DE SOLICITUDES DE SOPORTE
+// Este archivo contiene la logica completa del Ejercicio 21 (ejercicio 3 de Paulo)
 
-// ===============================
-// VALIDACIÓN DE UNA SOLICITUD
-// ===============================
-// Función pura: valida sin modificar el objeto original
+
+// FUNCION DE VALIDACION (NO SE EXPORTA)
+// Valida los datos basicos de la solicitud
+// Si falla lanza un Error
 function validarSolicitud(solicitud) {
 
-  // Validación del id
+  // Se valida que el ID sea un numero
   if (typeof solicitud.id !== "number" || isNaN(solicitud.id)) {
-    throw new Error("ID inválido");
+    throw new Error("ID invalido");
   }
 
-  // Validación del usuario
-  if (typeof solicitud.usuario !== "string" || solicitud.usuario.trim() === "") {
-    throw new Error("Usuario inválido");
+  // Se valida que el usuario sea un string
+  if (typeof solicitud.usuario !== "string") {
+    throw new Error("Usuario invalido");
   }
 
-  // Validación del tipo de problema
+  // Se valida que el tipo sea hardware, software o red
   const tiposPermitidos = ["hardware", "software", "red"];
   if (!tiposPermitidos.includes(solicitud.tipo)) {
-    throw new Error("Tipo de problema no permitido");
+    throw new Error("Tipo de solicitud no permitido");
   }
 
-  // Validación de prioridad
-  if (
-    typeof solicitud.prioridad !== "number" ||
-    solicitud.prioridad < 1 ||
-    solicitud.prioridad > 5
-  ) {
+  // Se valida que la prioridad sea un numero entre 1 y 5
+  if (typeof solicitud.prioridad !== "number" || isNaN(solicitud.prioridad) || solicitud.prioridad < 1 || solicitud.prioridad > 5) {
     throw new Error("Prioridad fuera de rango (1 a 5)");
   }
 
-  // Validación del estado inicial
+  // Se valida que el estado sea exactamente "pendiente"
   if (solicitud.estado !== "pendiente") {
-    throw new Error("Estado inicial inválido");
+    throw new Error("Estado inicial invalido");
   }
 
+  // Si todas las validaciones son correctas, retorna true
   return true;
 }
 
-// ===============================
-// CLASIFICACIÓN POR PRIORIDAD
-// ===============================
-// Función pura: retorna la clasificación sin modificar datos
-function clasificarPrioridad(prioridad) {
-  if (prioridad >= 4) return "alta";
-  if (prioridad >= 2) return "media";
-  return "baja";
+
+// FUNCION DE CLASIFICACION (FUNCION PURA)
+// Clasifica la solicitud segun su prioridad
+// No modifica el objeto recibido
+function clasificarSolicitud(solicitud) {
+
+  // Variable para almacenar la clasificacion
+  let clasificacion;
+  let nuevoEstado;
+
+  // Se clasifica segun el nivel de prioridad
+  // Prioridad alta: 4 o 5
+  if (solicitud.prioridad >= 4) {
+    clasificacion = "ALTA";
+    nuevoEstado = "escalado";
+  }
+  // Prioridad media: 2 o 3
+  else if (solicitud.prioridad >= 2) {
+    clasificacion = "MEDIA";
+    nuevoEstado = "en_proceso";
+  }
+  // Prioridad baja: 1
+  else {
+    clasificacion = "BAJA";
+    nuevoEstado = "en_proceso";
+  }
+
+  // Se retorna un nuevo objeto con la clasificacion y nuevo estado
+  // Se garantiza inmutabilidad usando spread operator
+  return {
+    ...solicitud,
+    clasificacion: clasificacion,
+    estadoFinal: nuevoEstado
+  };
 }
 
-// ===============================
-// ASIGNACIÓN DE NUEVO ESTADO
-// ===============================
-// Función pura que define el nuevo estado
-function asignarEstado(clasificacion) {
-  if (clasificacion === "alta") return "escalado";
-  if (clasificacion === "media") return "en_proceso";
-  return "pendiente";
-}
 
-// ===============================
-// CALLBACK ASÍNCRONO
-// ===============================
-// Simula el envío con callback
-function envioConCallback(solicitud, callback) {
+// FUNCION CALLBACK (NO SE EXPORTA)
+// Simula el envio de la solicitud con callback
+// Justificacion: callbacks permiten simular validaciones externas asincronas
+function enviarConCallback(solicitud, callback) {
+
+  // setTimeout simula un proceso asincronico
   setTimeout(() => {
-    callback(null, `Solicitud ${solicitud.id} enviada con callback`);
-  }, 400);
+
+    // Se retorna el resultado mediante callback
+    const mensaje = "Solicitud " + solicitud.id + " enviada con callback";
+    callback(null, mensaje);
+
+  }, 300);
 }
 
-// ===============================
-// PROMESA ASÍNCRONA
-// ===============================
-function envioConPromesa(solicitud) {
+
+// PROMESA ASINCRONICA (NO SE EXPORTA)
+// Simula el envio de la solicitud con promesa
+// Justificacion: promesas permiten manejo moderno de operaciones asincronas
+function enviarConPromesa(solicitud) {
+
+  // Se retorna una promesa
   return new Promise((resolve) => {
+
+    // setTimeout simula un proceso asincronico
     setTimeout(() => {
-      resolve(`Solicitud ${solicitud.id} enviada con promesa`);
+
+      // Se resuelve la promesa con el resultado
+      const mensaje = "Solicitud " + solicitud.id + " enviada con promesa";
+      resolve(mensaje);
+
     }, 400);
   });
 }
 
-// ===============================
-// FUNCIÓN PRINCIPAL ASYNC / AWAIT
-// ===============================
-// ESTA FUNCIÓN SÍ SE EXPORTA
+
+// FUNCION ASYNC/AWAIT (NO SE EXPORTA)
+// Simula el envio de la solicitud con async/await
+// Justificacion: async/await facilita la coordinacion de flujos asincronos
+async function enviarConAsync(solicitud) {
+
+  // Se retorna una promesa
+  return new Promise((resolve) => {
+
+    // setTimeout simula un proceso asincronico
+    setTimeout(() => {
+
+      // Se resuelve la promesa con el resultado
+      const mensaje = "Solicitud " + solicitud.id + " enviada con async/await";
+      resolve(mensaje);
+
+    }, 500);
+  });
+}
+
+
+// FUNCION PRINCIPAL ASYNC / AWAIT
+// ESTA FUNCION SI SE EXPORTA
+// Es la unica funcion visible para el menu general
+// Justificacion: async/await coordina todo el flujo de validacion y procesamiento
 export async function procesarSolicitudesEj21(solicitudes) {
 
-  // Arreglos inmutables de salida
+  // Arreglo para almacenar solicitudes procesadas
   const procesadas = [];
+
+  // Arreglo para almacenar solicitudes rechazadas
   const rechazadas = [];
 
-  // Se recorre el arreglo original SIN modificarlo
-  for (let i = 0; i < solicitudes.length; i++) {
+  try {
 
-    const solicitud = solicitudes[i];
-
-    try {
-      // VALIDACIÓN
-      validarSolicitud(solicitud);
-
-      // CLASIFICACIÓN
-      const clasificacion = clasificarPrioridad(solicitud.prioridad);
-
-      // NUEVO ESTADO
-      const nuevoEstado = asignarEstado(clasificacion);
-
-      // PROCESAMIENTO INMUTABLE
-      const nuevaSolicitud = {
-        ...solicitud,
-        clasificacion: clasificacion,
-        estado: nuevoEstado
-      };
-
-      // CALLBACK
-      await new Promise((resolve, reject) => {
-        envioConCallback(nuevaSolicitud, (error, mensaje) => {
-          if (error) reject(error);
-          console.log(mensaje);
-          resolve();
-        });
-      });
-
-      // PROMESA
-      const mensajePromesa = await envioConPromesa(nuevaSolicitud);
-      console.log(mensajePromesa);
-
-      // ASYNC / AWAIT (simulación final)
-      await new Promise(resolve => setTimeout(resolve, 300));
-
-      procesadas.push(nuevaSolicitud);
-
-    } catch (error) {
-
-      // MANEJO DE ERRORES CONTROLADO
-      rechazadas.push({
-        id: solicitud?.id ?? null,
-        error: error.message
-      });
+    // Se valida que la entrada sea un arreglo
+    if (!Array.isArray(solicitudes)) {
+      throw new Error("La entrada debe ser un arreglo de solicitudes");
     }
-  }
 
-  return {
-    originales: solicitudes,
-    procesadas: procesadas,
-    rechazadas: rechazadas
-  };
+    // PROCESAMIENTO DE SOLICITUDES
+    // Se recorre el arreglo usando ciclo for clasico
+    for (let i = 0; i < solicitudes.length; i++) {
+
+      // Se obtiene la solicitud actual
+      const solicitud = solicitudes[i];
+
+      try {
+
+        // VALIDACION DE DATOS
+        // Se valida la solicitud
+        validarSolicitud(solicitud);
+
+        // CLASIFICACION
+        // Se clasifica la solicitud segun su prioridad
+        const solicitudClasificada = clasificarSolicitud(solicitud);
+
+        // PROCESO ASINCRONO CON CALLBACK
+        // Se envuelve el callback en una promesa
+        await new Promise((resolve, reject) => {
+
+          // Se ejecuta el envio con callback
+          enviarConCallback(solicitud, (error, mensaje) => {
+
+            // Si hay error se rechaza
+            if (error) {
+              reject(error);
+            } else {
+              // Si no hay error se muestra el mensaje y se resuelve
+              console.log(mensaje);
+              resolve();
+            }
+          });
+        });
+
+        // PROCESO ASINCRONO CON PROMESA
+        const mensajePromesa = await enviarConPromesa(solicitud);
+        console.log(mensajePromesa);
+
+        // PROCESO ASINCRONO CON ASYNC/AWAIT
+        const mensajeAsync = await enviarConAsync(solicitud);
+        console.log(mensajeAsync);
+
+        // Se muestra mensaje de procesamiento exitoso
+        console.log("Solicitud " + solicitud.id + " procesada correctamente");
+
+        // Se agrega a solicitudes procesadas
+        // Se garantiza inmutabilidad
+        procesadas.push(solicitudClasificada);
+
+      } catch (errorValidacion) {
+
+        // Si falla la validacion se agrega al arreglo de rechazadas
+        // Se muestra el motivo del rechazo
+        console.log("Solicitud " + (solicitud.id || "desconocido") + " rechazada: " + errorValidacion.message);
+
+        rechazadas.push({
+          id: solicitud.id ?? "desconocido",
+          estadoFinal: "rechazada",
+          motivo: errorValidacion.message
+        });
+      }
+    }
+
+    // Se muestra mensaje de confirmacion del proceso asincronico
+    console.log("\nProceso asincronico completado");
+
+    // Se retorna un objeto con todos los resultados
+    // Se incluye el arreglo original sin modificaciones
+    return {
+      originales: solicitudes,
+      procesadas: procesadas,
+      rechazadas: rechazadas
+    };
+
+  } catch (errorGeneral) {
+
+    // Si ocurre un error critico, se retorna error controlado
+    return {
+      originales: [],
+      procesadas: [],
+      rechazadas: [],
+      error: errorGeneral.message
+    };
+  }
 }
