@@ -257,9 +257,12 @@ id: 8
 estado: "EN REVISIÓN"
 motivo: "Error en validación externa"
 
-Nota: Este caso depende del resultado aleatorio de la validación externa.
-Ejecutar varias veces hasta que la validación externa falle (30% probabilidad).
-Si la validación externa tiene éxito, el estado será "APROBADA".
+
+ **Nota técnica:** 
+ Este caso depende de la función asincrónica `validacionExterna()`, la cual utiliza `Math.random()` para simular la disponibilidad de un servicio externo. 
+ *   Posee un **30% de probabilidad** de fallar (Estado: EN REVISIÓN).
+ *   Posee un **70% de probabilidad** de éxito (Estado: APROBADA).
+ Si al ejecutar la prueba el resultado es "APROBADA", se debe reintentar la ejecución para evidenciar el manejo de excepciones en procesos asincrónicos externos.
 
 --
 

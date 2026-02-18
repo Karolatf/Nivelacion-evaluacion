@@ -1,201 +1,170 @@
-// SISTEMA DE GESTION Y VALIDACION DE TRANSACCIONES FINANCIERAS
-// Este archivo contiene la logica completa del Ejercicio 7 (ejercicio 1 de Andres)
+// SISTEMA DE GESTIÓN Y VALIDACIÓN DE TRANSACCIONES FINANCIERAS
+// Este módulo centraliza la auditoría de saldos y la detección de patrones de riesgo conductual.
 
-
-// FUNCION CALLBACK (NO SE EXPORTA)
-// Valida la estructura basica de cada transaccion
+// FUNCIÓN CALLBACK (Validación Estructural)
+// JUSTIFICACIÓN: Implementada para realizar una verificación de esquema obligatoria antes de cualquier cálculo.
+// RECIBE: El objeto 'transaccion' y la función 'callback'. RETORNA: El resultado de la validación asíncrona.
 function validarEstructuraTransaccion(transaccion, callback) {
 
-  // setTimeout simula un proceso asincronico
+  // Iniciamos un temporizador para simular la latencia de una validación de esquema en un servidor externo.
   setTimeout(() => {
 
+    // Iniciamos un bloque try para capturar cualquier error de validación de datos.
     try {
 
-      // Se verifica que la transaccion sea un objeto valido
+      // Verificamos que la entrada sea un objeto y no sea nula para evitar errores de lectura de propiedades.
       if (typeof transaccion !== "object" || transaccion === null) {
         throw new Error("La transaccion no es un objeto valido");
       }
 
-      // Se verifica que el idUsuario sea un numero mayor a 0
+      // Validamos que el ID de usuario sea un número, que no sea NaN y que sea un valor positivo.
       if (typeof transaccion.idUsuario !== "number" || isNaN(transaccion.idUsuario) || transaccion.idUsuario <= 0) {
         throw new Error("ID de usuario invalido");
       }
 
-      // Se verifica que el tipo de transaccion sea ingreso o egreso
+      // Comprobamos que el tipo de transacción coincida exactamente con los valores permitidos en el sistema.
       if (!["ingreso", "egreso"].includes(transaccion.tipo)) {
         throw new Error("Tipo de transaccion invalido");
       }
 
-      // Se verifica que el monto sea un numero positivo
+      // Validamos que el monto sea un número y que sea estrictamente mayor a cero según la regla financiera.
       if (typeof transaccion.monto !== "number" || transaccion.monto <= 0) {
         throw new Error("Monto invalido");
       }
 
-      // Se verifica que la categoria sea un string no vacio
+      // Verificamos que la categoría exista y sea una cadena de texto para la clasificación del gasto.
       if (!transaccion.categoria || typeof transaccion.categoria !== "string") {
         throw new Error("Categoria invalida");
       }
 
-      // Se verifica que la fecha sea un string no vacio
+      // Validamos que la fecha esté presente como string para mantener la trazabilidad temporal.
       if (!transaccion.fecha || typeof transaccion.fecha !== "string") {
         throw new Error("Fecha invalida");
       }
 
-      // Si todas las validaciones pasan, se retorna la transaccion
+      // Si todas las validaciones son exitosas, ejecutamos el callback enviando 'null' en el error y la transacción válida.
       callback(null, transaccion);
 
     } catch (error) {
 
-      // Si ocurre un error, se retorna de forma controlada por callback
+      // En caso de encontrar un error, lo enviamos como primer argumento del callback siguiendo el estándar de Node.js.
       callback(error, null);
     }
 
-  }, 300);
+  }, 300); // Definimos un tiempo de espera de 300 milisegundos.
 }
 
 
-// PROMESA ASINCRONICA (NO SE EXPORTA)
-// Valida logicamente el monto de la transaccion
+// FUNCIÓN CON PROMESA (Validación Lógica de Monto)
+// JUSTIFICACIÓN: Se utiliza para simular una validación de fondos o límites de crédito de forma asíncrona.
 function validarMontoTransaccion(transaccion) {
 
-  // Se retorna una promesa
+  // Retornamos una nueva instancia de Promesa para gestionar el flujo de éxito o fallo.
   return new Promise((resolve, reject) => {
 
-    // setTimeout simula un proceso asincronico
+    // Simulamos un proceso asíncrono de verificación de fondos con un retraso controlado.
     setTimeout(() => {
 
-      // Se verifica que el monto sea numerico y positivo
+      // Verificamos que el monto sea un número operable y mayor que cero.
       if (isNaN(transaccion.monto) || transaccion.monto <= 0) {
 
-        // Si el monto no es valido se rechaza la promesa
+        // Si el monto es inconsistente, rechazamos la promesa enviando el objeto de error.
         reject(new Error("El monto debe ser un numero positivo"));
 
       } else {
 
-        // Si el monto es correcto se resuelve la promesa
+        // Si el monto es correcto, resolvemos la promesa devolviendo el objeto de la transacción.
         resolve(transaccion);
       }
 
-    }, 300);
+    }, 300); // El tiempo de simulación es de 300 milisegundos.
   });
 }
 
 
-// FUNCION PRINCIPAL ASYNC / AWAIT
-// ESTA FUNCION SI SE EXPORTA
-// Procesa todas las transacciones y genera resultados
+// FUNCIÓN PRINCIPAL ASYNC / AWAIT (Orquestador de Auditoría)
+// JUSTIFICACIÓN: Coordina el análisis financiero, garantizando inmutabilidad y detección de patrones de riesgo.
 export async function procesarTransaccionesEj7(transacciones) {
 
-  // Arreglo para almacenar transacciones validas
+  // Inicializamos arreglos vacíos para clasificar las transacciones según su validez técnica.
   const validas = [];
-
-  // Arreglo para almacenar transacciones invalidas
   const invalidas = [];
 
-  // Objeto para almacenar los saldos por usuario
-  const saldos = {};
+  // Inicializamos objetos vacíos (diccionarios) para agrupar saldos y alertas por cada ID de usuario único.
+  const saldos = {}; 
+  const saldoNegativo = {}; 
+  const patronesRiesgo = {}; 
 
-  // Objeto para almacenar alertas de saldo negativo
-  const saldoNegativo = {};
-
-  // Objeto para almacenar patrones de riesgo por usuario
-  const patronesRiesgo = {};
-
+  // Iniciamos el bloque try principal para capturar errores críticos en la entrada de datos general.
   try {
 
-    // Se valida que la entrada sea un arreglo
+    // Validamos que el parámetro de entrada sea efectivamente un arreglo antes de intentar iterar sobre él.
     if (!Array.isArray(transacciones)) {
       throw new Error("Las transacciones deben ser un arreglo");
     }
 
-    // Se crea una copia para garantizar inmutabilidad
+    // APLICACIÓN DE INMUTABILIDAD: Creamos una copia del arreglo original para evitar efectos secundarios en la fuente de datos.
     const copiaTransacciones = [...transacciones];
 
-    // Objeto auxiliar para contar egresos consecutivos por usuario
+    // Creamos un objeto temporal para rastrear cuántos egresos seguidos realiza cada usuario.
     const contadorEgresos = {};
 
-    // Se recorre el arreglo usando un ciclo for clasico
+    // Iniciamos un ciclo for clásico para procesar el lote de transacciones de forma secuencial y ordenada.
     for (let i = 0; i < copiaTransacciones.length; i++) {
-
-      // Se obtiene la transaccion actual
+      
+      // Extraemos la transacción actual del arreglo para su análisis individual.
       const transaccion = copiaTransacciones[i];
 
+      // Iniciamos un bloque try interno para que el fallo de una transacción no detenga el proceso de las demás.
       try {
 
-        // VALIDACION CON CALLBACK
-        // Se envuelve la funcion callback dentro de una promesa
+        // PASO 1: Envolvemos el Callback en una Promesa (Promisificación) para poder usar 'await' en la validación básica.
         const estructuraValida = await new Promise((resolve, reject) => {
-
-          // Se llama a la validacion estructural
           validarEstructuraTransaccion(transaccion, (error, data) => {
-
-            // Si hay error se rechaza la promesa
-            if (error) {
-              reject(error);
-            } else {
-              // Si no hay error se continua
-              resolve(data);
-            }
+            if (error) reject(error); // Si el callback reporta error, rechazamos la promesa interna.
+            else resolve(data);      // Si el callback es exitoso, resolvemos con los datos validados.
           });
         });
 
-        // VALIDACION CON PROMESA
-        // Se valida el monto usando promesas
+        // PASO 2: Ejecutamos la validación con promesa y esperamos su resolución para confirmar el monto.
         const transaccionValida = await validarMontoTransaccion(estructuraValida);
 
-        // PROCESAMIENTO
-        // Se extraen los datos necesarios de la transaccion
-        const idUsuario = transaccionValida.idUsuario;
-        const tipo = transaccionValida.tipo;
-        const monto = transaccionValida.monto;
+        // PASO 3: DESTRUCTURING (Operadores Modernos): Extraemos las propiedades necesarias del objeto validado.
+        const { idUsuario, tipo, monto } = transaccionValida;
 
-        // Se inicializa el saldo del usuario si no existe
+        // Verificamos si es la primera vez que vemos al usuario para inicializar su saldo y contador de riesgos.
         if (saldos[idUsuario] === undefined) {
           saldos[idUsuario] = 0;
+          contadorEgresos[idUsuario] = 0;
         }
 
-        // Se suma o resta segun el tipo de transaccion
+        // CÁLCULO DE SALDO: Si es ingreso sumamos el monto; si es egreso lo restamos del total del usuario.
         if (tipo === "ingreso") {
           saldos[idUsuario] = saldos[idUsuario] + monto;
+          // Si hay un ingreso, el patrón de "egresos consecutivos" se rompe y reiniciamos el contador a cero.
+          contadorEgresos[idUsuario] = 0;
         } else {
           saldos[idUsuario] = saldos[idUsuario] - monto;
+          // Si es egreso, incrementamos el contador para verificar si el usuario está gastando de forma compulsiva.
+          contadorEgresos[idUsuario] = contadorEgresos[idUsuario] + 1;
         }
 
-        // Se almacena la transaccion valida
-        validas.push(transaccionValida);
+        // DETECCIÓN DE PATRONES DE RIESGO: Si el usuario realiza 2 o más egresos sin ingresos intermedios, activamos la alerta.
+        if (contadorEgresos[idUsuario] >= 2) {
+          patronesRiesgo[idUsuario] = true;
+        }
 
-        // DETECCION DE SALDO NEGATIVO
-        // Se verifica si el saldo del usuario es negativo
+        // DETECCIÓN DE SALDO NEGATIVO: Si después de la operación el saldo es menor a cero, marcamos al usuario en riesgo.
         if (saldos[idUsuario] < 0) {
           saldoNegativo[idUsuario] = true;
         }
 
-        // DETECCION DE PATRON DE RIESGO
-        // Se inicializa el contador de egresos consecutivos
-        if (contadorEgresos[idUsuario] === undefined) {
-          contadorEgresos[idUsuario] = 0;
-        }
-
-        // Se verifica el tipo de transaccion
-        if (tipo === "egreso") {
-
-          // Se incrementa el contador de egresos
-          contadorEgresos[idUsuario] = contadorEgresos[idUsuario] + 1;
-
-          // Se marca patron de riesgo si hay 2 o mas egresos consecutivos
-          if (contadorEgresos[idUsuario] >= 2) {
-            patronesRiesgo[idUsuario] = true;
-          }
-
-        } else {
-
-          // Si es ingreso, se reinicia el contador
-          contadorEgresos[idUsuario] = 0;
-        }
+        // Agregamos la transacción aprobada al listado de transacciones válidas.
+        validas.push(transaccionValida);
 
       } catch (errorInterno) {
 
-        // Si falla una transaccion, se almacena como invalida
+        // Si ocurre un error en los pasos anteriores, capturamos el mensaje y guardamos la transacción en el grupo de inválidas.
         invalidas.push({
           transaccion: transaccion,
           motivo: errorInterno.message
@@ -203,7 +172,7 @@ export async function procesarTransaccionesEj7(transacciones) {
       }
     }
 
-    // Se retorna un objeto con todos los resultados
+    // Al finalizar el ciclo, retornamos un objeto estructurado con toda la información de la auditoría.
     return {
       totalProcesadas: copiaTransacciones.length,
       validas: validas,
@@ -215,7 +184,7 @@ export async function procesarTransaccionesEj7(transacciones) {
 
   } catch (errorGeneral) {
 
-    // Si ocurre un error critico, se retorna de forma controlada
+    // Si ocurre un error crítico (como que la entrada no sea un arreglo), retornamos un estado de error global.
     return {
       estado: "ERROR",
       mensaje: errorGeneral.message

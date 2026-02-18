@@ -1,167 +1,112 @@
-// EJERCICIO 3
-// Sistema de Gestión y Validación de Solicitudes de Acceso
-// Este archivo contiene toda la lógica del ejercicio 3
+// EJERCICIO 3: SISTEMA DE GESTIÓN Y VALIDACIÓN DE SOLICITUDES DE ACCESO
+// Este módulo centraliza la lógica de integridad, coherencia y validación externa asincrónica.
 
-// VALIDACIÓN BÁSICA (CALLBACK)
-// Esta función valida las reglas mínimas de la solicitud
-// Recibe la solicitud y un callback para retornar el resultado
+// FUNCIÓN CALLBACK (Validación de Reglas Básicas)
+// JUSTIFICACIÓN: Creada para verificar la integridad inicial del solicitante. 
+// RECIBE: Objeto 'solicitud' y función 'callback'. RETORNA: Ejecución del callback con booleano y mensaje.
 function validarBasico(solicitud, callback) {
 
-  // Valida que la edad sea un número válido y mayor de edad
-  // Se verifica el tipo, que no sea NaN, y que sea >= 18
+  // Validamos la consistencia matemática de la edad: debe ser un número real y cumplir la mayoría de edad (18+).
   if (typeof solicitud.edad !== "number" || isNaN(solicitud.edad) || solicitud.edad < 18) {
-    
-    // Si falla, se ejecuta el callback con false y el mensaje de error
     callback(false, "Edad inválida o menor de edad");
     return;
   }
 
-  // Valida que haya aceptado las condiciones del sistema
-  // Debe ser exactamente true, no cualquier valor truthy
+  // Verificación de cumplimiento legal: validamos que el indicador booleano de condiciones sea estrictamente 'true'.
   if (solicitud.aceptaCondiciones !== true) {
-    
-    // Si no aceptó, se retorna error mediante el callback
     callback(false, "No aceptó las condiciones del sistema");
     return;
   }
 
-  // Valida que los permisos sean un arreglo no vacío
-  // Primero verifica que sea array, luego que tenga elementos
+  // Validación de estructura: comprobamos que los permisos sean un arreglo y que contengan al menos un elemento.
   if (!Array.isArray(solicitud.permisos) || solicitud.permisos.length === 0) {
-    
-    // Si no hay permisos, se retorna error
     callback(false, "No se solicitaron permisos");
     return;
   }
 
-  // Si todas las validaciones pasaron correctamente
-  // Se ejecuta el callback con true indicando éxito
+  // Si se superan todos los filtros, el callback retorna éxito para continuar con el flujo asincrónico.
   callback(true, "Validación básica exitosa");
 }
 
 
-// FUNCIÓN PURA
-// Valida la coherencia entre el rol y los permisos solicitados
-// Esta función NO modifica los datos que recibe
-// Solo analiza y retorna true o false
+// FUNCIÓN PURA (Análisis de Coherencia Rol-Permiso)
+// JUSTIFICACIÓN: Creada para validar reglas de seguridad que dependen de la relación entre dos datos.
+// RECIBE: String 'rol' y Array 'permisos'. RETORNA: Booleano (Consistencia).
 function validarRolPermisos(rol, permisos) {
 
-  // Regla de negocio: un usuario normal no puede tener permiso de eliminar
-  // Se verifica si el rol es "usuario" Y si incluye el permiso "eliminar"
+  // Aplicamos una regla de negocio de seguridad: los usuarios de rol básico tienen prohibido el permiso 'eliminar'.
+  // Esto demuestra la relación entre varios campos de la solicitud según pide la guía.
   if (rol === "usuario" && permisos.includes("eliminar")) {
-    
-    // Si se viola la regla, retorna false
-    return false;
+    return false; // Inconsistencia detectada
   }
 
-  // Si no se viola ninguna regla, retorna true
-  // La solicitud es coherente con las políticas del sistema
-  return true;
+  return true; // Coherencia confirmada
 }
 
 
-// PROMESA ASINCRÓNICA
-// Simula una validación externa como verificación de antecedentes
-// En un sistema real, esto podría ser una consulta a una API externa
+// PROMESA ASINCRÓNICA (Simulación de Validación Externa)
+// JUSTIFICACIÓN: Creada para emular una consulta de antecedentes o servicios externos que pueden fallar.
+// RECIBE: Nada. RETORNA: Una Promesa (resolve/reject).
 function validacionExterna() {
 
-  // Se retorna una promesa para manejar la operación asincrónica
   return new Promise((resolve, reject) => {
-
-    // setTimeout simula el retardo de una consulta externa
-    // En producción sería una petición HTTP real
+    // Simulamos un tiempo de latencia de 1000ms para representar una operación de E/S externa.
     setTimeout(() => {
-
-      // Se genera un resultado aleatorio para simular aprobaciones y rechazos
-      // Math.random() > 0.3 da 70% de probabilidad de éxito
+      // Implementamos una lógica de éxito aleatoria para demostrar el manejo de rechazos de promesas.
       const exito = Math.random() > 0.3;
 
-      // Si la validación externa es exitosa
       if (exito) {
-        
-        // Se resuelve la promesa con un mensaje de éxito
         resolve("Validación externa aprobada");
-        
       } else {
-        
-        // Si falla, se rechaza la promesa con un mensaje de error
+        // El rechazo de la promesa disparará el estado de 'REVISIÓN' en la función principal.
         reject("Error en validación externa");
       }
-
     }, 1000);
   });
 }
 
 
 // FUNCIÓN PRINCIPAL ASYNC / AWAIT
-// Esta función coordina todo el flujo de validación
-// Recibe un ARRAY de solicitudes y retorna un ARRAY de resultados
-// ESTA ES LA ÚNICA FUNCIÓN QUE SE EXPORTA
+// JUSTIFICACIÓN: Función exportada que coordina el flujo secuencial, garantizando la inmutabilidad de los datos.
+// RECIBE: Array 'solicitudes'. RETORNA: Array 'resultados'.
 export async function procesarSolicitudEj3(solicitudes) {
 
-  // Se crea un arreglo vacío para guardar los resultados
-  // Aquí se irán agregando los resultados de cada solicitud
+  // Mantenemos la inmutabilidad creando un nuevo arreglo para los resultados en lugar de modificar las solicitudes.
   const resultados = [];
 
-  // Se recorre el arreglo de solicitudes usando un ciclo for tradicional
-  // Esto permite usar await dentro del ciclo
+  // Procesamos el lote de solicitudes de forma secuencial mediante un ciclo 'for' con control asincrónico.
   for (let i = 0; i < solicitudes.length; i++) {
     
-    // Se obtiene la solicitud actual del arreglo
     const solicitud = solicitudes[i];
 
-    // BLOQUE TRY - Aquí se ejecutan las validaciones que pueden fallar
     try {
       
-      // PASO 1: VALIDACIÓN BÁSICA CON CALLBACK
-      // Se envuelve la función callback en una promesa para poder usar await
-      // Esto convierte el patrón callback al patrón moderno de promesas
-      const resultadoBasico = await new Promise((resolve, reject) => {
-
-        // Se ejecuta la validación con callback pasando la solicitud
+      // PASO 1: PROMIFICACIÓN DE CALLBACK
+      // Convertimos el callback en una promesa para integrarlo al flujo moderno de 'async/await'.
+      await new Promise((resolve, reject) => {
         validarBasico(solicitud, (esValida, mensaje) => {
-
-          // Si la validación falla (esValida es false)
-          if (!esValida) {
-            
-            // Se rechaza la promesa con el mensaje de error
-            reject(new Error(mensaje));
-            
-          } else {
-            
-            // Si la validación es exitosa, se resuelve la promesa
-            resolve(true);
-          }
+          if (!esValida) reject(new Error(mensaje));
+          else resolve(true);
         });
       });
 
-      // PASO 2: VALIDACIÓN DE ROL Y PERMISOS
-      // Se llama a la función pura para verificar coherencia
-      // Si retorna false, el rol no es compatible con los permisos
+      // PASO 2: VALIDACIÓN DE COHERENCIA Y CONSISTENCIA
+      // Verificamos si la relación entre el rol y los permisos es válida.
       if (!validarRolPermisos(solicitud.rol, solicitud.permisos)) {
-        
-        // Se agrega el resultado de rechazo al arreglo
         resultados.push({
           id: solicitud.id,
           estado: "RECHAZADA",
           motivo: "Rol no compatible con permisos"
         });
-        
-        // continue salta a la siguiente iteración del ciclo
-        // No se procesan más validaciones para esta solicitud
-        continue;
+        continue; // Saltamos a la siguiente solicitud sin bloquear el programa.
       }
 
-      // PASO 3: VALIDACIÓN EXTERNA ASINCRÓNICA
-      // Se ejecuta en un try-catch interno para manejar su posible fallo
+      // PASO 3: GESTIÓN DE VALIDACIÓN EXTERNA CON TRY/CATCH ANIDADO
       try {
-        
-        // Se espera el resultado de la validación externa
-        // Si la promesa se resuelve, la validación fue exitosa
+        // Esperamos la resolución de la promesa externa.
         await validacionExterna();
 
-        // Si llegamos aquí, todas las validaciones pasaron
-        // La solicitud es APROBADA
+        // Si la validación externa y interna son correctas, la solicitud es APROBADA.
         resultados.push({
           id: solicitud.id,
           estado: "APROBADA",
@@ -169,9 +114,7 @@ export async function procesarSolicitudEj3(solicitudes) {
         });
 
       } catch (error) {
-        
-        // Si la validación externa falla (promesa rechazada)
-        // La solicitud queda EN REVISIÓN para análisis manual
+        // De acuerdo a la guía, si el proceso externo falla pero los datos son correctos, queda EN REVISIÓN.
         resultados.push({
           id: solicitud.id,
           estado: "EN REVISIÓN",
@@ -180,13 +123,8 @@ export async function procesarSolicitudEj3(solicitudes) {
       }
 
     } catch (error) {
-
-      // MANEJO DE ERRORES GENERALES
-      // Este catch atrapa errores de validación básica
-      // o cualquier error inesperado en el proceso
-      
-      // Se agrega un resultado de ERROR al arreglo
-      // Se usa optional chaining (?.) para evitar errores si solicitud es null
+      // GESTIÓN DE ERRORES POR DATOS INVÁLIDOS O MAL TIPADOS
+      // Capturamos cualquier excepción lanzada por la validación básica o el callback.
       resultados.push({
         id: solicitud?.id ?? null,
         estado: "ERROR",
@@ -195,8 +133,6 @@ export async function procesarSolicitudEj3(solicitudes) {
     }
   }
 
-  // Se retorna el arreglo completo de resultados
-  // Cada elemento contiene el id y el estado final de su solicitud
-  // NO se retorna resumen porque la guía no lo requiere
+  // Retornamos el conjunto final de veredictos manteniendo la transparencia de la decisión.
   return resultados;
 }

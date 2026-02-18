@@ -1,31 +1,31 @@
 // SISTEMA DE VALIDACIÓN Y DECISIÓN DE SOLICITUDES
-// Este archivo contiene la lógica completa del Ejercicio 2
+// Este archivo centraliza la lógica de negocio, validaciones y procesamiento estadístico del Ejercicio 2.
 
-// FUNCIÓN DE VALIDACIÓN (NO SE EXPORTA)
-// Valida los datos básicos de una solicitud
+// FUNCIÓN DE VALIDACIÓN (Interna)
+// Implementa la verificación de tipos y reglas lógicas para asegurar la integridad de cada objeto.
 function validarSolicitud(solicitud) {
 
-  // Se valida que el ID sea un número válido
+  // Verificamos que el ID sea numérico y descartamos valores NaN para garantizar una identificación única válida.
   if (typeof solicitud.id !== "number" || isNaN(solicitud.id)) {
     throw new Error("ID inválido");
   }
 
-  // Se valida que el tipo de operación sea texto no vacío
+  // Validamos que el tipo sea una cadena y usamos .trim() para asegurar que no se envíen textos vacíos.
   if (typeof solicitud.tipo !== "string" || solicitud.tipo.trim() === "") {
     throw new Error("Tipo de operación inválido");
   }
 
-  // Se valida que el valor sea un número válido
+  // Aseguramos que el valor económico de la operación sea un número real.
   if (typeof solicitud.valor !== "number" || isNaN(solicitud.valor)) {
     throw new Error("Valor inválido");
   }
 
-  // Se valida que el estado sea booleano
+  // Verificación estricta del tipo booleano para el estado, cumpliendo con el requisito de tipos de datos.
   if (typeof solicitud.estado !== "boolean") {
     throw new Error("Estado inválido");
   }
 
-  // Se valida que la prioridad esté entre 1 y 5
+  // Validamos que la prioridad se encuentre dentro del rango operativo permitido (1 a 5).
   if (
     typeof solicitud.prioridad !== "number" ||
     solicitud.prioridad < 1 ||
@@ -34,48 +34,43 @@ function validarSolicitud(solicitud) {
     throw new Error("Prioridad fuera de rango");
   }
 
-  // Si todas las validaciones son correctas, se retorna true
+  // Si todas las reglas se cumplen, la función confirma la validez de la estructura.
   return true;
 }
 
 
-// FUNCIÓN DE DECISIÓN (FUNCIÓN PURA)
-// Determina el resultado de la solicitud
-// No modifica el objeto recibido
+// FUNCIÓN DE DECISIÓN (Función Pura)
+// Aplica las reglas de negocio para clasificar la solicitud sin alterar el objeto original (Inmutabilidad).
 function decidirResultado(solicitud) {
 
-  // Si el valor es menor o igual a cero, la solicitud es inválida
+  // Regla 1: Valores menores o iguales a cero se clasifican automáticamente como INVÁLIDA.
   if (solicitud.valor <= 0) {
     return "INVÁLIDA";
   }
 
-  // Si la solicitud no está activa y tiene baja prioridad, se rechaza
+  // Regla 2: Solicitudes inactivas con baja prioridad son rechazadas por política del sistema.
   if (!solicitud.estado && solicitud.prioridad < 3) {
     return "RECHAZADA";
   }
 
-  // En cualquier otro caso, la solicitud se aprueba
+  // Regla 3: Si no se cumplen los criterios de rechazo o invalidez, la solicitud es APROBADA.
   return "APROBADA";
 }
 
 
-// CALLBACK (NO SE EXPORTA)
-// Simula una notificación posterior al proceso
+// CALLBACK (Simulación de Proceso Externo)
+// Representa una acción dependiente que se ejecuta después de procesar la solicitud.
 function notificarResultado(resultado) {
-
-  // Retorna un mensaje de notificación
+  // Retornamos un string interpolado que confirma la acción del sistema.
   return `Notificación enviada: ${resultado}`;
 }
 
 
-// PROMESA ASINCRÓNICA (NO SE EXPORTA)
-// Simula un proceso externo asincrónico
+// PROMESA ASINCRÓNICA
+// Simula una dependencia de red o base de datos con un retardo controlado.
 function procesoAsincronico() {
-
-  // Se retorna una promesa
+  // Retornamos una nueva Promesa que se resuelve tras 800 milisegundos usando setTimeout.
   return new Promise((resolve) => {
-
-    // Se simula un retardo de 800 milisegundos
     setTimeout(() => {
       resolve("Proceso externo finalizado");
     }, 800);
@@ -83,57 +78,49 @@ function procesoAsincronico() {
 }
 
 
-// FUNCIÓN PRINCIPAL ASYNC / AWAIT
-// ESTA FUNCIÓN SÍ SE EXPORTA
-// Ahora recibe un ARRAY de solicitudes
+// FUNCIÓN PRINCIPAL ASYNC / AWAIT (Exportada)
+// Recibe el arreglo completo de solicitudes y gestiona el flujo de procesamiento y estadísticas.
 export async function procesarSolicitudEj2(solicitudes) {
 
-  // Se crean contadores para el resumen final
+  // Definimos acumuladores locales para generar el resumen final requerido por la guía.
   let totalProcesadas = 0;
   let aprobadas = 0;
   let rechazadas = 0;
   let invalidas = 0;
   let errores = 0;
 
-  // Se crea un arreglo para guardar los resultados
+  // Estructura de datos inmutable para almacenar los resultados individuales.
   const resultados = [];
 
-  // Se recorre el arreglo de solicitudes
+  // Iteramos sobre el arreglo de solicitudes de manera secuencial para procesarlas una por una.
   for (let i = 0; i < solicitudes.length; i++) {
     
-    // Se obtiene la solicitud actual
     const solicitud = solicitudes[i];
 
     try {
-
-      // VALIDACIÓN DE LOS DATOS
-      // Se validan los datos básicos de la solicitud
+      // FASE 1: Validación técnica. Si falla, el flujo salta directamente al bloque 'catch'.
       validarSolicitud(solicitud);
 
-      // PROCESO ASINCRÓNICO
-      // Se espera la finalización del proceso externo
+      // FASE 2: Consumo de la Promesa. 'await' detiene la ejecución actual hasta que el proceso finalice.
       await procesoAsincronico();
 
-      // DECISIÓN FINAL
-      // Se decide el resultado de la solicitud
+      // FASE 3: Aplicación de lógica de negocio para obtener la clasificación.
       const resultado = decidirResultado(solicitud);
 
-      // CALLBACK DE NOTIFICACIÓN
-      // Se ejecuta el callback con el resultado
+      // FASE 4: Ejecución del Callback para generar el mensaje de notificación.
       const notificacion = notificarResultado(resultado);
 
-      // RESULTADO INDIVIDUAL
-      // Se agrega el resultado al arreglo
+      // FASE 5: Almacenamiento del resultado procesado con éxito.
       resultados.push({
         id: solicitud.id,
         resultado: resultado,
         notificacion: notificacion
       });
 
-      // Se incrementa el contador de procesadas
+      // Actualizamos los contadores de control estadístico.
       totalProcesadas = totalProcesadas + 1;
 
-      // Se incrementan contadores según el resultado
+      // Estructuras condicionales para clasificar el resultado en el resumen final.
       if (resultado === "APROBADA") {
         aprobadas = aprobadas + 1;
       }
@@ -145,22 +132,19 @@ export async function procesarSolicitudEj2(solicitudes) {
       }
 
     } catch (error) {
-
-      // MANEJO DE ERRORES CONTROLADOS
-      // Se agrega el error al arreglo de resultados
+      // FASE DE CONTINGENCIA: Si ocurre un error, el programa no se detiene y registra la falla.
       resultados.push({
         id: solicitud?.id ?? null,
         resultado: "ERROR",
         mensaje: error.message
       });
 
-      // Se incrementa el contador de errores
+      // Incrementamos el contador de errores sin interrumpir el ciclo de las demás solicitudes.
       errores = errores + 1;
     }
   }
 
-  // RESUMEN FINAL
-  // Se retorna un objeto con los resultados y el resumen
+  // Al finalizar el ciclo, retornamos un objeto compuesto con el detalle individual y el resumen consolidado.
   return {
     resultados: resultados,
     resumen: {

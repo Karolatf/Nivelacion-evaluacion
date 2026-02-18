@@ -161,7 +161,7 @@ Incluida en arreglo de sospechosas
 ### Caso 4: Error - ID inválido (número negativo)
 
 Datos de entrada:
-id: -5
+id: -4
 usuario: "Pedro Ruiz"
 monto: 300
 tipo: "egreso"

@@ -1,176 +1,130 @@
 // SISTEMA DE TRANSACCIONES Y CONTROL DE RIESGO
-// Este archivo contiene TODA la logica del ejercicio
+// Este módulo centraliza la lógica de validación estructural, integridad financiera y auditoría de riesgos.
 
-
-// FUNCION CALLBACK (NO SE EXPORTA)
-// Simula una validacion externa
+// FUNCIÓN CALLBACK (Validación de Estructura)
+// JUSTIFICACIÓN: Se utiliza un callback para simular una validación de esquema externa (tipo Middleware).
+// Es asincrónica para representar el tiempo de respuesta de un validador de sintaxis de datos.
 function validarEstructuraTransaccion(transaccion, callback) {
 
-  // setTimeout simula un proceso asincronico
   setTimeout(() => {
-
     try {
-
-      // Se valida que la transaccion sea un objeto valido
+      // Verificación de integridad del objeto: descartamos valores nulos o tipos no compatibles.
       if (typeof transaccion !== "object" || transaccion === null) {
         throw new Error("La transaccion no es un objeto valido");
       }
 
-      // Se valida que el id sea un numero entero positivo
+      // Validación del ID: debe ser estrictamente numérico y positivo para ser un identificador único.
       if (typeof transaccion.id !== "number" || isNaN(transaccion.id) || transaccion.id <= 0) {
         throw new Error("ID invalido");
       }
 
-      // Se valida que el usuario sea un string no vacio
+      // Validación de Usuario: aseguramos que el campo no contenga cadenas vacías o solo espacios.
       if (typeof transaccion.usuario !== "string" || transaccion.usuario.trim() === "") {
         throw new Error("Usuario invalido");
       }
 
-      // Se valida que el monto sea de tipo numerico
+      // Validación del Monto: se verifica que el dato sea de tipo number antes de cualquier operación matemática.
       if (typeof transaccion.monto !== "number") {
         throw new Error("Monto invalido");
       }
 
-      // Se valida que el tipo sea ingreso o egreso
+      // Consistencia del Tipo: solo se admiten las categorías financieras "ingreso" o "egreso".
       if (transaccion.tipo !== "ingreso" && transaccion.tipo !== "egreso") {
         throw new Error("Tipo de transaccion invalido");
       }
 
-      // Se valida que el estado de autorizacion sea booleano
+      // Integridad de Autorización: debe ser un booleano estricto para la clasificación de riesgo.
       if (typeof transaccion.autorizada !== "boolean") {
         throw new Error("Estado de autorizacion invalido");
       }
 
-      // Si todas las validaciones son correctas
-      // se retorna la transaccion sin modificar
+      // Si supera las pruebas, devolvemos la transacción original para el siguiente proceso.
       callback(null, transaccion);
 
     } catch (error) {
-
-      // Si ocurre cualquier error
-      // se retorna de forma controlada por callback
+      // Gestión de errores por callback (Error-First Callback) para reportar fallas técnicas.
       callback(error, null);
     }
-
   }, 300);
 }
 
 
-// FUNCION CON PROMESA (NO SE EXPORTA)
-// Valida logicamente el monto de la transaccion
+// FUNCIÓN CON PROMESA (Validación Lógica de Monto)
+// JUSTIFICACIÓN: Las promesas son ideales para procesos de evaluación de reglas de negocio que dependen de cálculos.
 function validarMontoTransaccion(transaccion) {
-
-  // Se retorna una promesa
   return new Promise((resolve, reject) => {
-
-    // Se simula un proceso asincronico
     setTimeout(() => {
-
-      // isNaN verifica que el monto sea numerico
+      // Verificamos que el monto sea un valor operable matemáticamente.
       if (isNaN(transaccion.monto)) {
-
-        // Si el monto no es valido se rechaza la promesa
         reject(new Error("El monto no es un numero valido"));
-
       } else {
-
-        // Si el monto es correcto se resuelve la promesa
         resolve(transaccion);
       }
-
     }, 300);
   });
 }
 
 
-// FUNCION PRINCIPAL ASYNC / AWAIT
-// ESTA FUNCION SI SE EXPORTA
-// Es la unica funcion visible para el menu general
+// FUNCIÓN PRINCIPAL ASYNC / AWAIT (Coordinación y Auditoría)
+// JUSTIFICACIÓN: Se usa async/await para leer el flujo de validaciones como un proceso secuencial y ordenado.
 export async function procesarTransaccionesEj4(transacciones) {
 
-  // Arreglo para almacenar transacciones validas
+  // Definimos estructuras de datos independientes (listas) para clasificar las transacciones según su estado.
+  // Requisito: Se retornan arreglos completos, no solo contadores, para trazabilidad total.
   const validas = [];
-
-  // Arreglo para almacenar transacciones sospechosas
   const sospechosas = [];
-
-  // Arreglo para almacenar transacciones invalidas
   const invalidas = [];
 
-  // Variable acumuladora de ingresos
+  // Acumuladores numéricos para el balance financiero (Ingresos y Egresos).
   let totalIngresos = 0;
-
-  // Variable acumuladora de egresos
   let totalEgresos = 0;
 
   try {
-
-    // Se valida que la entrada principal sea un arreglo
+    // Verificación de integridad de la entrada principal.
     if (!Array.isArray(transacciones)) {
       throw new Error("Las transacciones deben ser un arreglo");
     }
 
-    // Se crea una copia para garantizar inmutabilidad
+    // APLICACIÓN DEL PRINCIPIO DE INMUTABILIDAD
+    // Creamos una copia superficial (Shallow Copy) mediante el operador Spread (...) para no alterar el origen de datos.
     const copiaTransacciones = [...transacciones];
 
-    // Se recorre el arreglo usando un ciclo for clasico
+    // Recorremos el lote de transacciones de forma secuencial.
     for (let i = 0; i < copiaTransacciones.length; i++) {
-
-      // Se obtiene la transaccion actual
       const transaccion = copiaTransacciones[i];
 
       try {
-
-        // VALIDACION CON CALLBACK
-        // Se envuelve la funcion callback dentro de una promesa
+        // PASO 1: Promisificación del Callback para estandarizar el flujo asincrónico.
         const estructuraValida = await new Promise((resolve, reject) => {
-
-          // Se llama a la validacion estructural
           validarEstructuraTransaccion(transaccion, (error, data) => {
-
-            // Si hay error se rechaza la promesa
-            if (error) {
-              reject(error);
-            } else {
-              // Si no hay error se continua
-              resolve(data);
-            }
+            if (error) reject(error); else resolve(data);
           });
         });
 
-        // VALIDACION CON PROMESA
-        // Se valida el monto usando promesas
+        // PASO 2: Resolución de la promesa de validación lógica de montos.
         const transaccionValida = await validarMontoTransaccion(estructuraValida);
 
-        // CLASIFICACION LOGICA
-        // Se evalua si la transaccion esta autorizada
+        // PASO 3: CLASIFICACIÓN DE RIESGO Y PROCESAMIENTO MATEMÁTICO
+        // Evaluación del indicador de autorización: determina si es 'Válida' o 'Sospechosa'.
         if (transaccionValida.autorizada === true) {
-
-          // Se agrega al arreglo de validas
+          
           validas.push(transaccionValida);
 
-          // Se evalua el tipo de transaccion
+          // Lógica de acumuladores según el tipo de flujo financiero.
           if (transaccionValida.tipo === "ingreso") {
-
-            // Se suma al total de ingresos
             totalIngresos = totalIngresos + transaccionValida.monto;
-
           } else {
-
-            // Se suma al total de egresos
+            // Nota: Se asume que los egresos pueden venir positivos o negativos; aquí se suma el valor tal cual.
             totalEgresos = totalEgresos + transaccionValida.monto;
           }
 
         } else {
-
-          // Si no esta autorizada se marca como sospechosa
+          // Si los datos son correctos pero no hubo autorización, se clasifica como Sospechosa (Punto 2 de la guía).
           sospechosas.push(transaccionValida);
         }
 
       } catch (errorInterno) {
-
-        // Si falla una transaccion
-        // se almacena como invalida sin detener el sistema
+        // Gestión de errores individuales: evita que una transacción corrupta bloquee el análisis de las demás.
         invalidas.push({
           transaccion: transaccion,
           motivo: errorInterno.message
@@ -178,8 +132,7 @@ export async function procesarTransaccionesEj4(transacciones) {
       }
     }
 
-    // RESULTADO FINAL
-    // Se retorna un objeto con todos los resultados
+    // RETORNO CONSOLIDADO DE INDICADORES
     return {
       totalProcesadas: copiaTransacciones.length,
       validas: validas,
@@ -187,23 +140,15 @@ export async function procesarTransaccionesEj4(transacciones) {
       invalidas: invalidas,
       totalIngresos: totalIngresos,
       totalEgresos: totalEgresos,
+      // Balance Final: Cálculo matemático neto del flujo de caja.
       balanceFinal: totalIngresos + totalEgresos
     };
 
   } catch (errorGeneral) {
-
-    // Si ocurre un error critico
-    // se retorna un error controlado
+    // Captura de errores críticos del sistema (ej: si no se recibe un arreglo).
     return {
       estado: "ERROR",
       mensaje: errorGeneral.message
     };
   }
 }
-
-
-// Yo entiendo que se puede usar un contador simple con let validas = 0, 
-// pero en este ejercicio la guía pide que retorne la lista completa de transacciones válidas, 
-// no solo el número. Por eso uso un arreglo con const validas = [] y voy agregando cada transacción válida con .push().
-// Al final, si necesito el total, uso validas.length que me da la cantidad."
-

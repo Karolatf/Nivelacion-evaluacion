@@ -84,7 +84,7 @@ async function menuGeneral() {
   do {
     console.log("\n--- MENÚ GENERAL ---");
     carpetas.forEach((carpeta, index) => {
-      console.log(`${index + 1}. ${carpeta.toUpperCase()}`);
+      console.log(`${index + 1}. ${carpeta.toUpperCase()}`);    //devuelve el valor convertido en mayúsculas de la cadena que realiza la llamada
     });
     console.log(`${carpetas.length + 1}. Salir\n`);
 
@@ -129,42 +129,50 @@ async function menuCarpeta(nombreCarpeta) {
 
 
 // EJERCICIOS                                                                                        //EJERCICIO 1
+// Se define una función asíncrona para permitir el uso de 'await' al procesar los datos
 async function ejecutarEjercicio1() {
-  let solicitudes = [];
+  
+  // Se declara la variable y se inicializa como un arreglo vacío para almacenar las solicitudes ingresadas
+  let solicitudes = []; 
+  
+  // Se solicita al usuario la cantidad de registros y se convierte el texto ingresado a un número entero
   const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
 
+  // Ciclo principal para repetir el proceso de captura según la cantidad definida por el usuario
   for (let i = 0; i < cantidad; i++) {
     
-    // Se capturan los datos basicos
+    // Captura de datos básicos convirtiendo a entero donde es necesario (ID y Prioridad)
     const id = parseInt(prompt("ID: "));
     const nombre = prompt("Nombre: ");
     const tipo = prompt("Tipo: ");
     const prioridad = parseInt(prompt("Prioridad (1-5): "));
     
-    // Se captura el estado como texto
+    // Se captura el estado como una cadena de texto para su posterior validación
     const estadoTexto = prompt("Estado (true/false): ");
     
-    // Se convierte a booleano solo si es true o false
+    // Estructura condicional para transformar el texto ingresado en un valor booleano real (true/false)
     let estado;
     if (estadoTexto === "true") {
       estado = true;
     } else if (estadoTexto === "false") {
       estado = false;
     } else {
+      // Si el usuario escribe algo distinto, se guarda el texto original
       estado = estadoTexto;
     }
     
-    // Se capturan los requisitos
+    // Se inicializa un arreglo interno para manejar los requisitos de cada solicitud
     const cantidadRequisitos = parseInt(prompt("Cuantos requisitos: "));
     const requisitos = [];
     
-    // Se recorre para pedir cada requisito
+    // Ciclo secundario para capturar cada requisito de forma individual
     for (let j = 0; j < cantidadRequisitos; j++) {
+      // Se evalúa la respuesta y se guarda directamente como booleano en el arreglo
       const requisito = prompt("Requisito " + (j + 1) + " (true/false): ") === "true";
       requisitos.push(requisito);
     }
     
-    // Se agrega la solicitud completa
+    // Se crea un objeto con toda la información recolectada y se añade al arreglo de solicitudes
     solicitudes.push({
       id: id,
       nombre: nombre,
@@ -175,39 +183,54 @@ async function ejecutarEjercicio1() {
     });
   }
 
+  // Ciclo para recorrer cada solicitud guardada y procesarla una por una
   for (const solicitud of solicitudes) {
+    // Se espera a que la función procesarSolicitud termine y se muestra el resultado en consola
     console.log(await procesarSolicitud(solicitud));
   }
 }
 
-async function ejecutarEjercicio2() {                                                   //EJERCICIO 2
+// EJERCICIO 2
+
+// Definimos la función principal como asíncrona para gestionar el flujo de datos y esperar la respuesta del procesamiento.
+async function ejecutarEjercicio2() {                                                   
+  
+  // Declaramos e inicializamos un arreglo vacío para recolectar los objetos de solicitud que el usuario ingresará.
   const solicitudes = [];
+  
+  // Solicitamos la cantidad de registros, asegurando la conversión a entero para definir el límite del ciclo de captura.
   const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
 
-  // Captura múltiples solicitudes
+  // Iniciamos un ciclo 'for' para capturar de forma secuencial cada una de las solicitudes operativas.
   for (let i = 0; i < cantidad; i++) {
     
-    // Se capturan los datos basicos
+    // Capturamos el identificador único y lo convertimos a entero para cumplir con la validación de tipo 'number'.
     const id = parseInt(prompt("ID: "));
+    
+    // Capturamos el tipo de operación como una cadena de texto (string).
     const tipo = prompt("Tipo: ");
+    
+    // Utilizamos 'parseFloat' para permitir que el valor de la operación acepte números decimales, aumentando la precisión financiera.
     const valor = parseFloat(prompt("Valor: "));
     
-    // Se captura el estado como texto
+    // Capturamos el estado inicial como texto para validar manualmente su conversión a un tipo lógico.
     const estadoTexto = prompt("Estado (true/false): ");
     
-    // Se convierte a booleano solo si es true o false
+    // Estructura condicional para transformar el texto ingresado en un valor booleano real o mantenerlo como texto si es inválido.
     let estado;
     if (estadoTexto === "true") {
       estado = true;
     } else if (estadoTexto === "false") {
       estado = false;
     } else {
+      // Si la entrada no coincide con "true" o "false", se guarda el valor original para probar la gestión de errores.
       estado = estadoTexto;
     }
     
+    // Capturamos el nivel de prioridad como un entero dentro del rango esperado por la lógica de negocio.
     const prioridad = parseInt(prompt("Prioridad (1-5): "));
     
-    // Se agrega la solicitud completa
+    // Construimos un objeto con los datos recolectados y lo añadimos al arreglo mediante el método '.push()'.
     solicitudes.push({
       id: id,
       tipo: tipo,
@@ -217,103 +240,96 @@ async function ejecutarEjercicio2() {                                           
     });
   }
 
-  // Se envía el ARRAY completo a la función
+  // Enviamos el arreglo completo a 'procesarSolicitudEj2' y usamos 'await' para esperar el objeto que contiene resultados y resumen.
   const respuesta = await procesarSolicitudEj2(solicitudes);
   
-  // Se muestran los resultados individuales
+  // Imprimimos un encabezado visual para organizar la salida de datos en la terminal.
   console.log("\n--- RESULTADOS ---\n");
+  
+  // Utilizamos el método de arreglo '.forEach' para iterar sobre los resultados individuales y mostrarlos al usuario.
   respuesta.resultados.forEach(resultado => {
     console.log(resultado);
   });
   
-  // Se muestra el resumen final (REQUERIDO POR LA GUÍA)
+  // Sección de Resumen Final: Cumplimos con el requisito de la guía de presentar indicadores de gestión.
   console.log("\n--- RESUMEN FINAL ---");
+  
+  // Accedemos a las propiedades del objeto 'resumen' devuelto por la lógica del ejercicio para mostrar las estadísticas.
   console.log("Total procesadas: " + respuesta.resumen.total);
   console.log("Aprobadas: " + respuesta.resumen.aprobadas);
   console.log("Rechazadas: " + respuesta.resumen.rechazadas);
   console.log("Inválidas: " + respuesta.resumen.invalidas);
   console.log("Errores: " + respuesta.resumen.errores);
+  
+  // Imprimimos un espacio en blanco para mejorar la legibilidad visual de la consola.
   console.log("");
 }
 
-async function ejecutarEjercicio3() {                                                     //EJERCICIO 3
+// EJERCICIO 3
+
+// Definimos la función principal asíncrona para coordinar la captura y el procesamiento de accesos al sistema.
+async function ejecutarEjercicio3() {                                                     
   
-  // Se crea un arreglo vacío para almacenar todas las solicitudes
+  // Inicializamos una estructura de datos tipo arreglo (mutable) para consolidar todas las solicitudes antes de su evaluación.
   const solicitudes = [];
   
-  // Se pregunta cuántas solicitudes se van a ingresar
+  // Capturamos la dimensión del lote de trabajo mediante un entero que definirá las iteraciones del ciclo.
   const cantidad = parseInt(prompt("¿Cuántas solicitudes desea ingresar? "));
 
-  // Se usa un ciclo for para capturar múltiples solicitudes
-  // El ciclo se ejecuta tantas veces como solicitudes se pidieron
+  // Implementamos un ciclo 'for' para recolectar de forma secuencial la información de cada solicitante.
   for (let i = 0; i < cantidad; i++) {
     
-    // CAPTURA DE DATOS BÁSICOS
-    // Se captura el ID como número entero
+    // Captura del Identificador Único: Se convierte a entero para asegurar la consistencia numérica requerida.
     const id = parseInt(prompt("ID: "));
     
-    // Se captura el nombre como texto
+    // Captura de datos de identidad: Almacenamos el nombre como una cadena de texto (string).
     const nombre = prompt("Nombre: ");
     
-    // Se captura la edad y se convierte a número
-    // parseInt convierte el texto del prompt a número
+    // Captura de Edad: Dato crítico que será utilizado en la lógica de decisión matemática posterior.
     const edad = parseInt(prompt("Edad: "));
     
-    // Se captura el rol como texto
+    // Captura del Rol: Identificamos la función que el usuario desea desempeñar en el sistema interno.
     const rol = prompt("Rol: ");
     
-    // CAPTURA Y PROCESAMIENTO DE PERMISOS
-    // Los permisos se ingresan como texto separado por comas
+    // PROCESAMIENTO DINÁMICO DE PERMISOS
+    // Recibimos una cadena de texto separada por delimitadores (comas).
     const permisosTexto = prompt("Permisos (separados por coma): ");
     
-    // Se declara la variable permisos
     let permisos;
     
-    // Si el usuario no ingresó nada o solo espacios
+    // Verificamos si la entrada está vacía utilizando .trim() para limpiar espacios en blanco.
     if (permisosTexto.trim() === "") {
       
-      // Se asigna un arreglo vacío
-      // Esto permitirá validar el caso de "permisos no solicitados"
+      // Asignamos un arreglo vacío, permitiendo que la lógica de negocio detecte posteriormente la falta de permisos.
       permisos = [];
       
     } else {
       
-      // Si hay contenido, se separa el texto por comas
-      // split(",") divide el texto en un arreglo
-      // map(p => p.trim()) elimina espacios de cada permiso
+      // Transformamos la cadena en un arreglo mediante .split() y normalizamos cada elemento con .map() y .trim().
+      // Esto garantiza que cada permiso sea una cadena independiente y limpia.
       permisos = permisosTexto.split(",").map(p => p.trim());
     }
     
-    // Se captura el estado como texto
+    // Captura del estado administrativo actual de la solicitud.
     const estado = prompt("Estado: ");
     
-    // CONVERSIÓN DE ACEPTACONDICIONES A BOOLEANO
-    // Se captura como texto primero
+    // VALIDACIÓN LÓGICA DE CONDICIONES
+    // Proceso de conversión manual para asegurar que el dato de aceptación sea un booleano estricto.
     const aceptaTexto = prompt("Acepta condiciones (true/false): ");
     
-    // Se declara la variable para el booleano
     let aceptaCondiciones;
     
-    // Se valida si el usuario escribió exactamente "true"
+    // Evaluamos la entrada literal para asignar el tipo lógico correspondiente (true/false).
     if (aceptaTexto === "true") {
-      
-      // Se asigna el booleano true
       aceptaCondiciones = true;
-      
     } else if (aceptaTexto === "false") {
-      
-      // Se asigna el booleano false
       aceptaCondiciones = false;
-      
     } else {
-      
-      // Si escribió otra cosa, se guarda tal cual
-      // Esto permite validar datos mal ingresados
+      // Mantenemos el valor original si no es booleano para poner a prueba el sistema de gestión de errores.
       aceptaCondiciones = aceptaTexto;
     }
     
-    // Se agrega el objeto solicitud completo al arreglo
-    // Cada propiedad corresponde a los datos capturados
+    // Empaquetamos la información en un objeto y lo insertamos en el arreglo de gestión de lotes.
     solicitudes.push({
       id: id,
       nombre: nombre,
@@ -325,70 +341,70 @@ async function ejecutarEjercicio3() {                                           
     });
   }
 
-  // Se envía el ARRAY completo de solicitudes a la función procesadora
-  // await espera a que termine todo el procesamiento asincrónico
+  // Despachamos el arreglo completo a la lógica de procesamiento externo mediante una llamada asíncrona.
+  // El uso de 'await' garantiza que los resultados solo se muestren una vez finalizada la validación externa.
   const resultados = await procesarSolicitudEj3(solicitudes);
   
-  // MOSTRAR RESULTADOS EN CONSOLA
+  // SALIDA ESTRUCTURADA DE DATOS
   console.log("\n--- RESULTADOS ---\n");
   
-  // Se recorre el arreglo de resultados y se imprime cada uno
-  // forEach ejecuta una función por cada elemento del arreglo
+  // Iteramos sobre la respuesta para presentar el veredicto final de cada solicitud de acceso en la terminal.
   resultados.forEach(resultado => {
-    
-    // Se imprime el objeto resultado completo
     console.log(resultado);
   });
   
-  // Se imprime una línea en blanco al final
   console.log("");
 }
 
-async function ejecutarEjercicio4() {                                                    //EJERCICIO 4
+// EJERCICIO 4
+
+// Definimos la función principal asíncrona para gestionar el sistema de control de riesgo financiero.
+async function ejecutarEjercicio4() {                                                    
   
-  // Se crea el arreglo para guardar transacciones
+  // Inicializamos una estructura de datos tipo arreglo para consolidar el lote de transacciones a procesar.
   const transacciones = [];
   
-  // Se pregunta cuantas transacciones va a ingresar
+  // Capturamos la cantidad de operaciones, dato que servirá de límite para nuestro ciclo de recolección.
   const cantidad = parseInt(prompt("¿Cuántas transacciones? "));
 
-  // Se recorre para capturar cada transaccion
+  // Implementamos un ciclo 'for' para la captura manual de datos, permitiendo la entrada de valores inconsistentes para probar la robustez del sistema.
   for (let i = 0; i < cantidad; i++) {
     
-    // Se captura el ID como texto
+    // Captura de Identificador: Implementamos una validación preliminar para identificar si la entrada es numérica o un string inválido.
     const idTexto = prompt("ID: ");
     
-    // Se declara la variable id
     let id;
     
-    // Valida si esta vacio o no es numero
+    // Verificamos si el campo está vacío o si el contenido no es un número (NaN).
     if (idTexto === "" || isNaN(idTexto)) {
+      // Mantenemos el valor original para que el validador de riesgo detecte la inconsistencia de tipo.
       id = idTexto;
     } else {
+      // Normalizamos el ID a un valor entero para operaciones válidas.
       id = parseInt(idTexto);
     }
     
-    // Se capturan los demas campos
+    // Captura de datos operativos: Almacenamos el usuario y el monto (usando parseFloat para admitir decimales monetarios).
     const usuario = prompt("Usuario: ");
     const monto = parseFloat(prompt("Monto: "));
     const tipo = prompt("Tipo: ");
     
-    // Se captura autorizada como texto
+    // Captura de Autorización: Dato booleano crítico para la clasificación entre transacciones 'válidas' o 'sospechosas'.
     const autorizadaTexto = prompt("Autorizada (true/false): ");
     
-    // Se convierte a booleano
     let autorizada;
     if (autorizadaTexto === "true") {
       autorizada = true;
     } else if (autorizadaTexto === "false") {
       autorizada = false;
     } else {
+      // Si la entrada es ambigua, se guarda como texto para forzar un error controlado en la fase de validación.
       autorizada = autorizadaTexto;
     }
     
     const fecha = prompt("Fecha: ");
     
-    // Se agrega al arreglo
+    // Agregamos el objeto de transacción al arreglo principal manteniendo la integridad de la entrada del usuario.
     transacciones.push({
       id: id,
       usuario: usuario,
@@ -399,79 +415,62 @@ async function ejecutarEjercicio4() {                                           
     });
   }
 
-  // Se procesa el arreglo completo
+  // Invocamos la función lógica de procesamiento enviando el lote completo y esperando la respuesta mediante 'await'.
   const resultado = await procesarTransaccionesEj4(transacciones);
 
-  console.log("\n");
-  console.log("RESULTADOS DEL PROCESAMIENTO");
-  console.log("\n");
+  // FASE DE SALIDA: Presentación organizada y jerárquica de los resultados del análisis.
+  console.log("\nRESULTADOS DEL PROCESAMIENTO\n");
 
-  // Se muestran las transacciones validas
-  console.log("TRANSACCIONES VALIDAS");
-  console.log("\n");
+  // SECCIÓN 1: Visualización de Transacciones Válidas (Datos correctos y autorización confirmada).
+  console.log("TRANSACCIONES VALIDAS\n");
   
+  // Verificamos la existencia de elementos en el listado para evitar errores de lectura.
   if (resultado.validas && resultado.validas.length > 0) {
-    
-    // Se recorre cada transaccion valida
+    // Iteramos mediante un ciclo tradicional para mostrar el detalle de cada operación aprobada.
     for (let i = 0; i < resultado.validas.length; i++) {
       const t = resultado.validas[i];
       console.log("ID: " + t.id + " | Usuario: " + t.usuario + " | Monto: $" + t.monto + " | Tipo: " + t.tipo);
     }
-    
   } else {
     console.log("No hay transacciones validas");
   }
   
   console.log("\n");
 
-  // Se muestran las transacciones sospechosas
-  console.log("TRANSACCIONES SOSPECHOSAS");
-  console.log("\n");
+  // SECCIÓN 2: Identificación de Transacciones Sospechosas (Datos íntegros pero carecen de autorización).
+  console.log("TRANSACCIONES SOSPECHOSAS\n");
   
   if (resultado.sospechosas && resultado.sospechosas.length > 0) {
-    
-    // Se recorre cada transaccion sospechosa
     for (let i = 0; i < resultado.sospechosas.length; i++) {
       const t = resultado.sospechosas[i];
       console.log("ID: " + t.id + " | Usuario: " + t.usuario + " | Monto: $" + t.monto + " | Tipo: " + t.tipo);
     }
-    
   } else {
     console.log("No hay transacciones sospechosas");
   }
   
   console.log("\n");
 
-  // Se muestran las transacciones invalidas
-  console.log("TRANSACCIONES INVALIDAS");
-  console.log("\n");
+  // SECCIÓN 3: Reporte de Transacciones Inválidas con indicación de causa técnica.
+  console.log("TRANSACCIONES INVALIDAS\n");
   
   if (resultado.invalidas && resultado.invalidas.length > 0) {
-    
-    // Se recorre cada transaccion invalida
     for (let i = 0; i < resultado.invalidas.length; i++) {
       const item = resultado.invalidas[i];
       
-      // Se obtiene el id de la transaccion
-      let idInvalido;
-      if (item.transaccion && item.transaccion.id) {
-        idInvalido = item.transaccion.id;
-      } else {
-        idInvalido = "N/A";
-      }
+      // Aplicamos control de nulidad para mostrar el ID de la transacción fallida o "N/A" si el ID es el campo erróneo.
+      let idInvalido = (item.transaccion && item.transaccion.id) ? item.transaccion.id : "N/A";
       
       console.log("ID: " + idInvalido + " | Motivo: " + item.motivo);
     }
-    
   } else {
     console.log("No hay transacciones invalidas");
   }
   
   console.log("\n");
 
-  // Se muestra el resumen financiero
-  console.log("RESUMEN FINANCIERO");
-  console.log("\n");
+  // SECCIÓN 4: Balance Financiero Final (Consolidación de ingresos, egresos y flujo de caja neto).
+  console.log("RESUMEN FINANCIERO\n");
   console.log("Total procesadas:  " + resultado.totalProcesadas);
   console.log("Total de ingresos: $" + resultado.totalIngresos);
   console.log("Total de egresos:  $" + resultado.totalEgresos);
@@ -479,51 +478,55 @@ async function ejecutarEjercicio4() {                                           
   console.log("\n");
 }
 
-async function ejecutarEjercicio5() {                                                   //EJERCICIO 5
+// EJERCICIO 5
+
+// Definimos la función asíncrona principal para gestionar el procesamiento por lotes de operaciones organizacionales.
+async function ejecutarEjercicio5() {                                                   
   
-  // Se crea el arreglo vacio para guardar operaciones
+  // Inicializamos un arreglo (estructura inmutable en su consumo posterior) para almacenar los objetos de operación.
   const operaciones = [];
   
-  // Se pregunta cuantas operaciones va a ingresar
+  // Solicitamos la dimensión del lote para establecer el control del ciclo de captura de datos.
   const cantidad = parseInt(prompt("¿Cuántas operaciones? "));
 
-  // Se recorre para capturar cada operacion
+  // Implementamos un ciclo 'for' para recolectar la información, permitiendo la entrada de datos inconsistentes para validar la robustez del sistema.
   for (let i = 0; i < cantidad; i++) {
     
-    // Se captura el ID
+    // Captura del ID: Aceptamos cualquier entrada (string o number) cumpliendo con el requisito de flexibilidad del identificador único.
     const id = prompt("ID: ");
     
-    // Se capturan los valores separados por coma
+    // CAPTURA DE DATOS NUMÉRICOS MÚLTIPLES
+    // Recibimos una cadena de caracteres que representa un conjunto de valores para cálculos intermedios.
     const valoresTexto = prompt("Valores (separados por coma): ");
     
-    // Se procesan los valores
     let valores;
     
-    // Si esta vacio, se asigna array vacio
+    // Verificamos si la entrada es una cadena vacía para gestionar el escenario de 'Arreglos vacíos' mencionado en la guía.
     if (valoresTexto.trim() === "") {
       valores = [];
     } else {
-      // Se separa por comas y se convierte a numeros
+      // Aplicamos .split() para segmentar la cadena y .map() con parseFloat para transformar cada elemento en un dato de tipo Number operable.
       valores = valoresTexto.split(",").map(v => parseFloat(v.trim()));
     }
     
-    // Se captura el tipo de operacion
+    // Captura del tipo de operación para su posterior validación contra las reglas de negocio.
     const tipo = prompt("Tipo: ");
     
-    // Se captura activo como texto
+    // CAPTURA DEL INDICADOR LÓGICO
+    // Proceso de normalización manual para asegurar que el estado de la operación sea un booleano estricto (Active/Inactive).
     const activoTexto = prompt("Activo (true/false): ");
     
-    // Se convierte a booleano
     let activo;
     if (activoTexto === "true") {
       activo = true;
     } else if (activoTexto === "false") {
       activo = false;
     } else {
+      // Si el dato no es binario, se mantiene como texto para forzar una excepción controlada en la lógica de validación.
       activo = activoTexto;
     }
     
-    // Se agrega al arreglo
+    // Consolidamos la operación en un objeto y lo agregamos al arreglo de procesamiento.
     operaciones.push({
       id: id,
       valores: valores,
@@ -532,19 +535,18 @@ async function ejecutarEjercicio5() {                                           
     });
   }
 
-  // Se procesa el arreglo completo
+  // Despachamos el lote completo de operaciones a la lógica de procesamiento asíncrona y esperamos la resolución del informe final.
   const resultados = await procesarTransaccionesEj5(operaciones);
 
-  console.log("\n");
-  console.log("RESULTADOS DEL PROCESAMIENTO");
-  console.log("\n");
+  console.log("\nRESULTADOS DEL PROCESAMIENTO\n");
 
-  // Se muestran los resultados
+  // FASE DE SALIDA: Presentación jerárquica de los resultados para cada operación analizada.
   if (resultados && resultados.length > 0) {
     
-    // Se recorre cada resultado
+    // Utilizamos un ciclo 'for' tradicional para garantizar que la impresión en consola mantenga el orden secuencial del procesamiento.
     for (let i = 0; i < resultados.length; i++) {
       const r = resultados[i];
+      // Mostramos el ID, el veredicto (Aprobada/Rechazada) y la justificación técnica del resultado.
       console.log("ID: " + r.id + " | Estado: " + r.estado + " | Motivo: " + r.motivo);
     }
     
@@ -555,39 +557,48 @@ async function ejecutarEjercicio5() {                                           
   console.log("\n");
 }
 
-async function ejecutarEjercicio6() {                                                    //EJERCICIO 6
+// EJERCICIO 6
+
+// Definimos la función principal asíncrona para la gestión de solicitudes de servicio técnico bajo demanda.
+async function ejecutarEjercicio6() {                                                    
   
-  // Se crea el arreglo para guardar solicitudes
+  // Inicializamos un arreglo para recolectar el lote de solicitudes antes de iniciar la orquestación asíncrona.
   const solicitudes = [];
   
-  // Se pregunta cuantas solicitudes va a ingresar
+  // Capturamos el volumen de trabajo para controlar el flujo del ciclo de entrada de datos.
   const cantidad = parseInt(prompt("¿Cuántas solicitudes? "));
 
-  // Se recorre para capturar cada solicitud
+  // Implementamos un ciclo 'for' para la captura de información, permitiendo la entrada de datos con errores intencionales (Requisito del PDF).
   for (let i = 0; i < cantidad; i++) {
     
-    // Se capturan los datos basicos
+    // Captura del ID: Se normaliza a número entero para asegurar la identificación unívoca en el sistema.
     const id = parseInt(prompt("ID: "));
+    
+    // Captura de datos de identidad del cliente y categoría del servicio técnico solicitado.
     const cliente = prompt("Cliente: ");
     const tipoServicio = prompt("Tipo de servicio: ");
+    
+    // CAPTURA DE PRIORIDAD: Se define un rango (1-5) para establecer la jerarquía de atención del servicio.
     const prioridad = parseInt(prompt("Prioridad (1-5): "));
     
-    // Se captura activo como texto
+    // CAPTURA DEL INDICADOR DE ACTIVIDAD
+    // Proceso de conversión manual para garantizar que el estado de la solicitud sea un booleano controlado.
     const activoTexto = prompt("Activa (true/false): ");
     
-    // Se convierte a booleano
     let activo;
     if (activoTexto === "true") {
       activo = true;
     } else if (activoTexto === "false") {
       activo = false;
     } else {
+      // Se mantiene el valor original para validar la capacidad del sistema de detectar tipos de datos incorrectos.
       activo = activoTexto;
     }
     
+    // Captura de la fecha como cadena de texto, según la flexibilidad permitida en la guía.
     const fechaSolicitud = prompt("Fecha: ");
     
-    // Se agrega al arreglo
+    // Consolidamos la información en un objeto y lo insertamos en el arreglo principal.
     solicitudes.push({
       id: id,
       cliente: cliente,
@@ -598,17 +609,15 @@ async function ejecutarEjercicio6() {                                           
     });
   }
 
-  // Se procesa el arreglo completo
+  // ORQUESTACIÓN DEL FLUJO: Despachamos el lote completo y esperamos la respuesta del procesamiento secuencial.
   const resultado = await procesarSolicitudesServicio(solicitudes);
 
-  console.log("\n");
-  console.log("RESULTADOS DEL PROCESAMIENTO");
-  console.log("\n");
+  // FASE DE SALIDA: Presentación organizada de los veredictos individuales y estadísticos.
+  console.log("\nRESULTADOS DEL PROCESAMIENTO\n");
 
-  // Se muestra el detalle de cada solicitud
+  // Sección de detalle individual: Muestra el estado final (Aprobada/Rechazada) y su respectiva justificación técnica.
   if (resultado.detalle && resultado.detalle.length > 0) {
     
-    // Se recorre cada resultado
     for (let i = 0; i < resultado.detalle.length; i++) {
       const r = resultado.detalle[i];
       console.log("ID: " + r.id + " | Estado: " + r.estado + " | Motivo: " + r.motivo);
@@ -620,34 +629,42 @@ async function ejecutarEjercicio6() {                                           
   
   console.log("\n");
 
-  // Se muestra el resumen final
-  console.log("RESUMEN FINAL");
-  console.log("\n");
+  // RESUMEN FINAL: Cumplimiento de los indicadores estadísticos obligatorios definidos en el PDF.
+  console.log("RESUMEN FINAL\n");
   console.log("Total procesadas: " + resultado.totalProcesadas);
   console.log("Total aprobadas:  " + resultado.totalAprobadas);
   console.log("Total rechazadas: " + resultado.totalRechazadas);
   console.log("\n");
 }
 
-async function ejecutarEjercicio7() {                                                     //EJERCICIO 7
+// EJERCICIO 7
+
+// Definimos la función principal asíncrona para la gestión de auditoría financiera y análisis de riesgos.
+async function ejecutarEjercicio7() {                                                     
   
-  // Se crea el arreglo para guardar transacciones
+  // Inicializamos un arreglo para recolectar el historial de transacciones antes de su análisis masivo.
   const transacciones = [];
   
-  // Se pregunta cuantas transacciones va a ingresar
+  // Solicitamos la cantidad de registros para establecer el límite del ciclo de captura de datos en la terminal.
   const cantidad = parseInt(prompt("¿Cuántas transacciones? "));
 
-  // Se recorre para capturar cada transaccion
+  // Implementamos un ciclo 'for' para la recolección secuencial de transacciones financieras.
   for (let i = 0; i < cantidad; i++) {
     
-    // Se capturan los datos basicos
+    // Captura del ID de Usuario: Dato fundamental para el posterior agrupamiento de saldos.
     const idUsuario = parseInt(prompt("ID Usuario: "));
+    
+    // Captura de Tipo: Se recibe como texto para validar posteriormente si coincide con "ingreso" o "egreso".
     const tipo = prompt("Tipo (ingreso/egreso): ");
+    
+    // Captura de Monto: Se utiliza parseFloat para permitir operaciones con precisión decimal.
     const monto = parseFloat(prompt("Monto: "));
+    
+    // Captura de metadatos: Categoría y fecha de la operación para trazabilidad.
     const categoria = prompt("Categoría: ");
     const fecha = prompt("Fecha: ");
     
-    // Se agrega al arreglo
+    // Consolidamos la información en un objeto y lo agregamos al lote de procesamiento.
     transacciones.push({
       idUsuario: idUsuario,
       tipo: tipo,
@@ -657,95 +674,117 @@ async function ejecutarEjercicio7() {                                           
     });
   }
 
-  // Se procesa el arreglo completo
+  // DESPACHO ASINCRÓNICO: Enviamos el lote completo a la lógica de negocio y esperamos la resolución del informe financiero.
   const resultado = await procesarTransaccionesEj7(transacciones);
 
-  console.log("\n");
-  console.log("RESULTADOS DEL PROCESAMIENTO");
-  console.log("\n");
+  console.log("\nRESULTADOS DEL PROCESAMIENTO\n");
 
-  // Se muestran las transacciones validas
-  console.log("TRANSACCIONES VALIDAS: " + resultado.validas.length);
-  console.log("\n");
+  // SECCIÓN 1: Reporte de integridad de datos (conteo de registros que superaron las validaciones).
+  console.log("TRANSACCIONES VALIDAS: " + resultado.validas.length + "\n");
 
-  // Se muestran saldos por usuario
-  console.log("SALDOS POR USUARIO");
-  console.log("\n");
+  // SECCIÓN 2: Análisis de Saldos Consolidados por Usuario (Punto 3 del PDF).
+  console.log("SALDOS POR USUARIO\n");
   
-  // Se recorren los usuarios con saldo
+  // Obtenemos las claves del objeto de saldos para iterar sobre cada usuario procesado.
   const usuarios = Object.keys(resultado.saldos);
   for (let i = 0; i < usuarios.length; i++) {
     const userId = usuarios[i];
     const saldo = resultado.saldos[userId];
+    
+    // Mostramos el saldo final calculado (Ingresos - Egresos).
     console.log("Usuario " + userId + ": $" + saldo);
     
-    // Se verifica si tiene saldo negativo
+    // ALERTA DE SALDO NEGATIVO: Identificamos usuarios que presentan deudas según la lógica aplicada.
     if (resultado.saldoNegativo[userId]) {
-      console.log("  ALERTA: Saldo negativo");
+      console.log("  ALERTA: Saldo negativo detectado.");
     }
     
-    // Se verifica si tiene patron de riesgo
+    // DETECCIÓN DE PATRONES DE RIESGO: Mostramos alertas si se identificaron egresos consecutivos (Punto 3 del PDF).
     if (resultado.patronesRiesgo[userId]) {
-      console.log("  ALERTA: Multiples egresos consecutivos detectados");
+      console.log("  ALERTA: Multiples egresos consecutivos detectados.");
     }
   }
   
   console.log("\n");
 
-  // Se muestran las transacciones invalidas
+  // SECCIÓN 3: Gestión de Errores Controlados. Listado de transacciones que no cumplieron la estructura técnica.
+  // Se muestran las transacciones invalidas con su identificador
   if (resultado.invalidas && resultado.invalidas.length > 0) {
     console.log("TRANSACCIONES INVALIDAS");
-    console.log("\n");
     
-    // Se recorre cada transaccion invalida
     for (let i = 0; i < resultado.invalidas.length; i++) {
       const item = resultado.invalidas[i];
-      console.log("Motivo: " + item.motivo);
+      // Usamos el operador de encadenamiento opcional para mostrar el ID si está disponible
+      const idMostrable = item.transaccion?.idUsuario || "N/A";
+      console.log(`ID Usuario: ${idMostrable} | Motivo: ${item.motivo}`);
     }
-    console.log("\n");
   }
 
-  // Se muestra resumen
-  console.log("RESUMEN");
-  console.log("\n");
+  // SECCIÓN 4: Resumen Estadístico Final del procesamiento por lotes.
+  console.log("RESUMEN\n");
   console.log("Total procesadas: " + resultado.totalProcesadas);
   console.log("Validas: " + resultado.validas.length);
   console.log("Invalidas: " + resultado.invalidas.length);
   console.log("\n");
 }
 
-async function ejecutarEjercicio8() {                                                      //EJERCICIO 8
-  
-  // Se crea el arreglo para guardar movimientos
+// EJERCICIO 8
+
+// Definimos la función principal como asíncrona para permitir el uso de 'await'
+// en la coordinación del flujo de captura y procesamiento de movimientos de inventario.
+async function ejecutarEjercicio8() {                                                       
+
+  // Inicializamos una estructura de datos tipo arreglo (mutable con 'const') para consolidar
+  // el lote de movimientos que el usuario ingresará por consola antes de procesarlos.
   const movimientos = [];
-  
-  // Se pregunta cuantos movimientos va a ingresar
+
+  // Capturamos la cantidad de movimientos a registrar y aplicamos parseInt para
+  // asegurar que el dato ingresado se interprete como un número entero válido.
   const cantidad = parseInt(prompt("¿Cuántos movimientos? "));
 
-  // Se recorre para capturar cada movimiento
+  // Implementamos un ciclo 'for' para recorrer e iterar sobre cada posición del lote,
+  // permitiendo la captura secuencial y controlada de cada movimiento de inventario.
   for (let i = 0; i < cantidad; i++) {
-    
-    // Se capturan los datos basicos
+
+    // Capturamos el identificador del producto con parseInt, garantizando que sea
+    // de tipo 'number' para cumplir con la validación de tipo requerida en la lógica.
     const idProducto = parseInt(prompt("ID Producto: "));
+
+    // Capturamos el nombre del producto como cadena de texto (string), ya que
+    // es un dato descriptivo que no requiere transformación numérica.
     const nombreProducto = prompt("Nombre Producto: ");
+
+    // Capturamos el tipo de movimiento como string; su validación ("entrada" o "salida")
+    // será responsabilidad de la lógica de negocio en el módulo de procesamiento.
     const tipoMovimiento = prompt("Tipo Movimiento (entrada/salida): ");
+
+    // Usamos parseFloat para capturar la cantidad, admitiendo valores decimales
+    // que representan unidades fraccionarias en operaciones de inventario.
     const cantidadMov = parseFloat(prompt("Cantidad: "));
+
+    // Capturamos el identificador del lote como cadena de texto;
+    // su validación de no vacío se realizará en la función callback del módulo de lógica.
     const lote = prompt("Lote: ");
-    
-    // Se captura activo como texto
+
+    // Capturamos el estado 'activo' como texto plano, ya que el prompt devuelve
+    // siempre un string y se requiere una conversión explícita al tipo booleano.
     const activoTexto = prompt("Activo (true/false): ");
-    
-    // Se convierte a booleano
+
+    // Aplicamos una estructura condicional para transformar la cadena ingresada
+    // en un valor booleano estricto (true/false), evitando errores de tipo en la validación posterior.
     let activo;
     if (activoTexto === "true") {
       activo = true;
     } else if (activoTexto === "false") {
       activo = false;
     } else {
+      // Si el usuario ingresa un valor distinto, se conserva el texto original
+      // para que la validación con callback detecte el error de tipo y lo rechace de forma controlada.
       activo = activoTexto;
     }
-    
-    // Se agrega al arreglo
+
+    // Empaquetamos todos los datos recolectados en un objeto literal y lo insertamos
+    // en el arreglo mediante el método '.push()', construyendo el lote de forma dinámica.
     movimientos.push({
       idProducto: idProducto,
       nombreProducto: nombreProducto,
@@ -756,33 +795,39 @@ async function ejecutarEjercicio8() {                                           
     });
   }
 
-  // Se procesa el arreglo completo
+  // Despachamos el arreglo completo a la función de procesamiento asíncrono y usamos
+  // 'await' para suspender la ejecución hasta obtener el objeto de resultados consolidado.
   const resultado = await procesarInventarioEj8(movimientos);
 
   console.log("\n");
   console.log("RESULTADOS DEL PROCESAMIENTO");
   console.log("\n");
 
-  // Se muestra el inventario final
+  // SECCIÓN 1: Presentación del estado final del inventario por producto.
+  // Mostramos el resumen calculado agrupado por idProducto para facilitar la lectura del operador.
   console.log("INVENTARIO FINAL POR PRODUCTO");
   console.log("\n");
-  
-  // Se recorren los productos del inventario
+
+  // Extraemos las claves del objeto 'inventarioFinal' mediante Object.keys() para poder
+  // iterar sobre cada producto registrado y mostrar su estado de existencias.
   const productosIds = Object.keys(resultado.inventarioFinal);
   for (let i = 0; i < productosIds.length; i++) {
     const id = productosIds[i];
     const info = resultado.inventarioFinal[id];
     console.log("Producto " + id + " (" + info.nombreProducto + "): " + info.cantidad + " unidades");
   }
-  
+
   console.log("\n");
 
-  // Se muestran alertas de inventario negativo
+  // SECCIÓN 2: Alertas de inventario negativo.
+  // Verificamos la existencia del arreglo y que tenga elementos antes de iterar,
+  // previniendo errores de acceso a propiedades de un arreglo vacío o indefinido.
   if (resultado.inventarioNegativo && resultado.inventarioNegativo.length > 0) {
     console.log("ALERTAS - INVENTARIO NEGATIVO");
     console.log("\n");
-    
-    // Se recorre cada producto con inventario negativo
+
+    // Recorremos mediante un ciclo 'for' clásico para mostrar cada alerta de forma
+    // individual, indicando el producto crítico y la cantidad negativa detectada.
     for (let i = 0; i < resultado.inventarioNegativo.length; i++) {
       const prod = resultado.inventarioNegativo[i];
       console.log("ALERTA: Producto " + prod.idProducto + " (" + prod.nombreProducto + ") tiene inventario negativo: " + prod.cantidad + " unidades");
@@ -790,12 +835,14 @@ async function ejecutarEjercicio8() {                                           
     console.log("\n");
   }
 
-  // Se muestran los movimientos rechazados
+  // SECCIÓN 3: Movimientos rechazados con su motivo específico.
+  // El operador '&&' garantiza que no intentemos acceder a '.length' si el arreglo fuera undefined.
   if (resultado.rechazados && resultado.rechazados.length > 0) {
     console.log("MOVIMIENTOS RECHAZADOS");
     console.log("\n");
-    
-    // Se recorre cada movimiento rechazado
+
+    // Iteramos sobre el arreglo de rechazados para exponer el motivo de descarte
+    // de cada movimiento, facilitando la trazabilidad y auditoría del proceso.
     for (let i = 0; i < resultado.rechazados.length; i++) {
       const item = resultado.rechazados[i];
       console.log("Motivo: " + item.motivo);
@@ -803,7 +850,8 @@ async function ejecutarEjercicio8() {                                           
     console.log("\n");
   }
 
-  // Se muestra resumen
+  // SECCIÓN 4: Resumen estadístico final del lote procesado.
+  // Accedemos a '.length' de cada arreglo para presentar indicadores de gestión claros.
   console.log("RESUMEN");
   console.log("\n");
   console.log("Movimientos validos: " + resultado.validos.length);
@@ -811,38 +859,59 @@ async function ejecutarEjercicio8() {                                           
   console.log("\n");
 }
 
-async function ejecutarEjercicio9() {                                                         //EJERCICIO 9
-  
-  // Se crea el arreglo para guardar ordenes
+// EJERCICIO 9
+
+// Definimos la función principal como asíncrona para coordinar el flujo de captura
+// y procesamiento de órdenes de servicio, haciendo uso de 'await' de forma controlada.
+async function ejecutarEjercicio9() {                                                         
+
+  // Inicializamos una estructura de datos tipo arreglo para consolidar el lote de órdenes
+  // antes de enviarlo al módulo de procesamiento; se define con 'const' por ser la referencia inmutable.
   const ordenes = [];
-  
-  // Se pregunta cuantas ordenes va a ingresar
+
+  // Capturamos la cantidad total de órdenes a ingresar y aplicamos parseInt para
+  // convertir la cadena del prompt a un número entero que delimita el ciclo de captura.
   const cantidad = parseInt(prompt("¿Cuántas órdenes? "));
 
-  // Se recorre para capturar cada orden
+  // Implementamos un ciclo 'for' clásico para iterar de forma secuencial sobre
+  // cada orden, garantizando la recolección ordenada y controlada del lote completo.
   for (let i = 0; i < cantidad; i++) {
-    
-    // Se captura el ID como numero 
+
+    // Usamos parseFloat para capturar el ID, lo que permite que valores decimales
+    // como 4.5 ingresen al sistema y sean detectados por la validación de Number.isInteger() en la lógica.
     const id = parseFloat(prompt("ID: "));
-    
+
+    // Capturamos el nombre del cliente como cadena de texto (string); su validación
+    // de no vacío se delega a la función con callback en el módulo de procesamiento.
     const cliente = prompt("Cliente: ");
+
+    // Capturamos el tipo de servicio como string; los valores permitidos
+    // ("mantenimiento", "instalacion", "soporte") son verificados por la promesa de validación.
     const tipoServicio = prompt("Tipo de servicio (mantenimiento/instalacion/soporte): ");
+
+    // Aplicamos parseFloat para las horas, admitiendo valores decimales que representan
+    // fracciones de hora en servicios técnicos de duración variable.
     const horas = parseFloat(prompt("Horas: "));
-    
-    // Se captura pagado como texto
+
+    // Capturamos el estado de pago como texto plano, dado que el prompt devuelve
+    // siempre un string y se requiere una conversión manual al tipo booleano estricto.
     const pagadoTexto = prompt("Pagado (true/false): ");
-    
-    // Se convierte a booleano
+
+    // Aplicamos una estructura condicional para transformar la cadena de texto en un
+    // valor booleano real, cumpliendo con la validación estricta de tipo requerida por la lógica de negocio.
     let pagado;
     if (pagadoTexto === "true") {
       pagado = true;
     } else if (pagadoTexto === "false") {
       pagado = false;
     } else {
+      // Si la entrada no coincide con "true" o "false", conservamos el texto original
+      // para que la validación con promesa detecte el error de tipo y lo gestione de forma controlada.
       pagado = pagadoTexto;
     }
-    
-    // Se agrega al arreglo
+
+    // Construimos el objeto de orden con los datos recolectados y lo añadimos al arreglo
+    // mediante '.push()', manteniendo la integridad del lote sin modificar datos anteriores.
     ordenes.push({
       id: id,
       cliente: cliente,
@@ -852,19 +921,23 @@ async function ejecutarEjercicio9() {                                           
     });
   }
 
-  // Se procesa el arreglo completo
+  // Enviamos el arreglo completo al módulo de procesamiento asíncrono y empleamos 'await'
+  // para pausar la ejecución hasta recibir el objeto de resultados con órdenes y errores.
   const resultado = await procesarOrdenesEj9(ordenes);
 
   console.log("\n");
   console.log("RESULTADOS DEL PROCESAMIENTO");
   console.log("\n");
 
-  // Se muestran las ordenes procesadas
+  // SECCIÓN 1: Presentación de órdenes procesadas correctamente.
+  // Verificamos la existencia y contenido del arreglo antes de iterar para evitar
+  // accesos a propiedades de estructuras vacías o indefinidas.
   if (resultado.procesadas && resultado.procesadas.length > 0) {
     console.log("ORDENES PROCESADAS CORRECTAMENTE");
     console.log("\n");
-    
-    // Se recorre cada orden procesada
+
+    // Recorremos el arreglo con un ciclo 'for' clásico para mostrar el detalle
+    // completo de cada orden aprobada, incluyendo el costo total calculado por la función pura.
     for (let i = 0; i < resultado.procesadas.length; i++) {
       const orden = resultado.procesadas[i];
       console.log("Orden " + orden.id);
@@ -877,12 +950,14 @@ async function ejecutarEjercicio9() {                                           
     }
   }
 
-  // Se muestran los errores
+  // SECCIÓN 2: Presentación de órdenes con errores de validación o proceso.
+  // El operador '&&' previene errores de ejecución si el arreglo no existe en el objeto de respuesta.
   if (resultado.errores && resultado.errores.length > 0) {
     console.log("ORDENES CON ERRORES");
     console.log("\n");
-    
-    // Se recorre cada error
+
+    // Iteramos sobre el arreglo de errores para mostrar el ID afectado y el mensaje
+    // descriptivo generado por el bloque try/catch en la fase de validación o cálculo.
     for (let i = 0; i < resultado.errores.length; i++) {
       const error = resultado.errores[i];
       console.log("Error en orden " + error.id);
@@ -891,7 +966,8 @@ async function ejecutarEjercicio9() {                                           
     }
   }
 
-  // Se muestra estado final
+  // Presentamos el estado general del proceso, confirmando si el ciclo de procesamiento
+  // se completó exitosamente o si fue interrumpido por un error crítico inesperado.
   console.log("Estado: " + resultado.estado);
   console.log("\n");
 }

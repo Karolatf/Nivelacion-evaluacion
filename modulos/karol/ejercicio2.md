@@ -175,7 +175,7 @@ estado: true
 prioridad: 3
 
 Resultado esperado:
-id: null
+id: NaN
 resultado: "ERROR"
 mensaje: "ID inválido"
 

@@ -215,23 +215,6 @@ No procesado en el inventario
 
 --
 
-### Caso 8: Error - tipo de movimiento inválido
-
-Datos de entrada:
-idProducto: 8
-nombreProducto: "Camara Logitech"
-tipoMovimiento: "transferencia"
-cantidad: 8
-lote: "LT-2025-005"
-activo: true
-
-Resultado esperado:
-Clasificado como rechazado
-Motivo: "Tipo de movimiento invalido"
-
-
---
-
 ## 10. Justificación técnica
 
 Uso de callback → validacion externa de lote simulada.

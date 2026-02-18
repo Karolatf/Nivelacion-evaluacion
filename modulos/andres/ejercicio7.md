@@ -124,7 +124,7 @@ Saldo usuario 1: 50000
 ### Caso 2: Transacción válida tipo egreso
 
 Datos de entrada:
-idUsuario: 2
+idUsuario: 1
 tipo: "egreso"
 monto: 20000
 categoria: "Compras"
@@ -132,8 +132,8 @@ fecha: "2025-01-15"
 
 Resultado esperado:
 Clasificada como valida
-Restada del saldo del usuario 2
-Saldo usuario 2: 30000 (si tenia 50000)
+Restada del saldo del usuario 1
+Saldo usuario 1: 30000 (si tenia 50000)
 
 --
 
@@ -159,8 +159,8 @@ Usuario 4 con transacciones consecutivas:
 - idUsuario: 4, tipo: "egreso", monto: 8000
 
 Resultado esperado:
-Usuario 3 marcado en patronesRiesgo
-Alerta de patron de riesgo generada
+Usuario 3 marcado en saldo negativo detectado
+Alerta de Multiples egresos consecutivos detectados
 
 --
 

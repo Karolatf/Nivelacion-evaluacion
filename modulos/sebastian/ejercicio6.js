@@ -1,32 +1,31 @@
-// SISTEMA DE GESTION Y VALIDACION DE SERVICIOS
-// Este archivo contiene la logica completa del Ejercicio 6 (ejercicio 3 de Sebastian)
+// SISTEMA DE GESTIÓN Y VALIDACIÓN DE SERVICIOS
+// Este módulo centraliza la orquestación secuencial de solicitudes técnicas y la validación de integridad.
 
-
-// FUNCION CALLBACK (NO SE EXPORTA)
-// Valida los datos iniciales de la solicitud
+// FUNCIÓN CALLBACK (Validación Inicial)
+// JUSTIFICACIÓN: Se implementa para cumplir con el punto 'a' del PDF, realizando una verificación previa de tipos y estado.
+// RECIBE: El objeto 'solicitud' y un 'callback'. RETORNA: El error o el éxito mediante la función de retorno.
 function validarSolicitudInicial(solicitud, callback) {
 
-  // setTimeout simula un proceso asincronico
+  // Simulamos una validación interna con un retardo de 300ms.
   setTimeout(() => {
-
     try {
-
-      // Se valida que el ID sea un numero
+      // Verificación técnica: El identificador debe ser numérico y válido.
       if (typeof solicitud.id !== "number" || isNaN(solicitud.id)) {
         throw new Error("ID invalido");
       }
 
-      // Se valida que el cliente sea un string no vacio
+      // Validación de identidad: Se asegura que el cliente sea una cadena de texto no vacía.
       if (typeof solicitud.cliente !== "string" || solicitud.cliente.trim() === "") {
         throw new Error("Nombre de cliente invalido");
       }
 
-      // Se valida que el tipo de servicio sea un string
+      // Validación del tipo de servicio: Requisito del PDF para asegurar la coherencia del dato.
       if (typeof solicitud.tipoServicio !== "string") {
         throw new Error("Tipo de servicio invalido");
       }
 
-      // Se valida que la prioridad sea un numero entero entre 1 y 5
+      // REGLA DE NEGOCIO COMBINADA (Operadores Lógicos):
+      // Validamos que la prioridad (definida por el aprendiz como 1-5) sea un entero y esté en el rango permitido.
       if (
         !Number.isInteger(solicitud.prioridad) ||
         solicitud.prioridad < 1 ||
@@ -35,46 +34,41 @@ function validarSolicitudInicial(solicitud, callback) {
         throw new Error("Prioridad fuera de rango (1 a 5)");
       }
 
-      // Se valida que la solicitud este activa
+      // Verificación de disponibilidad: La solicitud debe estar activa para ser procesable.
       if (solicitud.activo !== true) {
         throw new Error("La solicitud esta desactivada");
       }
 
-      // Si todas las validaciones son correctas, se retorna exito
+      // Si todas las validaciones son correctas, invocamos el callback sin errores.
       callback(null);
 
     } catch (error) {
-
-      // Si ocurre cualquier error, se retorna por callback
+      // En caso de fallo técnico, el error se captura y se envía de forma controlada.
       callback(error);
     }
-
   }, 300);
 }
 
 
-// PROMESA ASINCRONICA (NO SE EXPORTA)
-// Simula la evaluacion de la solicitud por un servicio externo
+// PROMESA ASINCRÓNICA (Evaluación de Servicio Externo)
+// JUSTIFICACIÓN: Se utiliza para cumplir con el punto 'b' del PDF, simulando una dependencia externa.
+// RECIBE: La solicitud validada. RETORNA: Una Promesa con el resultado de la aprobación.
 function evaluarSolicitudExterna(solicitud) {
 
-  // Se retorna una promesa
   return new Promise((resolve, reject) => {
 
-    // Se calcula un tiempo de procesamiento variable entre 500ms y 2500ms
+    // Simulamos un tiempo de procesamiento variable (Punto 'b' del PDF) entre 500ms y 2500ms.
     const tiempo = Math.floor(Math.random() * 2000) + 500;
 
-    // setTimeout simula un proceso asincronico
     setTimeout(() => {
-
       try {
-
-        // Se aplica regla de negocio
-        // Se rechaza si la prioridad es menor a 3
+        // REGLA DE NEGOCIO PARA ACEPTACIÓN:
+        // Decidimos rechazar si la prioridad es menor a 3, simulando un criterio de alta demanda.
         if (solicitud.prioridad < 3) {
           throw new Error("Prioridad insuficiente para el servicio");
         }
 
-        // Si la prioridad es suficiente, se aprueba la solicitud
+        // Si cumple la regla, resolvemos la promesa con el objeto de éxito.
         resolve({
           id: solicitud.id,
           estado: "APROBADA",
@@ -82,87 +76,64 @@ function evaluarSolicitudExterna(solicitud) {
         });
 
       } catch (error) {
-
-        // Si ocurre un error, se rechaza la promesa
+        // El rechazo de la promesa se captura en el flujo principal para gestionar la estadística de rechazadas.
         reject(error);
       }
-
     }, tiempo);
   });
 }
 
 
-// FUNCION PRINCIPAL ASYNC / AWAIT
-// ESTA FUNCION SI SE EXPORTA
-// Es la unica funcion visible para el menu general
+// FUNCIÓN PRINCIPAL ASYNC / AWAIT (Orquestador)
+// JUSTIFICACIÓN: Coordina el flujo general (Punto 'c' del PDF) asegurando el procesamiento secuencial y ordenado.
 export async function procesarSolicitudesServicio(solicitudes) {
 
-  // Arreglo para almacenar los resultados de cada solicitud
+  // Creamos una nueva estructura de datos (Resultados) para mantener la inmutabilidad de la fuente original.
   const resultados = [];
-
-  // Contador de solicitudes aprobadas
   let aprobadas = 0;
-
-  // Contador de solicitudes rechazadas
   let rechazadas = 0;
 
   try {
-
-    // Se valida que la entrada sea un arreglo
+    // Verificamos que la entrada sea un arreglo para evitar bloqueos del sistema.
     if (!Array.isArray(solicitudes)) {
       throw new Error("Las solicitudes deben ser un arreglo");
     }
 
-    // Se recorre el arreglo usando un ciclo for clasico
+    // CICLO FOR CLÁSICO: Se utiliza para garantizar el procesamiento SECUENCIAL (await espera el turno de cada una).
     for (let i = 0; i < solicitudes.length; i++) {
 
       try {
-
-        // Se clona la solicitud para garantizar inmutabilidad
+        // INMUTABILIDAD: Realizamos un 'Shallow Copy' de la solicitud actual para proteger los datos originales.
         const solicitudCopia = { ...solicitudes[i] };
 
-        // VALIDACION CON CALLBACK
-        // Se envuelve la funcion callback dentro de una promesa
+        // FASE 1: Integración del Callback promidificado para la validación inicial obligatoria.
         await new Promise((resolve, reject) => {
-
-          // Se llama a la validacion inicial
           validarSolicitudInicial(solicitudCopia, (error) => {
-
-            // Si hay error se rechaza la promesa
-            if (error) {
-              reject(error);
-            } else {
-              // Si no hay error se continua
-              resolve();
-            }
+            if (error) reject(error); else resolve();
           });
         });
 
-        // PROCESAMIENTO ASINCRONICO CON PROMESA
-        // Se evalua la solicitud con un servicio externo simulado
+        // FASE 2: Procesamiento con la Promesa externa asincrónica.
         const resultado = await evaluarSolicitudExterna(solicitudCopia);
 
-        // Se agrega el resultado al arreglo
+        // FASE 3: Almacenamiento del resultado y actualización de estadísticas de aprobación.
         resultados.push(resultado);
-
-        // Se incrementa el contador de aprobadas
         aprobadas = aprobadas + 1;
 
       } catch (error) {
-
-        // Si falla una solicitud, se registra pero el sistema continua
+        // MANEJO DE ERRORES: Capturamos fallos individuales sin detener la ejecución de las demás solicitudes.
         resultados.push({
           id: solicitudes[i]?.id ?? null,
           estado: "RECHAZADA",
           motivo: error.message
         });
 
-        // Se incrementa el contador de rechazadas
+        // Incrementamos el contador de rechazadas para el reporte final.
         rechazadas = rechazadas + 1;
       }
     }
 
-    // Se retorna un objeto con el resumen final
+    // Retorno del objeto consolidado con el resumen estadístico exigido por el PDF.
     return {
       totalProcesadas: solicitudes.length,
       totalAprobadas: aprobadas,
@@ -171,8 +142,7 @@ export async function procesarSolicitudesServicio(solicitudes) {
     };
 
   } catch (errorGeneral) {
-
-    // Si ocurre un error critico, se retorna error controlado
+    // Captura de errores críticos a nivel de sistema.
     return {
       estado: "ERROR",
       mensaje: errorGeneral.message

@@ -148,7 +148,7 @@ estado: true
 requisitos: [true, true]
 
 Resultado esperado:
-id: null
+id: NaN
 estado: "ERROR"
 mensaje: "ID inválido"
 
@@ -222,11 +222,23 @@ mensaje: "Tipo de solicitud inválido"
 
 --
 
-## 9. Justificación técnica
+## 9: Justificación Técnica del Proyecto
+1. Estructuras de Datos: Mutabilidad e Inmutabilidad
 
-Uso de callback → permite simular validaciones externas.
-Uso de Promesas → manejo claro de procesos asincrónicos.
-Uso de async/await → código más legible y estructurado.
-Uso de try/catch → evita que el programa se bloquee.
-Separación de funciones → facilita mantenimiento y pruebas.
-Validaciones claras → garantizan la integridad de los datos.
+    Arreglo solicitudes (Mutable): Se definió con let y se utilizaron métodos como .push() porque la naturaleza del ejercicio requiere una recolección dinámica de datos en tiempo de ejecución.
+    Resultados (Inmutabilidad): Dentro de la función procesarSolicitud, no se modifica el objeto original recibido. En su lugar, se retornan nuevos objetos con los resultados. Esto es una buena práctica que evita "efectos secundarios" y mantiene la integridad de la información original.
+
+2. Tipos de Funciones y Parámetros
+
+    Funciones Asíncronas (async): Se utilizó async en la función principal para permitir el uso de await, logrando que un flujo complejo de validaciones se lea de forma lineal y sea fácil de mantener.
+    Parámetros: Se implementó el paso de objetos como parámetros (solicitud), lo que permite que las funciones sean escalables (podríamos agregar más propiedades al objeto sin cambiar la firma de la función).
+    Callbacks: Se incluyó una función de validación por callback para demostrar la capacidad de interactuar con lógica basada en eventos y tiempos de espera (setTimeout).
+
+3. Control de Flujo y Lógica
+
+    Validaciones de Cortocircuito: En la función evaluarRequisitos, se utilizó el método de arreglo .every(). Este método es más eficiente que un ciclo for tradicional, ya que se detiene inmediatamente al encontrar el primer valor que no cumple la condición.
+    Gestión de Excepciones (try/catch): Se implementó un bloque de control de errores que captura fallos tanto de tipo de dato como de lógica. Gracias a esto, si una solicitud falla por un ID inválido, el sistema captura el error, informa al usuario y continúa con la siguiente solicitud sin detener la ejecución total del programa.
+
+4. Integración de la Asincronía
+
+    Se realizó una "promisificación" manual del callback dentro de la función principal. Esto demuestra un dominio avanzado de JavaScript al convertir una estructura antigua (callback) en una moderna (promesa) para poder ser consumida mediante await.
